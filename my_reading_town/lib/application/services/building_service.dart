@@ -178,7 +178,7 @@ class BuildingService {
         if (hasBuildingAt(x + dx, y + dy, buildings)) return false;
         if (isRoadTile(x + dx, y + dy, roadTiles)) return false;
         final specialType = specialTiles[tileKey(x + dx, y + dy)];
-        if (specialType != null && specialType != 'sand') return false;
+        if (specialType != null && specialType != 'sand' && specialType != 'rock') return false;
         if (!isTileUnlocked(x + dx, y + dy, unlockedChunks)) return false;
       }
     }

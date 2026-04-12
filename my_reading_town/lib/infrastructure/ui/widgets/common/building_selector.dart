@@ -204,7 +204,7 @@ class _TileList extends StatelessWidget {
     'road': false,
     'sea': false,
     'sand': true,
-    'rock': false,
+    'rock': true,
   };
 
   Widget _buildTilePreview(String type, double size) {

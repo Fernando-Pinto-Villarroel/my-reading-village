@@ -11,6 +11,7 @@ import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/domain/rules/roulette_rules.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
 
 // Circus palette — bold, vivid, alternating so adjacent segments never share a hue
@@ -197,10 +198,65 @@ class _RouletteDialogState extends State<_RouletteDialog>
     super.dispose();
   }
 
+  Future<bool> _showGemConfirmDialog(BuildContext context, LanguageProvider lang, int gemCost) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: AppTheme.softWhite,
+        title: Row(
+          children: [
+            ResourceIcon.gem(size: 22),
+            SizedBox(width: 8),
+            Text(
+              lang.translate('store_confirm_title'),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.darkText),
+            ),
+          ],
+        ),
+        content: Text(
+          lang.translate('store_confirm_body').replaceAll('{gems}', '$gemCost'),
+          style: TextStyle(fontSize: 14, color: AppTheme.darkText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              lang.translate('cancel'),
+              style: TextStyle(color: AppTheme.darkText.withValues(alpha: 0.6)),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.darkLavender,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              lang.translate('store_confirm_buy'),
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
+
   Future<void> _spin() async {
     final village = context.read<VillageProvider>();
     final lang = context.read<LanguageProvider>();
     final wasFree = village.canSpinRouletteForFree;
+    if (!wasFree) {
+      final gemCost = RouletteRules.gemCostPerSpin;
+      if (village.gems < gemCost) {
+        if (mounted) showErrorToast(context, lang.translate('store_not_enough_gems'));
+        return;
+      }
+      final confirmed = await _showGemConfirmDialog(context, lang, gemCost);
+      if (!confirmed || !mounted) return;
+    }
     final canSpin = await village.spinRoulette();
     if (!canSpin) return;
     if (wasFree && mounted) {
@@ -489,7 +545,7 @@ class _RouletteDialogState extends State<_RouletteDialog>
                         Text(
                           '$gemCost ${lang.translate('gems')} — ${lang.translate('roulette_spin')}',
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ],
                     ],
