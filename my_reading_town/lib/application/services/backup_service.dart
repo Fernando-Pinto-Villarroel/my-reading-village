@@ -43,12 +43,15 @@ class BackupService {
     'villagers',
     'placed_buildings',
     'road_tiles',
+    'special_tiles',
     'unlocked_chunks',
     'game_state',
     'inventory_items',
     'minigame_cooldowns',
     'active_powerups',
     'mission_progress',
+    'species_unlocks',
+    'pending_villager_choices',
   ];
 
   String? _validateBackup(Map<String, dynamic> data) {

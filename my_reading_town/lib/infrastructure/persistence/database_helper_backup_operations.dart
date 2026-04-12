@@ -10,6 +10,7 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     'villagers',
     'placed_buildings',
     'road_tiles',
+    'special_tiles',
     'unlocked_chunks',
     'game_state',
     'inventory_items',
@@ -17,6 +18,7 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     'active_powerups',
     'mission_progress',
     'species_unlocks',
+    'pending_villager_choices',
   ];
 
   Future<Map<String, dynamic>> exportAllTables() async {
