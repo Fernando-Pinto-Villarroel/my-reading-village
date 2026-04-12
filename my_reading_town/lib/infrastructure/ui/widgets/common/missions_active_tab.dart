@@ -4,7 +4,6 @@ import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart'
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/domain/entities/mission.dart';
-import 'package:my_reading_town/domain/entities/mission_data.dart';
 import 'package:my_reading_town/domain/rules/holiday_rules.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
@@ -29,6 +28,7 @@ Color _rarityColor(VillagerRarity rarity) {
 class MissionColors {
   static const Color basicConstruction = AppTheme.mint;
   static const Color advancedConstruction = AppTheme.skyBlue;
+  static const Color decorator = AppTheme.peach;
   static const Color villager = AppTheme.pink;
   static const Color bookTracking = AppTheme.lavender;
   static const Color halloween = Color(0xFFFF8C42);
@@ -42,6 +42,8 @@ class MissionColors {
         return basicConstruction;
       case MissionBranch.advancedConstruction:
         return advancedConstruction;
+      case MissionBranch.decorator:
+        return decorator;
       case MissionBranch.villager:
         return villager;
       case MissionBranch.bookTracking:
@@ -61,6 +63,8 @@ class MissionColors {
         return Icons.construction;
       case MissionBranch.advancedConstruction:
         return Icons.apartment;
+      case MissionBranch.decorator:
+        return Icons.palette;
       case MissionBranch.villager:
         return Icons.pets;
       case MissionBranch.bookTracking:
@@ -205,7 +209,7 @@ class ActiveMissionCard extends StatelessWidget {
                     Text(
                       context.t(
                         'branch_${mission.branch.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}',
-                        fallback: MissionData.branchDisplayName(mission.branch),
+                        fallback: mission.branch.name,
                       ),
                       style: TextStyle(
                           fontSize: 10,

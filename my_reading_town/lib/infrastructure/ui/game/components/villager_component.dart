@@ -285,7 +285,6 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
           (offset < 1.0 ? offset : max(0.0, 2.1 - offset)).clamp(0.0, 1.0);
       if (alpha <= 0.05) continue;
       final yOff = -5.0 - offset * 20.0;
-      final xOff = size.x * 0.7 + i * 4.0;
       final painter = TextPainter(
         text: TextSpan(
           text: letters[i],
@@ -297,6 +296,9 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
+      final xOff = _facingRight
+          ? size.x * 0.7 + i * 4.0
+          : size.x * 0.3 - i * 4.0 - painter.width;
       painter.paint(canvas, Offset(xOff, yOff));
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:my_reading_town/app_constants.dart';
 
 class MinigameRules {
   static const Map<String, MinigameConfig> configs = {
@@ -8,23 +9,39 @@ class MinigameRules {
     'book_or_not': MinigameConfig(winsNeeded: 6, cooldownHours: 4),
   };
 
-  // Reward probabilities for completing a minigame.
-  // gems: 43%, book: 24%, sandwich: 23%, hammer: 7%, glasses: 3%
-  static const double _gemsThreshold = 0.43;
-  static const double _bookThreshold = 0.67;
-  static const double _sandwichThreshold = 0.90;
-  static const double _hammerThreshold = 0.97;
-  // glasses fills the remaining 3%
+  static const Map<String, double> rewardWeights = {
+    'coins_10': 0.22,
+    'coins_20': 0.15,
+    'coins_30': 0.10,
+    'wood_10': 0.18,
+    'wood_20': 0.10,
+    'gems_5': 0.10,
+    'book': 0.06,
+    'sandwich': 0.05,
+    'hammer': 0.03,
+    'glasses': 0.01,
+  };
 
-  static const int gemsRewardAmount = 5;
+  static Map<String, double> get _effectiveWeights {
+    if (!AppConstants.testMode) return rewardWeights;
+    final entries = rewardWeights.entries.toList()
+      ..sort((a, b) => a.value.compareTo(b.value));
+    final reversedValues = entries.map((e) => e.value).toList().reversed.toList();
+    return {
+      for (int i = 0; i < entries.length; i++) entries[i].key: reversedValues[i]
+    };
+  }
 
   static String pickRewardType(Random random) {
+    final weights = _effectiveWeights;
+    final keys = weights.keys.toList();
     final roll = random.nextDouble();
-    if (roll < _gemsThreshold) return 'gems';
-    if (roll < _bookThreshold) return 'book';
-    if (roll < _sandwichThreshold) return 'sandwich';
-    if (roll < _hammerThreshold) return 'hammer';
-    return 'glasses';
+    double cumulative = 0.0;
+    for (int i = 0; i < keys.length; i++) {
+      cumulative += weights[keys[i]] ?? 0.0;
+      if (roll < cumulative) return keys[i];
+    }
+    return keys.last;
   }
 }
 

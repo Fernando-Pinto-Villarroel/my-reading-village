@@ -3,6 +3,7 @@ enum MissionCheckType { bm, am }
 enum MissionBranch {
   basicConstruction,
   advancedConstruction,
+  decorator,
   villager,
   bookTracking,
   halloween,
@@ -21,6 +22,9 @@ enum MissionConditionType {
   booksCompleted,
   enterAppDuringEvent,
   villagerSpeciesHappiness,
+  haveDecorationMinCoinCost,
+  haveDecorationMinGemCost,
+  reachSpecialTileCount,
 }
 
 class MissionReward {
@@ -57,6 +61,7 @@ class Mission {
   final String? buildingType;
   final int? targetLevel;
   final int? targetCount;
+  final int? targetMinCost;
   final String? speciesType;
   final MissionReward reward;
   final int orderInBranch;
@@ -71,6 +76,7 @@ class Mission {
     this.buildingType,
     this.targetLevel,
     this.targetCount,
+    this.targetMinCost,
     this.speciesType,
     required this.reward,
     required this.orderInBranch,

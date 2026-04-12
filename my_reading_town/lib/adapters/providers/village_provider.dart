@@ -256,6 +256,7 @@ class VillageProvider extends ChangeNotifier {
       _bookItemUsedSinceActive,
       totalPagesRead: totalPagesRead,
       completedBooks: completedBooks,
+      nonGrassTileCount: _roadTiles.length + _specialTiles.length,
     );
   }
 
@@ -811,7 +812,13 @@ class VillageProvider extends ChangeNotifier {
 
   Future<String> grantMinigameReward() async {
     final rewardType = await _inventorySvc.grantMinigameReward(_inventoryItems);
-    if (rewardType == 'gems') {
+    if (rewardType.startsWith('coins_')) {
+      final amount = int.parse(rewardType.split('_')[1]);
+      _coins += amount;
+    } else if (rewardType.startsWith('wood_')) {
+      final amount = int.parse(rewardType.split('_')[1]);
+      _wood += amount;
+    } else if (rewardType == 'gems_5') {
       _gems += 5;
     } else {
       _hasNewBackpackItems = true;
@@ -840,6 +847,7 @@ class VillageProvider extends ChangeNotifier {
       bookItemUsedSinceActive: _bookItemUsedSinceActive,
       totalPagesRead: totalPagesRead,
       completedBooks: completedBooks,
+      nonGrassTileCount: _roadTiles.length + _specialTiles.length,
     );
     notifyListeners();
   }

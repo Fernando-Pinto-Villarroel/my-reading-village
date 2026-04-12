@@ -12,6 +12,7 @@ class MissionData {
   static List<Mission> get allMissions => [
     ..._basicConstructionBranch,
     ..._advancedConstructionBranch,
+    ..._decoratorBranch,
     ..._villagerBranch,
     ..._bookTrackingBranch,
     ..._halloweenBranch,
@@ -29,36 +30,8 @@ class MissionData {
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.buyBuilding,
         buildingType: buildingTypes[i],
-        reward: MissionReward(exp: 20 + i * 5),
-        orderInBranch: i,
-      ),
-
-    Mission(
-      id: 'bc_houses_2_lv1',
-      title: 'Have 2 Houses',
-      description: 'Have 2 houses at level 1 or above.',
-      branch: MissionBranch.basicConstruction,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.reachBuildingCount,
-      buildingType: 'house',
-      targetLevel: 1,
-      targetCount: 2,
-      reward: MissionReward(exp: 30, coins: 20),
-      orderInBranch: 7,
-    ),
-
-    for (int i = 0; i < allBuildingTypes.length; i++)
-      Mission(
-        id: 'bc_upgrade_${allBuildingTypes[i]}_lv2',
-        title: 'Upgrade ${_buildingDisplayName(allBuildingTypes[i])} to Lv.2',
-        description: 'Improve a ${_buildingDisplayName(allBuildingTypes[i])} to level 2.',
-        branch: MissionBranch.basicConstruction,
-        checkType: MissionCheckType.bm,
-        conditionType: MissionConditionType.upgradeBuilding,
-        buildingType: allBuildingTypes[i],
-        targetLevel: 2,
-        reward: MissionReward(exp: 40 + i * 5, coins: 30 + i * 10),
-        orderInBranch: 8 + i,
+        reward: MissionReward(exp: i < 5 ? 20 + i * 5 : 25 + i * 5, coins: i == 6 ? 20 : 0),
+        orderInBranch: i < 5 ? i : i + 1,
       ),
 
     Mission(
@@ -71,8 +44,36 @@ class MissionData {
       buildingType: 'house',
       targetLevel: 1,
       targetCount: 4,
-      reward: MissionReward(exp: 60, coins: 50),
-      orderInBranch: 16,
+      reward: MissionReward(exp: 45),
+      orderInBranch: 5,
+    ),
+
+    for (int i = 0; i < allBuildingTypes.length; i++)
+      Mission(
+        id: 'bc_upgrade_${allBuildingTypes[i]}_lv2',
+        title: 'Upgrade ${_buildingDisplayName(allBuildingTypes[i])} to Lv.2',
+        description: 'Improve a ${_buildingDisplayName(allBuildingTypes[i])} to level 2.',
+        branch: MissionBranch.basicConstruction,
+        checkType: MissionCheckType.bm,
+        conditionType: MissionConditionType.upgradeBuilding,
+        buildingType: allBuildingTypes[i],
+        targetLevel: 2,
+        reward: MissionReward(exp: i < 6 ? 40 + i * 5 : 45 + i * 5, coins: i < 6 ? 30 + i * 10 : 40 + i * 10),
+        orderInBranch: i < 6 ? 8 + i : 9 + i,
+      ),
+
+    Mission(
+      id: 'bc_houses_8_lv1',
+      title: 'Have 8 Houses',
+      description: 'Have 8 houses at level 1 or above.',
+      branch: MissionBranch.basicConstruction,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.reachBuildingCount,
+      buildingType: 'house',
+      targetLevel: 1,
+      targetCount: 8,
+      reward: MissionReward(exp: 70, coins: 90),
+      orderInBranch: 14,
     ),
 
     for (int i = 0; i < allBuildingTypes.length; i++)
@@ -85,22 +86,129 @@ class MissionData {
         conditionType: MissionConditionType.upgradeBuilding,
         buildingType: allBuildingTypes[i],
         targetLevel: 3,
-        reward: MissionReward(exp: 60 + i * 10, coins: 50 + i * 15, gems: 8 + i * 3),
-        orderInBranch: 17 + i,
+        reward: MissionReward(exp: i < 6 ? 60 + i * 10 : 70 + i * 10, coins: i < 6 ? 50 + i * 15 : 65 + i * 15, gems: i < 6 ? 8 + i * 3 : 11 + i * 3),
+        orderInBranch: i < 6 ? 17 + i : 18 + i,
       ),
 
     Mission(
-      id: 'bc_houses_6_lv1',
-      title: 'Have 6 Houses',
-      description: 'Have 6 houses at level 1 or above.',
+      id: 'bc_houses_12_lv1',
+      title: 'Have 12 Houses',
+      description: 'Have 12 houses at level 1 or above.',
       branch: MissionBranch.basicConstruction,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachBuildingCount,
       buildingType: 'house',
       targetLevel: 1,
-      targetCount: 6,
-      reward: MissionReward(exp: 100, coins: 80, gems: 10),
-      orderInBranch: 25,
+      targetCount: 12,
+      reward: MissionReward(exp: 120, coins: 140, gems: 26),
+      orderInBranch: 23,
+    ),
+  ];
+
+  static const List<Mission> _decoratorBranch = [
+    Mission(
+      id: 'dc_deco_1_coin50',
+      title: 'First Decoration',
+      description: 'Have 1 decoration that costs at least 50 coins.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.haveDecorationMinCoinCost,
+      targetCount: 1,
+      targetMinCost: 50,
+      reward: MissionReward(exp: 10),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'dc_tiles_25',
+      title: 'Reach 25 Special Tiles',
+      description: 'Place 25 special tiles (road, sand, water, rock) on the map.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.reachSpecialTileCount,
+      targetCount: 25,
+      reward: MissionReward(exp: 20),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'dc_deco_3_coin80',
+      title: '3 Pricey Decorations',
+      description: 'Have 3 decorations that each cost at least 80 coins.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.haveDecorationMinCoinCost,
+      targetCount: 3,
+      targetMinCost: 80,
+      reward: MissionReward(exp: 30),
+      orderInBranch: 2,
+    ),
+    Mission(
+      id: 'dc_tiles_40',
+      title: 'Reach 40 Special Tiles',
+      description: 'Place 40 special tiles (road, sand, water, rock) on the map.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.reachSpecialTileCount,
+      targetCount: 40,
+      reward: MissionReward(exp: 40),
+      orderInBranch: 3,
+    ),
+    Mission(
+      id: 'dc_deco_1_gem10',
+      title: 'Gem Decoration',
+      description: 'Have 1 decoration that costs at least 10 gems.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.haveDecorationMinGemCost,
+      targetCount: 1,
+      targetMinCost: 10,
+      reward: MissionReward(exp: 50, coins: 20),
+      orderInBranch: 4,
+    ),
+    Mission(
+      id: 'dc_tiles_60',
+      title: 'Reach 60 Special Tiles',
+      description: 'Place 60 special tiles (road, sand, water, rock) on the map.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.reachSpecialTileCount,
+      targetCount: 60,
+      reward: MissionReward(exp: 60, coins: 30),
+      orderInBranch: 5,
+    ),
+    Mission(
+      id: 'dc_deco_1_gem30',
+      title: 'Rare Gem Decoration',
+      description: 'Have 1 decoration that costs at least 30 gems.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.haveDecorationMinGemCost,
+      targetCount: 1,
+      targetMinCost: 30,
+      reward: MissionReward(exp: 50, coins: 40),
+      orderInBranch: 6,
+    ),
+    Mission(
+      id: 'dc_tiles_80',
+      title: 'Reach 80 Special Tiles',
+      description: 'Place 80 special tiles (road, sand, water, rock) on the map.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.reachSpecialTileCount,
+      targetCount: 80,
+      reward: MissionReward(exp: 60, gems: 5),
+      orderInBranch: 7,
+    ),
+    Mission(
+      id: 'dc_deco_5_coin100',
+      title: '5 Premium Decorations',
+      description: 'Have 5 decorations that each cost at least 100 coins.',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.haveDecorationMinCoinCost,
+      targetCount: 5,
+      targetMinCost: 100,
+      reward: MissionReward(exp: 70, gems: 10),
+      orderInBranch: 8,
     ),
   ];
 
@@ -486,7 +594,7 @@ class MissionData {
     }
   }
 
-  static int _advCount(String type) => type == 'house' ? 8 : 3;
+  static int _advCount(String type) => type == 'house' ? 16 : 3;
 
   static Mission? getMissionById(String id) {
     try {
@@ -499,30 +607,6 @@ class MissionData {
   static List<Mission> getMissionsForBranch(MissionBranch branch) {
     return allMissions.where((m) => m.branch == branch).toList()
       ..sort((a, b) => a.orderInBranch.compareTo(b.orderInBranch));
-  }
-
-  static String branchDisplayName(MissionBranch branch) {
-    switch (branch) {
-      case MissionBranch.basicConstruction: return 'Basic Construction';
-      case MissionBranch.advancedConstruction: return 'Advanced Construction';
-      case MissionBranch.villager: return 'Villager';
-      case MissionBranch.bookTracking: return 'Book Tracking';
-      case MissionBranch.halloween: return 'Halloween';
-      case MissionBranch.christmas: return 'Christmas';
-      case MissionBranch.easter: return 'Easter';
-    }
-  }
-
-  static String branchDescription(MissionBranch branch) {
-    switch (branch) {
-      case MissionBranch.basicConstruction: return 'Build and upgrade all building types';
-      case MissionBranch.advancedConstruction: return 'Expand your village with multiple buildings';
-      case MissionBranch.villager: return 'Keep your villagers happy';
-      case MissionBranch.bookTracking: return 'Track your reading journey';
-      case MissionBranch.halloween: return 'Spooky seasonal event — October only!';
-      case MissionBranch.christmas: return 'Festive seasonal event — December only!';
-      case MissionBranch.easter: return 'Spring seasonal event — April only!';
-    }
   }
 
   static List<MissionBranch> branchDependencies(MissionBranch branch) {

@@ -753,7 +753,7 @@ class _InputField extends StatelessWidget {
         const SizedBox(height: 7),
         TextField(
           controller: controller,
-          inputFormatters: [LengthLimitingTextInputFormatter(20)],
+          inputFormatters: [LengthLimitingTextInputFormatter(40)],
           style: const TextStyle(color: AppTheme.darkText, fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,

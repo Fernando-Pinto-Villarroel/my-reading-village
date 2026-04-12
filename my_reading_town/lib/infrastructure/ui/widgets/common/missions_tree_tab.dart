@@ -73,15 +73,12 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
       BuildContext context, MissionBranch branch, List<MissionBranch> deps) {
     final event = HolidayRules.eventForBranch(branch);
     if (event != null) {
-      return context.t(
-        'event_available_in_${event.id}',
-        fallback: MissionData.branchDescription(branch),
-      );
+      return context.t('event_available_in_${event.id}');
     }
     if (deps.isNotEmpty) {
-      return '${context.t('unlock_requirement_prefix')} ${deps.map((b) => context.t('branch_${b.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}', fallback: MissionData.branchDisplayName(b))).join(' and ')} ${context.t('unlock_requirement_suffix')}';
+      return '${context.t('unlock_requirement_prefix')} ${deps.map((b) => context.t('branch_${b.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}', fallback: b.name)).join(' and ')} ${context.t('unlock_requirement_suffix')}';
     }
-    return MissionData.branchDescription(branch);
+    return '';
   }
 
   @override
@@ -142,8 +139,7 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
                         Text(
                           context.t(
                             'branch_${widget.branch.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}',
-                            fallback:
-                                MissionData.branchDisplayName(widget.branch),
+                            fallback: widget.branch.name,
                           ),
                           style: TextStyle(
                             fontSize: 14,
@@ -154,16 +150,13 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
                         if (!isUnlocked) ...[
                           if (HolidayRules.isHolidayBranch(widget.branch))
                             Text(
-                              context.t(
-                                'event_available_in_${HolidayRules.eventForBranch(widget.branch)?.id ?? ''}',
-                                fallback: MissionData.branchDescription(widget.branch),
-                              ),
+                              context.t('event_available_in_${HolidayRules.eventForBranch(widget.branch)?.id ?? ''}'),
                               style: TextStyle(
                                   fontSize: 11, color: Colors.grey.shade500),
                             )
                           else if (deps.isNotEmpty)
                             Text(
-                              '${context.t('requires')} ${deps.map((b) => context.t('branch_${b.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}', fallback: MissionData.branchDisplayName(b))).join(', ')}',
+                              '${context.t('requires')} ${deps.map((b) => context.t('branch_${b.name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}')}', fallback: b.name)).join(', ')}',
                               style: TextStyle(
                                   fontSize: 11, color: Colors.grey.shade500),
                             ),

@@ -142,25 +142,25 @@ class VillageRules {
     }
   }
 
-  static int maxHousesForPlayerLevel(int playerLevel) => 4 + playerLevel * 2;
+  static int maxHousesForPlayerLevel(int playerLevel) => playerLevel * 2;
 
   static int maxBuildingsOfTypeForPlayerLevel(String type, int playerLevel) {
     switch (type) {
       case 'house':
-        return 4 + playerLevel * 2;
+        return playerLevel * 2;
       case 'restaurant':
       case 'park':
-        return playerLevel * 2;
+        return playerLevel - 1;
       case 'library':
-        return playerLevel >= 3 ? playerLevel * 2 : 0;
+        return playerLevel >= 3 ? playerLevel - 1 : 0;
       case 'hospital':
-        return playerLevel >= 5 ? playerLevel * 2 : 0;
+        return playerLevel >= 5 ? playerLevel - 1 : 0;
       case 'water_plant':
       case 'power_plant':
       case 'school':
-        return 2 + playerLevel * 2;
+        return playerLevel;
       default:
-        return 4 + playerLevel * 2;
+        return playerLevel * 2;
     }
   }
 

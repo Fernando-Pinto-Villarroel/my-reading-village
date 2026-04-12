@@ -108,6 +108,7 @@ class MissionService {
     required bool bookItemUsedSinceActive,
     int? totalPagesRead,
     int? completedBooks,
+    int nonGrassTileCount = 0,
   }) async {
     for (final branch in MissionBranch.values) {
       final mission = getActiveMission(branch, progress);
@@ -121,7 +122,8 @@ class MissionService {
 
       final isComplete = _checkMissionCondition(mission, p, buildings, villagers,
           activePowerups, bookItemUsedSinceActive,
-          totalPagesRead: totalPagesRead, completedBooks: completedBooks);
+          totalPagesRead: totalPagesRead, completedBooks: completedBooks,
+          nonGrassTileCount: nonGrassTileCount);
       if (isComplete) {
         p.isCompleted = true;
         await _invRepo.upsertMissionProgress(mission.id, isCompleted: true);
@@ -137,7 +139,8 @@ class MissionService {
       List<ActivePowerup> activePowerups,
       bool bookItemUsedSinceActive,
       {int? totalPagesRead,
-      int? completedBooks}) {
+      int? completedBooks,
+      int nonGrassTileCount = 0}) {
     if (_isEventReadingMission(mission)) {
       totalPagesRead = (totalPagesRead ?? 0) - (missionProgress.pagesAtActivation ?? 0);
       completedBooks = (completedBooks ?? 0) - (missionProgress.booksAtActivation ?? 0);
@@ -191,6 +194,23 @@ class MissionService {
                 v.species == mission.speciesType && v.happiness >= 100)
             .length;
         return happyCount >= (mission.targetCount ?? 1);
+
+      case MissionConditionType.haveDecorationMinCoinCost:
+        final minCost = mission.targetMinCost ?? 0;
+        final count = buildings
+            .where((b) => b.isDecoration && b.isConstructed && b.coinCost >= minCost)
+            .length;
+        return count >= (mission.targetCount ?? 1);
+
+      case MissionConditionType.haveDecorationMinGemCost:
+        final minGemCost = mission.targetMinCost ?? 0;
+        final gemCount = buildings
+            .where((b) => b.isDecoration && b.isConstructed && b.gemCost >= minGemCost)
+            .length;
+        return gemCount >= (mission.targetCount ?? 1);
+
+      case MissionConditionType.reachSpecialTileCount:
+        return nonGrassTileCount >= (mission.targetCount ?? 1);
     }
   }
 
@@ -202,7 +222,8 @@ class MissionService {
       List<ActivePowerup> activePowerups,
       bool bookItemUsedSinceActive,
       {int? totalPagesRead,
-      int? completedBooks}) {
+      int? completedBooks,
+      int nonGrassTileCount = 0}) {
     if (_isEventReadingMission(mission) && missionProgress != null) {
       totalPagesRead = ((totalPagesRead ?? 0) - (missionProgress.pagesAtActivation ?? 0)).clamp(0, 999999);
       completedBooks = ((completedBooks ?? 0) - (missionProgress.booksAtActivation ?? 0)).clamp(0, 999999);
@@ -270,6 +291,24 @@ class MissionService {
             .where((v) =>
                 v.species == mission.speciesType && v.happiness >= 100)
             .length;
+        return (current: current.clamp(0, target), target: target);
+
+      case MissionConditionType.haveDecorationMinCoinCost:
+        final minCost = mission.targetMinCost ?? 0;
+        current = buildings
+            .where((b) => b.isDecoration && b.isConstructed && b.coinCost >= minCost)
+            .length;
+        return (current: current.clamp(0, target), target: target);
+
+      case MissionConditionType.haveDecorationMinGemCost:
+        final minGemCost = mission.targetMinCost ?? 0;
+        current = buildings
+            .where((b) => b.isDecoration && b.isConstructed && b.gemCost >= minGemCost)
+            .length;
+        return (current: current.clamp(0, target), target: target);
+
+      case MissionConditionType.reachSpecialTileCount:
+        current = nonGrassTileCount;
         return (current: current.clamp(0, target), target: target);
     }
   }

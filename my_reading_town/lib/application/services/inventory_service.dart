@@ -199,8 +199,14 @@ class InventoryService {
 
   Future<String> grantMinigameReward(List<InventoryItem> items) async {
     final rewardType = MinigameRules.pickRewardType(Random());
-    if (rewardType == 'gems') {
-      await _villageRepo.addResources(gems: MinigameRules.gemsRewardAmount);
+    if (rewardType.startsWith('coins_')) {
+      final amount = int.parse(rewardType.split('_')[1]);
+      await _villageRepo.addResources(coins: amount);
+    } else if (rewardType.startsWith('wood_')) {
+      final amount = int.parse(rewardType.split('_')[1]);
+      await _villageRepo.addResources(wood: amount);
+    } else if (rewardType == 'gems_5') {
+      await _villageRepo.addResources(gems: 5);
     } else {
       await addItem(rewardType, items);
     }

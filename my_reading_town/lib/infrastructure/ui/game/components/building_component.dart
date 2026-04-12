@@ -13,12 +13,8 @@ class BuildingComponent extends PositionComponent {
   Sprite? _constructionSprite;
   int _loadedLevel = 0;
 
-  double _pulseTimer = 0;
-  double _pulseScale = 1.0;
-  bool _justUpgraded = false;
   double _glowTimer = 0;
   Duration effectiveRemaining = Duration.zero;
-
 
   BuildingComponent({
     required this.building,
@@ -41,10 +37,6 @@ class BuildingComponent extends PositionComponent {
   }
 
   void updateBuilding(PlacedBuilding updated) {
-    if (updated.level > building.level) {
-      _justUpgraded = true;
-      _pulseTimer = 0;
-    }
     if (updated.isConstructed) effectiveRemaining = Duration.zero;
     building = updated;
     priority = 10 + building.tileY;
@@ -58,14 +50,6 @@ class BuildingComponent extends PositionComponent {
     super.update(dt);
 
     _glowTimer += dt;
-    if (_justUpgraded) {
-      _pulseTimer += dt;
-      _pulseScale = 1.0 + 0.2 * (1.0 - _pulseTimer / 0.5).clamp(0.0, 1.0);
-      if (_pulseTimer > 0.5) {
-        _justUpgraded = false;
-        _pulseScale = 1.0;
-      }
-    }
   }
 
   void _renderWarningGlow(Canvas canvas, double offsetX, double offsetY,
@@ -87,9 +71,16 @@ class BuildingComponent extends PositionComponent {
   static const _glowTypes = {
     'house',
     'hospital',
-    'park',
     'power_plant',
-    'lamp_post'
+    'lamp_post',
+  };
+
+  static const _dimTypes = {
+    'water_plant',
+    'school',
+    'park',
+    'restaurant',
+    'library',
   };
 
   void _renderNightGlow(Canvas canvas, double offsetX, double offsetY,
@@ -125,6 +116,30 @@ class BuildingComponent extends PositionComponent {
     }
   }
 
+  static final Paint _nightDimPaint = Paint()
+    ..colorFilter = const ColorFilter.matrix([
+      0.6,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.6,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.7,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ]);
+
   @override
   void render(Canvas canvas) {
     final sprite = building.isConstructed ? _builtSprite : _constructionSprite;
@@ -145,8 +160,10 @@ class BuildingComponent extends PositionComponent {
     final offsetX = (size.x - spriteW) / 2;
     final offsetY = size.y - spriteH;
 
-    if (!isRoadConnected && building.isConstructed &&
-        !building.isDecoration && building.type != 'house') {
+    if (!isRoadConnected &&
+        building.isConstructed &&
+        !building.isDecoration &&
+        building.type != 'house') {
       _renderWarningGlow(canvas, offsetX, offsetY, spriteW, spriteH);
     }
 
@@ -155,22 +172,37 @@ class BuildingComponent extends PositionComponent {
       _renderNightGlow(canvas, offsetX, offsetY, spriteW, spriteH);
     }
 
+    final isDimmed = isNight && (
+      !building.isConstructed ||
+      _dimTypes.contains(building.type) ||
+      (building.isDecoration && building.type != 'lamp_post')
+    );
+
+    if (isDimmed) {
+      canvas.saveLayer(
+        Rect.fromLTWH(offsetX, offsetY, spriteW, spriteH),
+        _nightDimPaint,
+      );
+    }
+
     canvas.save();
 
-    final cx = offsetX + spriteW / 2;
-    final cy = offsetY + spriteH / 2;
-    canvas.translate(cx, cy);
     if (building.isFlipped) {
-      canvas.scale(-_pulseScale, _pulseScale);
-    } else {
-      canvas.scale(_pulseScale, _pulseScale);
+      final cx = offsetX + spriteW / 2;
+      final cy = offsetY + spriteH / 2;
+      canvas.translate(cx, cy);
+      canvas.scale(-1, 1);
+      canvas.translate(-cx, -cy);
     }
-    canvas.translate(-cx, -cy);
 
     sprite.render(canvas,
         position: Vector2(offsetX, offsetY), size: Vector2(spriteW, spriteH));
 
     canvas.restore();
+
+    if (isDimmed) {
+      canvas.restore();
+    }
 
     if (!building.isConstructed && building.constructionStart != null) {
       final zoom = (findGame() as VillageGame?)?.currentZoom ?? 1.0;
