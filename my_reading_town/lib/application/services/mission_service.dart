@@ -239,14 +239,13 @@ class MissionService {
         return (current: current.clamp(0, 1), target: 1);
 
       case MissionConditionType.upgradeBuilding:
-        final maxLevel = buildings
-            .where((b) => b.type == mission.buildingType && b.isConstructed)
-            .fold<int>(0, (max, b) => b.level > max ? b.level : max);
-        current = maxLevel;
-        return (
-          current: current.clamp(0, mission.targetLevel ?? 1),
-          target: mission.targetLevel ?? 1
-        );
+        current = buildings
+            .where((b) =>
+                b.type == mission.buildingType &&
+                b.level >= (mission.targetLevel ?? 1) &&
+                b.isConstructed)
+            .length;
+        return (current: current.clamp(0, 1), target: 1);
 
       case MissionConditionType.reachBuildingCount:
         current = buildings

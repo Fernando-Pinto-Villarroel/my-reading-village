@@ -1,11 +1,6 @@
 import 'dart:math';
 
 class VillageRules {
-  static const int coinsPerPage = 4;
-  static const int woodPerPage = 3;
-  static const int metalPerPage = 2;
-  static const int bookCompletionGemBonus = 15;
-  static const int bookCompletionCoinBonus = 50;
   static const int startingCoins = 50;
   static const int startingGems = 5;
   static const int startingWood = 30;
@@ -30,8 +25,8 @@ class VillageRules {
     return (startTile + endTile) ~/ 2;
   }
 
-  static int expansionGemCost(int expansionCount) => 5 * (expansionCount + 1);
-  static int expansionCoinCost(int expansionCount) => 100 + 50 * expansionCount;
+  static int expansionGemCost(int expansionCount) => 3 * (expansionCount + 1);
+  static int expansionCoinCost(int expansionCount) => 30 + 5 * expansionCount;
 
   static int villagersForLevel(int level) => level * 5;
 
@@ -260,7 +255,7 @@ class VillageRules {
       'coinCost': 90,
       'gemCost': 0,
       'woodCost': 30,
-      'metalCost': 50,
+      'metalCost': 30,
       'happinessBonus': 10,
       'constructionMinutes': 120,
       'exp': 50
@@ -307,7 +302,7 @@ class VillageRules {
       'coinCost': 60,
       'gemCost': 0,
       'woodCost': 50,
-      'metalCost': 20,
+      'metalCost': 0,
       'happinessBonus': 0,
       'constructionMinutes': 10,
       'exp': 7
@@ -329,7 +324,7 @@ class VillageRules {
       'coinCost': 50,
       'gemCost': 0,
       'woodCost': 0,
-      'metalCost': 75,
+      'metalCost': 45,
       'happinessBonus': 0,
       'constructionMinutes': 15,
       'exp': 10
@@ -338,7 +333,7 @@ class VillageRules {
       'type': 'reading_bench',
       'name': 'Reading Bench',
       'coinCost': 120,
-      'gemCost': 20,
+      'gemCost': 10,
       'woodCost': 80,
       'metalCost': 0,
       'happinessBonus': 0,
@@ -351,7 +346,7 @@ class VillageRules {
       'coinCost': 150,
       'gemCost': 0,
       'woodCost': 0,
-      'metalCost': 65,
+      'metalCost': 50,
       'happinessBonus': 0,
       'constructionMinutes': 30,
       'exp': 15
@@ -362,7 +357,7 @@ class VillageRules {
       'coinCost': 200,
       'gemCost': 0,
       'woodCost': 0,
-      'metalCost': 120,
+      'metalCost': 100,
       'happinessBonus': 0,
       'constructionMinutes': 45,
       'exp': 20
@@ -371,7 +366,7 @@ class VillageRules {
       'type': 'cat_colon_statue',
       'name': 'Villager Statue',
       'coinCost': 300,
-      'gemCost': 10,
+      'gemCost': 20,
       'woodCost': 0,
       'metalCost': 200,
       'happinessBonus': 0,
@@ -382,7 +377,7 @@ class VillageRules {
       'type': 'book_stack_monument',
       'name': 'Book Stack Monument',
       'coinCost': 400,
-      'gemCost': 30,
+      'gemCost': 40,
       'woodCost': 100,
       'metalCost': 0,
       'happinessBonus': 0,

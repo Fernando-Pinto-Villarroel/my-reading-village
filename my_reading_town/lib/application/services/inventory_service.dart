@@ -205,6 +205,9 @@ class InventoryService {
     } else if (rewardType.startsWith('wood_')) {
       final amount = int.parse(rewardType.split('_')[1]);
       await _villageRepo.addResources(wood: amount);
+    } else if (rewardType.startsWith('metal_')) {
+      final amount = int.parse(rewardType.split('_')[1]);
+      await _villageRepo.addResources(metal: amount);
     } else if (rewardType == 'gems_5') {
       await _villageRepo.addResources(gems: 5);
     } else {

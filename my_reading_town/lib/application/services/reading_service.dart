@@ -3,7 +3,6 @@ import 'package:my_reading_town/domain/entities/book.dart';
 import 'package:my_reading_town/domain/entities/reading_session.dart';
 import 'package:my_reading_town/domain/entities/tag.dart';
 import 'package:my_reading_town/domain/ports/book_repository.dart';
-import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/domain/rules/reading_rules.dart';
 
 class ReadingService {
@@ -149,22 +148,22 @@ class ReadingService {
     final rewardablePages =
         (newPagesRead - book.maxRewardedPages).clamp(0, actualPagesLogged);
 
-    int coinsEarned = (rewardablePages * VillageRules.coinsPerPage * resourceMultiplier).round();
+    int coinsEarned = (rewardablePages * ReadingRules.coinsPerPage * resourceMultiplier).round();
     int gemsEarned = 0;
     int woodEarned = 0;
     int metalEarned = 0;
 
     if (rewardablePages > 0) {
-      woodEarned = (rewardablePages * VillageRules.woodPerPage * resourceMultiplier).round();
-      metalEarned = (rewardablePages * VillageRules.metalPerPage * resourceMultiplier).round();
+      woodEarned = (rewardablePages * ReadingRules.woodPerPage * resourceMultiplier).round();
+      metalEarned = (rewardablePages * ReadingRules.metalPerPage * resourceMultiplier).round();
     }
 
     bool bookCompleted = newPagesRead >= book.totalPages;
     final completionBonusEarned =
         bookCompleted && book.maxRewardedPages < book.totalPages;
     if (completionBonusEarned) {
-      coinsEarned += VillageRules.bookCompletionCoinBonus;
-      gemsEarned += VillageRules.bookCompletionGemBonus;
+      coinsEarned += ReadingRules.bookCompletionCoinBonus;
+      gemsEarned += ReadingRules.bookCompletionGemBonus;
     }
 
     final newMaxRewarded = max(book.maxRewardedPages, newPagesRead);

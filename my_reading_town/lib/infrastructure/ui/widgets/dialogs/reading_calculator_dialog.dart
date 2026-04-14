@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
-import 'package:my_reading_town/domain/rules/village_rules.dart';
+import 'package:my_reading_town/domain/rules/reading_rules.dart';
 
 void showReadingCalculatorDialog(BuildContext context) {
   showModalBottomSheet(
@@ -62,46 +62,46 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
   _CalculationResult _computeResult(_ResourceType type, int target) {
     switch (type) {
       case _ResourceType.coins:
-        final pagesForCoins = (target / VillageRules.coinsPerPage).ceil();
+        final pagesForCoins = (target / ReadingRules.coinsPerPage).ceil();
         final booksForCoins =
-            (target / VillageRules.bookCompletionCoinBonus).ceil();
+            (target / ReadingRules.bookCompletionCoinBonus).ceil();
         return _CalculationResult(
           resourceType: type,
           target: target,
           pagesNeeded: pagesForCoins,
           booksNeeded: booksForCoins,
-          ratePerPage: VillageRules.coinsPerPage,
-          bonusPerBook: VillageRules.bookCompletionCoinBonus,
+          ratePerPage: ReadingRules.coinsPerPage,
+          bonusPerBook: ReadingRules.bookCompletionCoinBonus,
         );
       case _ResourceType.gems:
         final booksForGems =
-            (target / VillageRules.bookCompletionGemBonus).ceil();
+            (target / ReadingRules.bookCompletionGemBonus).ceil();
         return _CalculationResult(
           resourceType: type,
           target: target,
           pagesNeeded: null,
           booksNeeded: booksForGems,
           ratePerPage: null,
-          bonusPerBook: VillageRules.bookCompletionGemBonus,
+          bonusPerBook: ReadingRules.bookCompletionGemBonus,
         );
       case _ResourceType.wood:
-        final pagesForWood = (target / VillageRules.woodPerPage).ceil();
+        final pagesForWood = (target / ReadingRules.woodPerPage).ceil();
         return _CalculationResult(
           resourceType: type,
           target: target,
           pagesNeeded: pagesForWood,
           booksNeeded: null,
-          ratePerPage: VillageRules.woodPerPage,
+          ratePerPage: ReadingRules.woodPerPage,
           bonusPerBook: null,
         );
       case _ResourceType.metal:
-        final pagesForMetal = (target / VillageRules.metalPerPage).ceil();
+        final pagesForMetal = (target / ReadingRules.metalPerPage).ceil();
         return _CalculationResult(
           resourceType: type,
           target: target,
           pagesNeeded: pagesForMetal,
           booksNeeded: null,
-          ratePerPage: VillageRules.metalPerPage,
+          ratePerPage: ReadingRules.metalPerPage,
           bonusPerBook: null,
         );
     }
@@ -260,6 +260,34 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
                   const SizedBox(height: 16),
                   _ResultCard(result: _result!),
                 ],
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.mint.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppTheme.mint.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline, size: 18, color: AppTheme.mediumMint),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          context.t('calculator_minigame_tip'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.darkText.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 8),
               ],
             ),

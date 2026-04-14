@@ -17,7 +17,7 @@ import 'package:my_reading_town/infrastructure/persistence/database_helper.dart'
 import 'package:my_reading_town/application/services/backup_service.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 
-void showSettingsDialog(BuildContext context, VillageProvider village) {
+void showSettingsDialog(BuildContext context, VillageProvider village, {VoidCallback? onRetakeTutorial}) {
   final usernameController = TextEditingController(text: village.username);
   final townNameController = TextEditingController(text: village.townName);
 
@@ -171,6 +171,27 @@ void showSettingsDialog(BuildContext context, VillageProvider village) {
                     child: Text(ctx.t('save')),
                   ),
                 ),
+                if (onRetakeTutorial != null) ...[
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: Icon(Icons.replay_rounded, color: AppTheme.pink),
+                      label: Text(ctx.t('retake_tutorial')),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.pink,
+                        side: BorderSide(color: AppTheme.pink.withValues(alpha: 0.6)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        onRetakeTutorial();
+                      },
+                    ),
+                  ),
+                ],
                 SizedBox(height: 20),
                 Divider(color: AppTheme.darkText.withValues(alpha: 0.15)),
                 SizedBox(height: 4),

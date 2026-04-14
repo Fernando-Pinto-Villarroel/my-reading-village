@@ -432,6 +432,60 @@ class _GameScreenState extends State<GameScreen>
     if (mounted) setState(() => _tourStep = -1);
   }
 
+  void _onTourGoBack() {
+    final step = _tourStep;
+    if (step <= 0) return;
+    if (step == kTourStepBuildExplain) {
+      setState(() {
+        _mode = GameMode.normal;
+        _selectedBuildingType = null;
+        _flipNextBuilding = false;
+        _tourStep = kTourStepBuildHighlight;
+      });
+      _syncGameState();
+    } else if (step == kTourStepPhotoHighlight) {
+      setState(() {
+        _menuOpen = false;
+        _tourStep = kTourStepReadingExplain;
+      });
+    } else {
+      setState(() => _tourStep = step - 1);
+    }
+  }
+
+  void _onTourSkip() {
+    if (_mode == GameMode.construction) {
+      setState(() {
+        _mode = GameMode.normal;
+        _selectedBuildingType = null;
+        _flipNextBuilding = false;
+      });
+      _syncGameState();
+    }
+    if (_menuOpen) setState(() => _menuOpen = false);
+    setState(() => _tourStep = kTourStepInput);
+  }
+
+  void _onBuildHighlightTap() {
+    setState(() {
+      _mode = GameMode.construction;
+      _tourStep = kTourStepBuildExplain;
+    });
+    _syncGameState();
+  }
+
+  void _startRetakeTutorial() {
+    if (_mode == GameMode.construction) {
+      setState(() {
+        _mode = GameMode.normal;
+        _selectedBuildingType = null;
+        _flipNextBuilding = false;
+      });
+      _syncGameState();
+    }
+    if (_menuOpen) setState(() => _menuOpen = false);
+    setState(() => _tourStep = kTourStepWelcome);
+  }
 
   void _onVillagerTapped(Villager villager) {
     if (!mounted) return;
@@ -642,7 +696,7 @@ class _GameScreenState extends State<GameScreen>
                     if (_tourStep == kTourStepSettingsHighlight) {
                       setState(() => _tourStep = kTourStepSettingsExplain);
                     } else {
-                      showSettingsDialog(context, _villageProvider);
+                      showSettingsDialog(context, _villageProvider, onRetakeTutorial: _startRetakeTutorial);
                     }
                   },
                   onSpeciesBookTap: () {
@@ -707,6 +761,11 @@ class _GameScreenState extends State<GameScreen>
               translate: (key, {fallback}) =>
                   sl<LanguageProvider>().translate(key, fallback: fallback ?? key),
               onAdvance: _onTourAdvance,
+              onGoBack: _onTourGoBack,
+              onSkip: _onTourSkip,
+              onBuildHighlightTap: _onBuildHighlightTap,
+              initialUsername: _villageProvider.username.isNotEmpty ? _villageProvider.username : null,
+              initialTownName: _villageProvider.townName.isNotEmpty ? _villageProvider.townName : null,
               onInputSubmit: _onTourInputSubmit,
             ),
         ],

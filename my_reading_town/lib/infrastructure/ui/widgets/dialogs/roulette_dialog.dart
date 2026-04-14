@@ -35,6 +35,7 @@ class _RouletteReward {
   final int? amount;
   final String assetPath;
   final Widget Function(double size) iconBuilder;
+  final Color? color;
 
   const _RouletteReward({
     required this.key,
@@ -42,6 +43,7 @@ class _RouletteReward {
     this.amount,
     required this.assetPath,
     required this.iconBuilder,
+    this.color,
   });
 }
 
@@ -52,9 +54,9 @@ List<_RouletteReward> _buildRewards(VillagerSpeciesData? weeklySpecies) {
 
   return [
     _RouletteReward(
-      key: 'coins_50',
+      key: 'coins_30',
       type: 'coins',
-      amount: 50,
+      amount: 30,
       assetPath: 'assets/images/coin.png',
       iconBuilder: (s) => ResourceIcon.coin(size: s),
     ),
@@ -64,13 +66,6 @@ List<_RouletteReward> _buildRewards(VillagerSpeciesData? weeklySpecies) {
       amount: 5,
       assetPath: 'assets/images/gem.png',
       iconBuilder: (s) => ResourceIcon.gem(size: s),
-    ),
-    _RouletteReward(
-      key: 'coins_100',
-      type: 'coins',
-      amount: 100,
-      assetPath: 'assets/images/coin.png',
-      iconBuilder: (s) => ResourceIcon.coin(size: s),
     ),
     _RouletteReward(
       key: 'wood_30',
@@ -90,6 +85,7 @@ List<_RouletteReward> _buildRewards(VillagerSpeciesData? weeklySpecies) {
       key: 'species',
       type: 'species',
       assetPath: speciesAsset,
+      color: AppTheme.gemPurple,
       iconBuilder: (s) => Image.asset(
         speciesAsset,
         width: s,
@@ -784,7 +780,7 @@ class _WheelPainter extends CustomPainter {
     // Filled segments
     for (int i = 0; i < rewards.length; i++) {
       final startAngle = i * segmentAngle - pi / 2;
-      fillPaint.color = _circusColors[i % _circusColors.length];
+      fillPaint.color = rewards[i].color ?? _circusColors[i % _circusColors.length];
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         startAngle,

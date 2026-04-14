@@ -475,6 +475,9 @@
   "tour_farewell": "Tutto pronto, {name}! La tua avventura inizia ORA! Leggi ogni giorno, costruisci la città dei tuoi sogni e mantieni felici i tuoi abitanti! 🌸",
   "tour_tap_continue": "Tocca ovunque per continuare",
   "tour_tap_highlighted": "Tocca il pulsante luminoso!",
+  "tour_skip": "Salta",
+  "tour_previous": "Precedente",
+  "retake_tutorial": "Rifare il tutorial",
   "session_date_label": "Data della sessione",
   "rate_your_book": "Valuta il tuo libro!",
   "rate_book_subtitle": "Com'è andata?",
@@ -708,5 +711,6 @@
   "mission_desc_dc_deco_5_coin100": "Avere 5 decorazioni che costano almeno 100 monete ciascuna.",
   "minigame_reward_coins": "+{amount} Monete!",
   "minigame_reward_wood": "+{amount} Legno!",
-  "minigame_reward_metal": "+{amount} Metallo!"
+  "minigame_reward_metal": "+{amount} Metallo!",
+  "calculator_minigame_tip": "Puoi anche guadagnare risorse giocando ai minigiochi o girando la ruota della fortuna!"
 }

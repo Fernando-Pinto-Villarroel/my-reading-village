@@ -475,6 +475,9 @@
   "tour_farewell": "C'est tout bon, {name} ! Ton aventure commence MAINTENANT ! Lis chaque jour, construis la ville de tes rêves et rends tes villageois heureux ! 🌸",
   "tour_tap_continue": "Appuie n'importe où pour continuer",
   "tour_tap_highlighted": "Appuie sur le bouton lumineux !",
+  "tour_skip": "Passer",
+  "tour_previous": "Précédent",
+  "retake_tutorial": "Reprendre le tutoriel",
   "session_date_label": "Date de la session",
   "rate_your_book": "Évalue ton livre !",
   "rate_book_subtitle": "Comment tu l'as trouvé ?",
@@ -708,5 +711,6 @@
   "mission_desc_dc_deco_5_coin100": "Avoir 5 décorations coûtant au moins 100 pièces chacune.",
   "minigame_reward_coins": "+{amount} Pièces!",
   "minigame_reward_wood": "+{amount} Bois!",
-  "minigame_reward_metal": "+{amount} Métal!"
+  "minigame_reward_metal": "+{amount} Métal!",
+  "calculator_minigame_tip": "Vous pouvez aussi gagner des ressources en jouant aux mini-jeux ou en faisant tourner la roue chanceuse !"
 }

@@ -5,15 +5,14 @@ class RouletteRules {
   static const int gemCostPerSpin = 20;
 
   static const Map<String, double> rewardWeights = {
-    'coins_50': 0.20,
-    'gems_5': 0.13,
-    'coins_100': 0.155,
-    'wood_30': 0.08,
-    'sandwich': 0.09,
-    'metal_15': 0.09,
-    'gems_15': 0.09,
+    'coins_30': 0.31,
+    'gems_5': 0.06,
+    'wood_30': 0.165,
+    'sandwich': 0.08,
+    'metal_15': 0.16,
+    'gems_15': 0.04,
     'hammer': 0.06,
-    'book': 0.07,
+    'book': 0.09,
     'glasses': 0.03,
     'species': 0.005,
   };

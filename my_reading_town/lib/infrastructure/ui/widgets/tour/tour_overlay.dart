@@ -127,6 +127,11 @@ class TourOverlay extends StatefulWidget {
   final GlobalKey? resourcesKey;
   final String Function(String key, {String? fallback}) translate;
   final VoidCallback onAdvance;
+  final VoidCallback? onGoBack;
+  final VoidCallback? onSkip;
+  final VoidCallback? onBuildHighlightTap;
+  final String? initialUsername;
+  final String? initialTownName;
   final void Function(String username, String townName) onInputSubmit;
 
   const TourOverlay({
@@ -148,6 +153,11 @@ class TourOverlay extends StatefulWidget {
     this.resourcesKey,
     required this.translate,
     required this.onAdvance,
+    this.onGoBack,
+    this.onSkip,
+    this.onBuildHighlightTap,
+    this.initialUsername,
+    this.initialTownName,
     required this.onInputSubmit,
   });
 
@@ -191,8 +201,11 @@ class _TourOverlayState extends State<TourOverlay>
       duration: const Duration(milliseconds: 1400),
     )..repeat();
     _pulseAnim = Tween<double>(begin: 0, end: 1).animate(_pulseController);
-    _usernameController = TextEditingController();
-    _townNameController = TextEditingController();
+    _usernameController = TextEditingController(text: widget.initialUsername ?? '');
+    _townNameController = TextEditingController(text: widget.initialTownName ?? '');
+    if ((widget.initialUsername ?? '').isNotEmpty) {
+      _submittedUsername = _formatFarewellName(widget.initialUsername!);
+    }
 
     _playEntrance();
   }
@@ -219,6 +232,11 @@ class _TourOverlayState extends State<TourOverlay>
     _usernameController.dispose();
     _townNameController.dispose();
     super.dispose();
+  }
+
+  String _formatFarewellName(String name) {
+    final firstWord = name.trim().split(' ').first;
+    return firstWord.length > 10 ? '${firstWord.substring(0, 10)}...' : firstWord;
   }
 
   String _getChatMessage() {
@@ -297,13 +315,40 @@ class _TourOverlayState extends State<TourOverlay>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final rightPadding = MediaQuery.of(context).padding.right;
 
+    final showPrev = step > 0 && step < kTourStepFarewell && widget.onGoBack != null;
+    final showSkip = step < kTourStepInput && widget.onSkip != null;
+
     return Stack(
       children: [
         content,
         Positioned(
           bottom: bottomPadding + 8,
           right: rightPadding + 8,
-          child: _TourLanguageButton(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showSkip) ...[
+                _TourNavButton(
+                  icon: Icons.fast_forward_rounded,
+                  label: widget.translate('tour_skip'),
+                  onTap: widget.onSkip!,
+                  accentColor: AppTheme.darkText.withValues(alpha: 0.55),
+                ),
+                const SizedBox(height: 5),
+              ],
+              if (showPrev) ...[
+                _TourNavButton(
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  label: widget.translate('tour_previous'),
+                  onTap: widget.onGoBack!,
+                  accentColor: AppTheme.lavender,
+                ),
+                const SizedBox(height: 5),
+              ],
+              _TourLanguageButton(),
+            ],
+          ),
         ),
       ],
     );
@@ -506,7 +551,9 @@ class _TourOverlayState extends State<TourOverlay>
             width: tapZoneRect.width,
             height: tapZoneRect.height,
             child: GestureDetector(
-              onTap: widget.onAdvance,
+              onTap: (step == kTourStepBuildHighlight && widget.onBuildHighlightTap != null)
+                  ? widget.onBuildHighlightTap
+                  : widget.onAdvance,
               behavior: HitTestBehavior.opaque,
               child: Container(color: Colors.transparent),
             ),
@@ -674,7 +721,7 @@ class _TourOverlayState extends State<TourOverlay>
                   _townNameError = townName.length < 3 ? minMsg : null;
                 });
                 if (_usernameError != null || _townNameError != null) return;
-                setState(() => _submittedUsername = username);
+                setState(() => _submittedUsername = _formatFarewellName(username));
                 widget.onInputSubmit(username, townName);
               },
               child: Container(
@@ -800,6 +847,57 @@ class _InputField extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _TourNavButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color accentColor;
+
+  const _TourNavButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: AppTheme.softWhite.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: accentColor.withValues(alpha: 0.55), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: accentColor),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

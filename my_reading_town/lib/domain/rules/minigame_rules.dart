@@ -3,22 +3,24 @@ import 'package:my_reading_town/app_constants.dart';
 
 class MinigameRules {
   static const Map<String, MinigameConfig> configs = {
-    'guess_author': MinigameConfig(winsNeeded: 5, cooldownHours: 4),
-    'match_character_role': MinigameConfig(winsNeeded: 10, cooldownHours: 5),
-    'first_or_last_line': MinigameConfig(winsNeeded: 7, cooldownHours: 4),
-    'book_or_not': MinigameConfig(winsNeeded: 6, cooldownHours: 4),
+    'guess_author': MinigameConfig(winsNeeded: 5, cooldownHours: 6),
+    'match_character_role': MinigameConfig(winsNeeded: 10, cooldownHours: 9),
+    'first_or_last_line': MinigameConfig(winsNeeded: 7, cooldownHours: 7),
+    'book_or_not': MinigameConfig(winsNeeded: 6, cooldownHours: 5),
   };
 
   static const Map<String, double> rewardWeights = {
-    'coins_10': 0.22,
-    'coins_20': 0.15,
-    'coins_30': 0.10,
-    'wood_10': 0.18,
-    'wood_20': 0.10,
-    'gems_5': 0.10,
-    'book': 0.06,
-    'sandwich': 0.05,
-    'hammer': 0.03,
+    'coins_10': 0.20,
+    'coins_20': 0.13,
+    'coins_30': 0.09,
+    'wood_10': 0.15,
+    'wood_20': 0.08,
+    'metal_10': 0.12,
+    'metal_20': 0.06,
+    'gems_5': 0.03,
+    'book': 0.08,
+    'sandwich': 0.03,
+    'hammer': 0.02,
     'glasses': 0.01,
   };
 

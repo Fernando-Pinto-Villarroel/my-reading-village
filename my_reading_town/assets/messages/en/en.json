@@ -475,6 +475,9 @@
   "tour_farewell": "You're all set, {name}! Your adventure starts RIGHT NOW! Read every day, build your dream town, and keep your villagers happy! 🌸",
   "tour_tap_continue": "Tap anywhere to continue",
   "tour_tap_highlighted": "Tap the glowing button!",
+  "tour_skip": "Skip",
+  "tour_previous": "Previous",
+  "retake_tutorial": "Retake Tutorial",
   "session_date_label": "Session date",
   "rate_your_book": "Rate Your Book!",
   "rate_book_subtitle": "How did you like it?",
@@ -708,5 +711,6 @@
   "mission_desc_dc_deco_5_coin100": "Have 5 decorations that each cost at least 100 coins.",
   "minigame_reward_coins": "+{amount} Coins!",
   "minigame_reward_wood": "+{amount} Wood!",
-  "minigame_reward_metal": "+{amount} Metal!"
+  "minigame_reward_metal": "+{amount} Metal!",
+  "calculator_minigame_tip": "You can also earn some resources by playing minigames or spinning the lucky wheel!"
 }

@@ -30,6 +30,11 @@ class MinigameWinScreen extends StatelessWidget {
       rewardText = context.t('minigame_reward_wood').replaceAll('{amount}', amount);
       rewardAsset = 'assets/images/wood.png';
       rewardColor = AppTheme.mint;
+    } else if (rewardType != null && rewardType!.startsWith('metal_')) {
+      final amount = rewardType!.split('_')[1];
+      rewardText = context.t('minigame_reward_metal').replaceAll('{amount}', amount);
+      rewardAsset = 'assets/images/metal.png';
+      rewardColor = AppTheme.mediumOrange;
     } else {
       switch (rewardType) {
         case 'gems_5':
