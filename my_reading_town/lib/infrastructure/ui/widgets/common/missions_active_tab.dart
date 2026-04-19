@@ -248,7 +248,7 @@ class ActiveMissionCard extends StatelessWidget {
           ],
           const SizedBox(height: 8),
           Text(
-            context.t('mission_title_${mission.id}', fallback: mission.title),
+            context.t('mission_title_${mission.id}'),
             style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -256,8 +256,7 @@ class ActiveMissionCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            context.t('mission_desc_${mission.id}',
-                fallback: mission.description),
+            context.t('mission_desc_${mission.id}'),
             style: TextStyle(
                 fontSize: 12, color: AppTheme.darkText.withValues(alpha: 0.6)),
           ),

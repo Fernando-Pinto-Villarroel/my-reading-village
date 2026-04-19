@@ -7,6 +7,7 @@ import 'package:my_reading_town/domain/entities/mission.dart';
 import 'package:my_reading_town/domain/entities/mission_data.dart';
 import 'package:my_reading_town/domain/entities/pending_villager_choice.dart';
 import 'package:my_reading_town/domain/ports/village_repository.dart';
+import 'package:my_reading_town/domain/ports/book_repository.dart';
 import 'package:my_reading_town/application/services/building_service.dart';
 import 'package:my_reading_town/application/services/villager_service.dart';
 import 'package:my_reading_town/application/services/inventory_service.dart';
@@ -19,14 +20,15 @@ import 'package:my_reading_town/domain/rules/village_rules.dart';
 
 class VillageProvider extends ChangeNotifier {
   final VillageRepository _repo;
+  final BookRepository _bookRepo;
   final BuildingService _buildingSvc;
   final VillagerService _villagerSvc;
   final InventoryService _inventorySvc;
   final MissionService _missionSvc;
   final PlayerService _playerSvc;
 
-  VillageProvider(this._repo, this._buildingSvc, this._villagerSvc,
-      this._inventorySvc, this._missionSvc, this._playerSvc);
+  VillageProvider(this._repo, this._bookRepo, this._buildingSvc,
+      this._villagerSvc, this._inventorySvc, this._missionSvc, this._playerSvc);
 
   VillagerService get villagerService => _villagerSvc;
 
@@ -330,6 +332,8 @@ class VillageProvider extends ChangeNotifier {
     _activePowerups = await _inventorySvc.loadActivePowerups();
     _minigameCooldowns = await _inventorySvc.loadMinigameCooldowns();
     _missionProgress = await _missionSvc.loadMissionProgress();
+    _lastTotalPagesRead = await _bookRepo.getTotalPagesRead();
+    _lastCompletedBooks = await _bookRepo.getCompletedBooksCount();
     _unlockedSpeciesIds = await _repo.getUnlockedSpeciesIds();
 
     final choiceMaps = await _repo.getPendingVillagerChoices();
@@ -845,8 +849,8 @@ class VillageProvider extends ChangeNotifier {
       villagers: _villagers,
       activePowerups: _activePowerups,
       bookItemUsedSinceActive: _bookItemUsedSinceActive,
-      totalPagesRead: totalPagesRead,
-      completedBooks: completedBooks,
+      totalPagesRead: _lastTotalPagesRead,
+      completedBooks: _lastCompletedBooks,
       nonGrassTileCount: _roadTiles.length + _specialTiles.length,
     );
     notifyListeners();

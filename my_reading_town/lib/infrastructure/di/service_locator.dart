@@ -51,6 +51,7 @@ void initServiceLocator() {
   // Adapters (providers)
   sl.registerLazySingleton(() => VillageProvider(
         sl<VillageRepository>(),
+        sl<BookRepository>(),
         sl<BuildingService>(),
         sl<VillagerService>(),
         sl<InventoryService>(),

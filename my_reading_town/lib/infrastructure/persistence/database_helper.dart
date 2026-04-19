@@ -167,7 +167,8 @@ class DatabaseHelper {
         notif_days_enabled TEXT NOT NULL DEFAULT '1111111',
         notif_start_hour INTEGER NOT NULL DEFAULT 8,
         notif_end_hour INTEGER NOT NULL DEFAULT 22,
-        notif_per_day INTEGER NOT NULL DEFAULT 2
+        notif_per_day INTEGER NOT NULL DEFAULT 2,
+        event_notifs_scheduled TEXT
       )
     ''');
 

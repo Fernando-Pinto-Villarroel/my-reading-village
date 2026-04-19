@@ -71,8 +71,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _scheduleEventReminders(
       NotificationService notif, String locale) async {
+    final db = DatabaseHelper();
     final lang = context.read<LanguageProvider>();
     final now = DateTime.now();
+    final guardKey = '${now.year}_$locale';
+    final alreadyScheduled = await db.getEventNotifsScheduled();
+    if (alreadyScheduled == guardKey) return;
     for (int i = 0; i < HolidayRules.allEvents.length; i++) {
       final event = HolidayRules.allEvents[i];
       final eventName = lang.translate('branch_${event.id}');
@@ -109,6 +113,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
       await notif.scheduleEventReminders(eventIndex: i, notifications: notifs);
     }
+
+    await db.setEventNotifsScheduled(guardKey);
   }
 
   Future<void> _loadTips(String locale) async {

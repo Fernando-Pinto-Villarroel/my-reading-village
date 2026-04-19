@@ -160,4 +160,14 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
         where: 'species_id = ?', whereArgs: [speciesId]);
     return rows.isNotEmpty;
   }
+
+  Future<String?> getEventNotifsScheduled() async {
+    final state = await getGameState();
+    return state['event_notifs_scheduled'] as String?;
+  }
+
+  Future<void> setEventNotifsScheduled(String value) async {
+    final db = await database;
+    await db.update('game_state', {'event_notifs_scheduled': value}, where: 'id = 1');
+  }
 }

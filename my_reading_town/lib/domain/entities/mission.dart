@@ -53,8 +53,6 @@ class MissionReward {
 
 class Mission {
   final String id;
-  final String title;
-  final String description;
   final MissionBranch branch;
   final MissionCheckType checkType;
   final MissionConditionType conditionType;
@@ -68,8 +66,6 @@ class Mission {
 
   const Mission({
     required this.id,
-    required this.title,
-    required this.description,
     required this.branch,
     required this.checkType,
     required this.conditionType,

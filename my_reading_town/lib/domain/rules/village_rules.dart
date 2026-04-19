@@ -7,7 +7,7 @@ class VillageRules {
   static const int startingMetal = 10;
 
   static const int maxBuildingLevel = 3;
-  static const int sadHappinessThreshold = 75;
+  static const int sadHappinessThreshold = 100;
 
   static const int mapSize = 150;
   static const int defaultAreaSize = 25;

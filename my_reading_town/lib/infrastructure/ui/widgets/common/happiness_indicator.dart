@@ -9,19 +9,19 @@ class HappinessIndicator extends StatelessWidget {
       {super.key, required this.happiness, this.landscape = false});
 
   IconData get _moodIcon {
-    if (happiness >= 80) return Icons.sentiment_very_satisfied;
-    if (happiness >= 60) return Icons.sentiment_satisfied;
-    if (happiness >= 40) return Icons.sentiment_neutral;
-    if (happiness >= 20) return Icons.sentiment_dissatisfied;
+    if (happiness >= 100) return Icons.sentiment_very_satisfied;
+    if (happiness >= 75) return Icons.sentiment_satisfied;
+    if (happiness >= 50) return Icons.sentiment_neutral;
+    if (happiness >= 25) return Icons.sentiment_dissatisfied;
     return Icons.sentiment_very_dissatisfied;
   }
 
   Color get _barColor {
-    if (happiness >= 80) return AppTheme.coinGold;
-    if (happiness >= 60) return AppTheme.mint;
-    if (happiness >= 40) return AppTheme.peach;
-    if (happiness >= 20) return Colors.orange.shade300;
-    return Colors.red.shade300;
+    if (happiness >= 100) return AppTheme.mint;
+    if (happiness >= 75) return AppTheme.coinGold;
+    if (happiness >= 50) return Colors.orange.shade400;
+    if (happiness >= 25) return Colors.deepOrange.shade400;
+    return Colors.red.shade400;
   }
 
   @override

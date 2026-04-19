@@ -316,8 +316,7 @@ class MissionTreeNode extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.t('mission_title_${mission.id}',
-                      fallback: mission.title),
+                  context.t('mission_title_${mission.id}'),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,

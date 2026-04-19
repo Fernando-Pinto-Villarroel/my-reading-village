@@ -174,16 +174,24 @@ Widget _dragHandle() {
 }
 
 Widget _happinessChip(Villager villager, LanguageProvider langProvider) {
-  final color = villager.happiness >= 60
+  final color = villager.happiness >= 100
       ? Color(0xFF2E7D32)
-      : villager.happiness >= 40
+      : villager.happiness >= 75
           ? Color(0xFFB8860B)
-          : Color(0xFFC62828);
-  final icon = villager.happiness >= 60
-      ? Icons.sentiment_satisfied_alt
-      : villager.happiness >= 40
-          ? Icons.sentiment_neutral
-          : Icons.sentiment_dissatisfied;
+          : villager.happiness >= 50
+              ? Color(0xFFE65100)
+              : villager.happiness >= 25
+                  ? Color(0xFFBF360C)
+                  : Color(0xFFC62828);
+  final icon = villager.happiness >= 100
+      ? Icons.sentiment_very_satisfied
+      : villager.happiness >= 75
+          ? Icons.sentiment_satisfied
+          : villager.happiness >= 50
+              ? Icons.sentiment_neutral
+              : villager.happiness >= 25
+                  ? Icons.sentiment_dissatisfied
+                  : Icons.sentiment_very_dissatisfied;
 
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),

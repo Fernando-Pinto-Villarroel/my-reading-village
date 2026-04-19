@@ -24,8 +24,6 @@ class MissionData {
     for (int i = 0; i < buildingTypes.length; i++)
       Mission(
         id: 'bc_buy_${buildingTypes[i]}',
-        title: 'Build a ${_buildingDisplayName(buildingTypes[i])}',
-        description: 'Place your first ${_buildingDisplayName(buildingTypes[i])} in the village.',
         branch: MissionBranch.basicConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.buyBuilding,
@@ -36,8 +34,6 @@ class MissionData {
 
     Mission(
       id: 'bc_houses_4_lv1',
-      title: 'Have 4 Houses',
-      description: 'Have 4 houses at level 1 or above.',
       branch: MissionBranch.basicConstruction,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachBuildingCount,
@@ -51,8 +47,6 @@ class MissionData {
     for (int i = 0; i < allBuildingTypes.length; i++)
       Mission(
         id: 'bc_upgrade_${allBuildingTypes[i]}_lv2',
-        title: 'Upgrade ${_buildingDisplayName(allBuildingTypes[i])} to Lv.2',
-        description: 'Improve a ${_buildingDisplayName(allBuildingTypes[i])} to level 2.',
         branch: MissionBranch.basicConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.upgradeBuilding,
@@ -64,8 +58,6 @@ class MissionData {
 
     Mission(
       id: 'bc_houses_8_lv1',
-      title: 'Have 8 Houses',
-      description: 'Have 8 houses at level 1 or above.',
       branch: MissionBranch.basicConstruction,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachBuildingCount,
@@ -79,8 +71,6 @@ class MissionData {
     for (int i = 0; i < allBuildingTypes.length; i++)
       Mission(
         id: 'bc_upgrade_${allBuildingTypes[i]}_lv3',
-        title: 'Upgrade ${_buildingDisplayName(allBuildingTypes[i])} to Lv.3',
-        description: 'Improve a ${_buildingDisplayName(allBuildingTypes[i])} to level 3.',
         branch: MissionBranch.basicConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.upgradeBuilding,
@@ -92,8 +82,6 @@ class MissionData {
 
     Mission(
       id: 'bc_houses_12_lv1',
-      title: 'Have 12 Houses',
-      description: 'Have 12 houses at level 1 or above.',
       branch: MissionBranch.basicConstruction,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachBuildingCount,
@@ -108,8 +96,6 @@ class MissionData {
   static const List<Mission> _decoratorBranch = [
     Mission(
       id: 'dc_deco_1_coin50',
-      title: 'First Decoration',
-      description: 'Have 1 decoration that costs at least 50 coins.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.haveDecorationMinCoinCost,
@@ -120,8 +106,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_tiles_25',
-      title: 'Reach 25 Special Tiles',
-      description: 'Place 25 special tiles (road, sand, water, rock) on the map.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
@@ -131,8 +115,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_deco_3_coin80',
-      title: '3 Pricey Decorations',
-      description: 'Have 3 decorations that each cost at least 80 coins.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.haveDecorationMinCoinCost,
@@ -143,8 +125,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_tiles_40',
-      title: 'Reach 40 Special Tiles',
-      description: 'Place 40 special tiles (road, sand, water, rock) on the map.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
@@ -154,8 +134,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_deco_1_gem10',
-      title: 'Gem Decoration',
-      description: 'Have 1 decoration that costs at least 10 gems.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.haveDecorationMinGemCost,
@@ -166,8 +144,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_tiles_60',
-      title: 'Reach 60 Special Tiles',
-      description: 'Place 60 special tiles (road, sand, water, rock) on the map.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
@@ -177,8 +153,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_deco_1_gem30',
-      title: 'Rare Gem Decoration',
-      description: 'Have 1 decoration that costs at least 30 gems.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.haveDecorationMinGemCost,
@@ -189,8 +163,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_tiles_80',
-      title: 'Reach 80 Special Tiles',
-      description: 'Place 80 special tiles (road, sand, water, rock) on the map.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
@@ -200,8 +172,6 @@ class MissionData {
     ),
     Mission(
       id: 'dc_deco_5_coin100',
-      title: '5 Premium Decorations',
-      description: 'Have 5 decorations that each cost at least 100 coins.',
       branch: MissionBranch.decorator,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.haveDecorationMinCoinCost,
@@ -216,8 +186,6 @@ class MissionData {
     for (int i = 0; i < allBuildingTypes.length; i++)
       Mission(
         id: 'ac_count_${allBuildingTypes[i]}_lv1',
-        title: 'Reach ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s Lv.1',
-        description: 'Have ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s at level 1 or above.',
         branch: MissionBranch.advancedConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.reachBuildingCount,
@@ -231,8 +199,6 @@ class MissionData {
     for (int i = 0; i < allBuildingTypes.length; i++)
       Mission(
         id: 'ac_count_${allBuildingTypes[i]}_lv2',
-        title: 'Reach ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s Lv.2',
-        description: 'Have ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s at level 2 or above.',
         branch: MissionBranch.advancedConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.reachBuildingCount,
@@ -246,8 +212,6 @@ class MissionData {
     for (int i = 0; i < allBuildingTypes.length; i++)
       Mission(
         id: 'ac_count_${allBuildingTypes[i]}_lv3',
-        title: 'Reach ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s Lv.3',
-        description: 'Have ${_advCount(allBuildingTypes[i])} ${_buildingDisplayName(allBuildingTypes[i])}s at level 3.',
         branch: MissionBranch.advancedConstruction,
         checkType: MissionCheckType.bm,
         conditionType: MissionConditionType.reachBuildingCount,
@@ -262,8 +226,6 @@ class MissionData {
   static const List<Mission> _villagerBranch = [
     Mission(
       id: 'vl_happy_1',
-      title: '1 Happy Villager',
-      description: 'Get 1 villager to 100% happiness.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -273,8 +235,6 @@ class MissionData {
     ),
     Mission(
       id: 'vl_book_happy',
-      title: 'Happiness Book',
-      description: 'Use a Happiness Book on a villager to temporarily get 100% happiness.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappinessWithBook,
@@ -284,8 +244,6 @@ class MissionData {
     ),
     Mission(
       id: 'vl_happy_3',
-      title: '3 Happy Villagers',
-      description: 'Get 3 villagers to 100% happiness at the same time.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -295,8 +253,6 @@ class MissionData {
     ),
     Mission(
       id: 'vl_happy_5',
-      title: '5 Happy Villagers',
-      description: 'Get 5 villagers to 100% happiness at the same time.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -306,8 +262,6 @@ class MissionData {
     ),
     Mission(
       id: 'vl_happy_10',
-      title: '10 Happy Villagers',
-      description: 'Get 10 villagers to 100% happiness at the same time.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -317,8 +271,6 @@ class MissionData {
     ),
     Mission(
       id: 'vl_happy_12_natural',
-      title: '12 Happy Villagers (Natural)',
-      description: 'Get 12 villagers to 100% happiness at the same time WITHOUT any Happiness Books active.',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappinessNatural,
@@ -331,8 +283,6 @@ class MissionData {
   static const List<Mission> _bookTrackingBranch = [
     Mission(
       id: 'bt_pages_100',
-      title: 'Read 100 Pages',
-      description: 'Log 100 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -342,8 +292,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_300',
-      title: 'Read 300 Pages',
-      description: 'Log 300 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -353,8 +301,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_books_1',
-      title: 'Finish 1 Book',
-      description: 'Finish reading 1 book completely.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.booksCompleted,
@@ -364,8 +310,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_500',
-      title: 'Read 500 Pages',
-      description: 'Log 500 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -375,8 +319,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_750',
-      title: 'Read 750 Pages',
-      description: 'Log 750 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -386,8 +328,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_books_2',
-      title: 'Finish 2 Books',
-      description: 'Finish reading 2 books completely.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.booksCompleted,
@@ -397,8 +337,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_1000',
-      title: 'Read 1,000 Pages',
-      description: 'Log 1,000 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -408,8 +346,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_1500',
-      title: 'Read 1,500 Pages',
-      description: 'Log 1,500 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -419,8 +355,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_books_4',
-      title: 'Finish 4 Books',
-      description: 'Finish reading 4 books completely.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.booksCompleted,
@@ -430,8 +364,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_pages_2500',
-      title: 'Read 2,500 Pages',
-      description: 'Log 2,500 pages read in total.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -441,8 +373,6 @@ class MissionData {
     ),
     Mission(
       id: 'bt_books_8',
-      title: 'Finish 8 Books',
-      description: 'Finish reading 8 books completely.',
       branch: MissionBranch.bookTracking,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.booksCompleted,
@@ -455,8 +385,6 @@ class MissionData {
   static const List<Mission> _halloweenBranch = [
     Mission(
       id: 'hw_enter',
-      title: 'Enter the App',
-      description: 'Open the app during the Halloween event.',
       branch: MissionBranch.halloween,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.enterAppDuringEvent,
@@ -465,8 +393,6 @@ class MissionData {
     ),
     Mission(
       id: 'hw_happy_5',
-      title: 'Make 5 Villagers Happy',
-      description: 'Get 5 villagers to 100% happiness at the same time.',
       branch: MissionBranch.halloween,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -476,8 +402,6 @@ class MissionData {
     ),
     Mission(
       id: 'hw_pages_500',
-      title: 'Read 500 Pages',
-      description: 'Log 500 total pages read.',
       branch: MissionBranch.halloween,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -490,8 +414,6 @@ class MissionData {
   static const List<Mission> _christmasBranch = [
     Mission(
       id: 'xmas_enter',
-      title: 'Enter the App',
-      description: 'Open the app during the Christmas event.',
       branch: MissionBranch.christmas,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.enterAppDuringEvent,
@@ -500,8 +422,6 @@ class MissionData {
     ),
     Mission(
       id: 'xmas_happy_3',
-      title: 'Make 3 Villagers Happy',
-      description: 'Get 3 villagers to 100% happiness at the same time.',
       branch: MissionBranch.christmas,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -511,8 +431,6 @@ class MissionData {
     ),
     Mission(
       id: 'xmas_pages_1000',
-      title: 'Read 1,000 Pages',
-      description: 'Log 1,000 total pages read.',
       branch: MissionBranch.christmas,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -522,8 +440,6 @@ class MissionData {
     ),
     Mission(
       id: 'xmas_happy_10',
-      title: 'Make 10 Villagers Happy',
-      description: 'Get 10 villagers to 100% happiness at the same time.',
       branch: MissionBranch.christmas,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -536,8 +452,6 @@ class MissionData {
   static const List<Mission> _easterBranch = [
     Mission(
       id: 'easter_enter',
-      title: 'Enter the App',
-      description: 'Open the app during the Easter event.',
       branch: MissionBranch.easter,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.enterAppDuringEvent,
@@ -546,8 +460,6 @@ class MissionData {
     ),
     Mission(
       id: 'easter_bunny_happy_3',
-      title: 'Make 3 Bunny Villagers Happy',
-      description: 'Get 3 rabbit villagers to 100% happiness at the same time.',
       branch: MissionBranch.easter,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerSpeciesHappiness,
@@ -558,8 +470,6 @@ class MissionData {
     ),
     Mission(
       id: 'easter_pages_300',
-      title: 'Read 300 Pages',
-      description: 'Log 300 total pages read.',
       branch: MissionBranch.easter,
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
@@ -569,8 +479,6 @@ class MissionData {
     ),
     Mission(
       id: 'easter_happy_5',
-      title: 'Make 5 Villagers Happy',
-      description: 'Get 5 villagers to 100% happiness at the same time.',
       branch: MissionBranch.easter,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
@@ -579,20 +487,6 @@ class MissionData {
       orderInBranch: 3,
     ),
   ];
-
-  static String _buildingDisplayName(String type) {
-    switch (type) {
-      case 'house': return 'House';
-      case 'park': return 'Park';
-      case 'restaurant': return 'Restaurant';
-      case 'water_plant': return 'Water Tower';
-      case 'power_plant': return 'Power Station';
-      case 'school': return 'School';
-      case 'library': return 'Library';
-      case 'hospital': return 'Hospital';
-      default: return type;
-    }
-  }
 
   static int _advCount(String type) => type == 'house' ? 16 : 3;
 

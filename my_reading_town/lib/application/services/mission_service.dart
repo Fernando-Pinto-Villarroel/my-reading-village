@@ -83,21 +83,38 @@ class MissionService {
       Mission mission, Map<String, MissionProgress> progress,
       {int? totalPagesRead, int? completedBooks}) async {
     final p = _getOrCreateProgress(mission, progress);
-    if (p.activatedAt == null) {
+
+    final needsActivationTime = p.activatedAt == null;
+
+    // Capture the baseline if:
+    // - Never set (null), OR
+    // - Was set to 0 but we now have real page data (fixes wrong baselines
+    //   saved when page counts weren't loaded yet)
+    final currentPages = totalPagesRead ?? 0;
+    final currentBooks = completedBooks ?? 0;
+    final needsBaseline = _isEventReadingMission(mission) &&
+        (p.pagesAtActivation == null ||
+            (p.pagesAtActivation == 0 && currentPages > 0));
+
+    if (!needsActivationTime && !needsBaseline) return;
+
+    if (needsActivationTime) {
       p.activatedAt = DateTime.now().toIso8601String();
-      int? pagesBaseline;
-      int? booksBaseline;
-      if (_isEventReadingMission(mission)) {
-        pagesBaseline = totalPagesRead ?? 0;
-        booksBaseline = completedBooks ?? 0;
-        p.pagesAtActivation = pagesBaseline;
-        p.booksAtActivation = booksBaseline;
-      }
-      await _invRepo.upsertMissionProgress(mission.id,
-          activatedAt: p.activatedAt,
-          pagesAtActivation: pagesBaseline,
-          booksAtActivation: booksBaseline);
     }
+
+    int? pagesBaseline;
+    int? booksBaseline;
+    if (needsBaseline) {
+      pagesBaseline = currentPages;
+      booksBaseline = currentBooks;
+      p.pagesAtActivation = pagesBaseline;
+      p.booksAtActivation = booksBaseline;
+    }
+
+    await _invRepo.upsertMissionProgress(mission.id,
+        activatedAt: needsActivationTime ? p.activatedAt : null,
+        pagesAtActivation: pagesBaseline,
+        booksAtActivation: booksBaseline);
   }
 
   Future<void> checkMissions({
