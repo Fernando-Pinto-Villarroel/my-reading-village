@@ -24,11 +24,16 @@ class _SpeciesBookDialogState extends State<_SpeciesBookDialog> {
 
   Color _rarityColor(VillagerRarity rarity) {
     switch (rarity) {
-      case VillagerRarity.common: return const Color(0xFF78909C);
-      case VillagerRarity.rare: return const Color(0xFF1E88E5);
-      case VillagerRarity.extraordinary: return const Color(0xFF8E24AA);
-      case VillagerRarity.legendary: return const Color(0xFFEF6C00);
-      case VillagerRarity.godly: return const Color(0xFFE53935);
+      case VillagerRarity.common:
+        return const Color(0xFF78909C);
+      case VillagerRarity.rare:
+        return const Color(0xFF1E88E5);
+      case VillagerRarity.extraordinary:
+        return const Color(0xFF8E24AA);
+      case VillagerRarity.legendary:
+        return const Color(0xFFEF6C00);
+      case VillagerRarity.godly:
+        return const Color(0xFFE53935);
     }
   }
 
@@ -57,7 +62,8 @@ class _SpeciesBookDialogState extends State<_SpeciesBookDialog> {
       ),
       child: SizedBox(
         width: isLandscape ? screenSize.width * 0.8 : screenSize.width * 0.95,
-        height: isLandscape ? screenSize.height * 0.9 : screenSize.height * 0.85,
+        height:
+            isLandscape ? screenSize.height * 0.9 : screenSize.height * 0.85,
         child: Column(
           children: [
             _BookHeader(lang: lang),
@@ -102,7 +108,8 @@ class _BookHeader extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, 16, 12, 16),
       child: Row(
         children: [
-          Icon(Icons.menu_book_rounded, color: const Color(0xFFFFECB3), size: 28),
+          Icon(Icons.menu_book_rounded,
+              color: const Color(0xFFFFECB3), size: 28),
           SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -163,9 +170,7 @@ class _RarityFilter extends StatelessWidget {
                   duration: Duration(milliseconds: 150),
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? color
-                        : color.withValues(alpha: 0.12),
+                    color: isSelected ? color : color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: color,
@@ -211,11 +216,10 @@ class _SpeciesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLandscape = MediaQuery.of(context).size.width >
-        MediaQuery.of(context).size.height;
-    final crossAxisCount = isLandscape
-        ? (screenWidth > 900 ? 6 : 5)
-        : (screenWidth > 480 ? 5 : 4);
+    final isLandscape =
+        MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
+    final crossAxisCount =
+        isLandscape ? (screenWidth > 900 ? 6 : 5) : (screenWidth > 480 ? 5 : 4);
 
     return GridView.builder(
       padding: EdgeInsets.all(12),
@@ -294,7 +298,7 @@ class _SpeciesCard extends StatelessWidget {
               padding: EdgeInsets.all(6),
               child: isUnlocked
                   ? Image.asset(
-                      'assets/images/${species.id}_villager.png',
+                      'assets/images/villagers/${species.id}/${species.id}_villager.png',
                       filterQuality: FilterQuality.medium,
                       errorBuilder: (_, __, ___) => Icon(
                         Icons.pets,
@@ -303,10 +307,10 @@ class _SpeciesCard extends StatelessWidget {
                       ),
                     )
                   : ColorFiltered(
-                      colorFilter: ColorFilter.mode(
-                          Colors.black, BlendMode.srcATop),
+                      colorFilter:
+                          ColorFilter.mode(Colors.black, BlendMode.srcATop),
                       child: Image.asset(
-                        'assets/images/${species.id}_villager.png',
+                        'assets/images/villagers/${species.id}/${species.id}_villager.png',
                         filterQuality: FilterQuality.medium,
                         errorBuilder: (_, __, ___) => Icon(
                           Icons.lock,
@@ -331,9 +335,8 @@ class _SpeciesCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
-                      color: isUnlocked
-                          ? AppTheme.darkText
-                          : Colors.grey.shade500,
+                      color:
+                          isUnlocked ? AppTheme.darkText : Colors.grey.shade500,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -389,13 +392,11 @@ class _SpeciesDetailPopup extends StatelessWidget {
       return lang.translate('species_book_unlock_starter');
     }
     if (species.unlockType == 'level' && species.unlockLevel != null) {
-      return lang.translate('species_book_unlock_level')
+      return lang
+          .translate('species_book_unlock_level')
           .replaceAll('{level}', '${species.unlockLevel}');
     }
-    if (species.unlockType == 'special') {
-      return lang.translate('species_book_unlock_store');
-    }
-    return lang.translate('species_book_unlock_special');
+    return lang.translate('species_book_unlock_store');
   }
 
   @override
@@ -412,132 +413,132 @@ class _SpeciesDetailPopup extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: isUnlocked
-                    ? rarityColor.withValues(alpha: 0.12)
-                    : Colors.grey.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isUnlocked ? rarityColor : Colors.grey.shade300,
-                  width: 2,
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: isUnlocked
+                      ? rarityColor.withValues(alpha: 0.12)
+                      : Colors.grey.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isUnlocked ? rarityColor : Colors.grey.shade300,
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: Center(
-                child: isUnlocked
-                    ? Image.asset(
-                        'assets/images/${species.id}_villager.png',
-                        width: 72,
-                        height: 72,
-                        filterQuality: FilterQuality.medium,
-                        errorBuilder: (_, __, ___) => Icon(Icons.pets,
-                            size: 40, color: rarityColor),
-                      )
-                    : ColorFiltered(
-                        colorFilter:
-                            ColorFilter.mode(Colors.black, BlendMode.srcATop),
-                        child: Image.asset(
-                          'assets/images/${species.id}_villager.png',
+                child: Center(
+                  child: isUnlocked
+                      ? Image.asset(
+                          'assets/images/villagers/${species.id}/${species.id}_villager.png',
                           width: 72,
                           height: 72,
                           filterQuality: FilterQuality.medium,
-                          errorBuilder: (_, __, ___) => Icon(Icons.lock,
-                              size: 40, color: Colors.grey.shade400),
+                          errorBuilder: (_, __, ___) =>
+                              Icon(Icons.pets, size: 40, color: rarityColor),
+                        )
+                      : ColorFiltered(
+                          colorFilter:
+                              ColorFilter.mode(Colors.black, BlendMode.srcATop),
+                          child: Image.asset(
+                            'assets/images/villagers/${species.id}/${species.id}_villager.png',
+                            width: 72,
+                            height: 72,
+                            filterQuality: FilterQuality.medium,
+                            errorBuilder: (_, __, ___) => Icon(Icons.lock,
+                                size: 40, color: Colors.grey.shade400),
+                          ),
                         ),
-                      ),
-              ),
-            ),
-            SizedBox(height: 14),
-            Text(
-              isUnlocked
-                  ? lang.translate(species.nameKey)
-                  : lang.translate('species_book_locked'),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: isUnlocked ? AppTheme.darkText : Colors.grey.shade500,
-              ),
-            ),
-            SizedBox(height: 8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-              decoration: BoxDecoration(
-                color: rarityColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: rarityColor, width: 1.5),
-              ),
-              child: Text(
-                lang.translate(SpeciesRules.rarityKey(species.rarity)),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: rarityColor,
                 ),
               ),
-            ),
-            SizedBox(height: 16),
-            if (isUnlocked) ...[
+              SizedBox(height: 14),
+              Text(
+                isUnlocked
+                    ? lang.translate(species.nameKey)
+                    : lang.translate('species_book_locked'),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: isUnlocked ? AppTheme.darkText : Colors.grey.shade500,
+                ),
+              ),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                decoration: BoxDecoration(
+                  color: rarityColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: rarityColor, width: 1.5),
+                ),
+                child: Text(
+                  lang.translate(SpeciesRules.rarityKey(species.rarity)),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: rarityColor,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              if (isUnlocked) ...[
+                _InfoRow(
+                  icon: Icons.cottage,
+                  label: lang.translate('species_book_detail_inhabitants'),
+                  value: '$inhabitantCount',
+                  color: rarityColor,
+                ),
+                SizedBox(height: 8),
+              ],
               _InfoRow(
-                icon: Icons.cottage,
-                label: lang.translate('species_book_detail_inhabitants'),
-                value: '$inhabitantCount',
+                icon: Icons.lock_open,
+                label: lang.translate('species_book_detail_how'),
+                value: _unlockDescription(),
                 color: rarityColor,
               ),
               SizedBox(height: 8),
+              if (isUnlocked) ...[
+                Divider(color: const Color(0xFFD7B899), thickness: 1),
+                SizedBox(height: 8),
+                Text(
+                  lang.translate(species.descriptionKey),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.darkText.withValues(alpha: 0.75),
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ] else ...[
+                Divider(color: const Color(0xFFD7B899), thickness: 1),
+                SizedBox(height: 8),
+                Text(
+                  lang.translate('species_book_locked_desc'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade500,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8D6E63),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    lang.translate('close'),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
-            _InfoRow(
-              icon: Icons.lock_open,
-              label: lang.translate('species_book_detail_how'),
-              value: _unlockDescription(),
-              color: rarityColor,
-            ),
-            SizedBox(height: 8),
-            if (isUnlocked) ...[
-              Divider(color: const Color(0xFFD7B899), thickness: 1),
-              SizedBox(height: 8),
-              Text(
-                lang.translate(species.descriptionKey),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppTheme.darkText.withValues(alpha: 0.75),
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ] else ...[
-              Divider(color: const Color(0xFFD7B899), thickness: 1),
-              SizedBox(height: 8),
-              Text(
-                lang.translate('species_book_locked_desc'),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade500,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8D6E63),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: Text(
-                  lang.translate('close'),
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
           ),
         ),
       ),

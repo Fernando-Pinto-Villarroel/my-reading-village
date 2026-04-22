@@ -11,6 +11,8 @@ class NotificationService {
   static const int _rouletteId = 4000;
   static const int _eventBaseId = 5000;
   static const int _eventNotifsPerEvent = 3;
+  static const int _storeDiscountBaseId = 6000;
+  static const int _maxStoreDiscountSlots = 10;
 
   static const String _dailyChannelId = 'daily_reminder';
   static const String _dailyChannelName = 'Daily Reading Reminder';
@@ -22,6 +24,8 @@ class NotificationService {
   static const String _rouletteChannelName = 'Roulette Spin';
   static const String _eventChannelId = 'event_reminder';
   static const String _eventChannelName = 'Event Reminders';
+  static const String _storeDiscountChannelId = 'store_discount';
+  static const String _storeDiscountChannelName = 'Store Discounts';
 
   static const Map<String, int> _minigameNotifIds = {
     'guess_author': _minigameBaseId,
@@ -246,6 +250,38 @@ class NotificationService {
           android: AndroidNotificationDetails(
             _eventChannelId,
             _eventChannelName,
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/launcher_icon',
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+      slot++;
+    }
+  }
+
+  Future<void> scheduleStoreDiscountNotifications({
+    required List<({DateTime scheduledAt, String title, String body})> notifications,
+  }) async {
+    if (!_initialized) return;
+    for (int i = 0; i < _maxStoreDiscountSlots; i++) {
+      await _plugin.cancel(id: _storeDiscountBaseId + i);
+    }
+    final now = DateTime.now();
+    int slot = 0;
+    for (final n in notifications) {
+      if (slot >= _maxStoreDiscountSlots) break;
+      if (!n.scheduledAt.isAfter(now)) continue;
+      await _plugin.zonedSchedule(
+        id: _storeDiscountBaseId + slot,
+        title: n.title,
+        body: n.body,
+        scheduledDate: _fromDeviceMs(n.scheduledAt.millisecondsSinceEpoch),
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            _storeDiscountChannelId,
+            _storeDiscountChannelName,
             importance: Importance.high,
             priority: Priority.high,
             icon: '@mipmap/launcher_icon',

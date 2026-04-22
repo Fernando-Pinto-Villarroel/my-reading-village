@@ -17,10 +17,12 @@ class Villager {
 
   bool get isSad => happiness < VillageRules.sadHappinessThreshold;
 
-  String get spriteFile =>
-      isSad ? '${species}_villager_sad.png' : '${species}_villager.png';
+  String get spriteFile => isSad
+      ? 'villagers/$species/${species}_villager_sad.png'
+      : 'villagers/$species/${species}_villager.png';
 
-  String get sleepingSpriteFile => '${species}_villager_sleeping.png';
+  String get sleepingSpriteFile =>
+      'villagers/$species/${species}_villager_sleeping.png';
 
   String get assetPath => 'assets/images/$spriteFile';
 

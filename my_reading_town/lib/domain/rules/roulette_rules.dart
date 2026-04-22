@@ -3,6 +3,7 @@ import 'package:my_reading_town/app_constants.dart';
 
 class RouletteRules {
   static const int gemCostPerSpin = 20;
+  static const int guaranteedSpeciesAfterSpins = 30;
 
   static const Map<String, double> rewardWeights = {
     'coins_30': 0.31,

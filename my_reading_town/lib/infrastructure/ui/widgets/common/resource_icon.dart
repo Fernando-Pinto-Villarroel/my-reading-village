@@ -18,7 +18,7 @@ class ResourceIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/images/$assetName.png',
+      'assets/images/resources/$assetName.png',
       width: size,
       height: size,
       filterQuality: FilterQuality.medium,

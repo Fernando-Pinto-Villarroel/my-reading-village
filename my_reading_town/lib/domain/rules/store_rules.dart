@@ -98,52 +98,52 @@ class DiscountInfo {
 
 class StoreRules {
   static const List<StoreResourceItem> coinItems = [
-    StoreResourceItem(id: 'coins_50', resource: ResourceType.coins, amount: 50, gemCost: 10),
-    StoreResourceItem(id: 'coins_100', resource: ResourceType.coins, amount: 100, gemCost: 18),
-    StoreResourceItem(id: 'coins_200', resource: ResourceType.coins, amount: 200, gemCost: 35),
-    StoreResourceItem(id: 'coins_500', resource: ResourceType.coins, amount: 500, gemCost: 80),
+    StoreResourceItem(id: 'coins_50', resource: ResourceType.coins, amount: 50, gemCost: 15),
+    StoreResourceItem(id: 'coins_100', resource: ResourceType.coins, amount: 100, gemCost: 27),
+    StoreResourceItem(id: 'coins_200', resource: ResourceType.coins, amount: 200, gemCost: 53),
+    StoreResourceItem(id: 'coins_500', resource: ResourceType.coins, amount: 500, gemCost: 120),
   ];
 
   static const List<StoreResourceItem> woodItems = [
-    StoreResourceItem(id: 'wood_50', resource: ResourceType.wood, amount: 50, gemCost: 8),
-    StoreResourceItem(id: 'wood_100', resource: ResourceType.wood, amount: 100, gemCost: 15),
-    StoreResourceItem(id: 'wood_200', resource: ResourceType.wood, amount: 200, gemCost: 28),
-    StoreResourceItem(id: 'wood_500', resource: ResourceType.wood, amount: 500, gemCost: 65),
+    StoreResourceItem(id: 'wood_50', resource: ResourceType.wood, amount: 50, gemCost: 12),
+    StoreResourceItem(id: 'wood_100', resource: ResourceType.wood, amount: 100, gemCost: 23),
+    StoreResourceItem(id: 'wood_200', resource: ResourceType.wood, amount: 200, gemCost: 42),
+    StoreResourceItem(id: 'wood_500', resource: ResourceType.wood, amount: 500, gemCost: 98),
   ];
 
   static const List<StoreResourceItem> metalItems = [
-    StoreResourceItem(id: 'metal_30', resource: ResourceType.metal, amount: 30, gemCost: 8),
-    StoreResourceItem(id: 'metal_60', resource: ResourceType.metal, amount: 60, gemCost: 15),
-    StoreResourceItem(id: 'metal_120', resource: ResourceType.metal, amount: 120, gemCost: 28),
-    StoreResourceItem(id: 'metal_300', resource: ResourceType.metal, amount: 300, gemCost: 65),
+    StoreResourceItem(id: 'metal_30', resource: ResourceType.metal, amount: 30, gemCost: 12),
+    StoreResourceItem(id: 'metal_60', resource: ResourceType.metal, amount: 60, gemCost: 23),
+    StoreResourceItem(id: 'metal_120', resource: ResourceType.metal, amount: 120, gemCost: 42),
+    StoreResourceItem(id: 'metal_300', resource: ResourceType.metal, amount: 300, gemCost: 98),
   ];
 
   static const List<StorePowerupItem> bookItems = [
-    StorePowerupItem(id: 'book_1', powerup: PowerupType.book, quantity: 1, gemCost: 5),
-    StorePowerupItem(id: 'book_3', powerup: PowerupType.book, quantity: 3, gemCost: 12),
-    StorePowerupItem(id: 'book_5', powerup: PowerupType.book, quantity: 5, gemCost: 18),
-    StorePowerupItem(id: 'book_10', powerup: PowerupType.book, quantity: 10, gemCost: 30),
+    StorePowerupItem(id: 'book_1', powerup: PowerupType.book, quantity: 1, gemCost: 13),
+    StorePowerupItem(id: 'book_3', powerup: PowerupType.book, quantity: 3, gemCost: 30),
+    StorePowerupItem(id: 'book_5', powerup: PowerupType.book, quantity: 5, gemCost: 45),
+    StorePowerupItem(id: 'book_10', powerup: PowerupType.book, quantity: 10, gemCost: 75),
   ];
 
   static const List<StorePowerupItem> sandwichItems = [
-    StorePowerupItem(id: 'sandwich_1', powerup: PowerupType.sandwich, quantity: 1, gemCost: 5),
-    StorePowerupItem(id: 'sandwich_3', powerup: PowerupType.sandwich, quantity: 3, gemCost: 12),
-    StorePowerupItem(id: 'sandwich_5', powerup: PowerupType.sandwich, quantity: 5, gemCost: 18),
-    StorePowerupItem(id: 'sandwich_10', powerup: PowerupType.sandwich, quantity: 10, gemCost: 30),
+    StorePowerupItem(id: 'sandwich_1', powerup: PowerupType.sandwich, quantity: 1, gemCost: 13),
+    StorePowerupItem(id: 'sandwich_3', powerup: PowerupType.sandwich, quantity: 3, gemCost: 30),
+    StorePowerupItem(id: 'sandwich_5', powerup: PowerupType.sandwich, quantity: 5, gemCost: 45),
+    StorePowerupItem(id: 'sandwich_10', powerup: PowerupType.sandwich, quantity: 10, gemCost: 75),
   ];
 
   static const List<StorePowerupItem> hammerItems = [
-    StorePowerupItem(id: 'hammer_1', powerup: PowerupType.hammer, quantity: 1, gemCost: 8),
-    StorePowerupItem(id: 'hammer_3', powerup: PowerupType.hammer, quantity: 3, gemCost: 20),
-    StorePowerupItem(id: 'hammer_5', powerup: PowerupType.hammer, quantity: 5, gemCost: 35),
-    StorePowerupItem(id: 'hammer_10', powerup: PowerupType.hammer, quantity: 10, gemCost: 60),
+    StorePowerupItem(id: 'hammer_1', powerup: PowerupType.hammer, quantity: 1, gemCost: 20),
+    StorePowerupItem(id: 'hammer_3', powerup: PowerupType.hammer, quantity: 3, gemCost: 50),
+    StorePowerupItem(id: 'hammer_5', powerup: PowerupType.hammer, quantity: 5, gemCost: 88),
+    StorePowerupItem(id: 'hammer_10', powerup: PowerupType.hammer, quantity: 10, gemCost: 150),
   ];
 
   static const List<StorePowerupItem> glassesItems = [
-    StorePowerupItem(id: 'glasses_1', powerup: PowerupType.glasses, quantity: 1, gemCost: 10),
-    StorePowerupItem(id: 'glasses_3', powerup: PowerupType.glasses, quantity: 3, gemCost: 25),
-    StorePowerupItem(id: 'glasses_5', powerup: PowerupType.glasses, quantity: 5, gemCost: 40),
-    StorePowerupItem(id: 'glasses_10', powerup: PowerupType.glasses, quantity: 10, gemCost: 75),
+    StorePowerupItem(id: 'glasses_1', powerup: PowerupType.glasses, quantity: 1, gemCost: 25),
+    StorePowerupItem(id: 'glasses_3', powerup: PowerupType.glasses, quantity: 3, gemCost: 63),
+    StorePowerupItem(id: 'glasses_5', powerup: PowerupType.glasses, quantity: 5, gemCost: 100),
+    StorePowerupItem(id: 'glasses_10', powerup: PowerupType.glasses, quantity: 10, gemCost: 188),
   ];
 
   static const List<StoreGemsItem> gemsItems = [
@@ -235,25 +235,25 @@ class StoreRules {
 
   static const double discountMinThreshold = 5.0;
 
-  static const List<_DiscountEvent> _events = [
-    _DiscountEvent(startMonth: 1,  startDay: 1,  endMonth: 1,  endDay: 3,  labelKey: 'discount_new_year',    maxPct: 25),
-    _DiscountEvent(startMonth: 2,  startDay: 13, endMonth: 2,  endDay: 15, labelKey: 'discount_valentines',  maxPct: 20),
-    _DiscountEvent(startMonth: 7,  startDay: 1,  endMonth: 7,  endDay: 7,  labelKey: 'discount_summer',      maxPct: 20),
-    _DiscountEvent(startMonth: 10, startDay: 29, endMonth: 10, endDay: 31, labelKey: 'discount_halloween',   maxPct: 30),
-    _DiscountEvent(startMonth: 11, startDay: 25, endMonth: 11, endDay: 30, labelKey: 'discount_black_friday',maxPct: 40),
-    _DiscountEvent(startMonth: 12, startDay: 22, endMonth: 12, endDay: 26, labelKey: 'discount_christmas',   maxPct: 50),
+  static const List<DiscountEvent> discountEvents = [
+    DiscountEvent(startMonth: 1,  startDay: 1,  endMonth: 1,  endDay: 8,  labelKey: 'discount_new_year',    maxPct: 25),
+    DiscountEvent(startMonth: 2,  startDay: 8,  endMonth: 2,  endDay: 15, labelKey: 'discount_valentines',  maxPct: 20),
+    DiscountEvent(startMonth: 7,  startDay: 1,  endMonth: 7,  endDay: 8,  labelKey: 'discount_summer',      maxPct: 20),
+    DiscountEvent(startMonth: 10, startDay: 24, endMonth: 10, endDay: 31, labelKey: 'discount_halloween',   maxPct: 30),
+    DiscountEvent(startMonth: 11, startDay: 23, endMonth: 11, endDay: 30, labelKey: 'discount_black_friday',maxPct: 40),
+    DiscountEvent(startMonth: 12, startDay: 19, endMonth: 12, endDay: 26, labelKey: 'discount_christmas',   maxPct: 50),
   ];
 
   static Map<String, DiscountInfo> computeDiscounts() {
     final now = DateTime.now();
-    _DiscountEvent? active;
+    DiscountEvent? active;
     DateTime? endsAt;
 
     if (AppConstants.testMode) {
-      active = _events.last;
+      active = discountEvents.last;
       endsAt = now.add(const Duration(days: 1));
     } else {
-      for (final event in _events) {
+      for (final event in discountEvents) {
         final start = DateTime(now.year, event.startMonth, event.startDay);
         final end = DateTime(now.year, event.endMonth, event.endDay, 23, 59, 59);
         if (now.isAfter(start) && now.isBefore(end)) {
@@ -311,7 +311,7 @@ class StoreRules {
   }
 }
 
-class _DiscountEvent {
+class DiscountEvent {
   final int startMonth;
   final int startDay;
   final int endMonth;
@@ -319,7 +319,7 @@ class _DiscountEvent {
   final String labelKey;
   final int maxPct;
 
-  const _DiscountEvent({
+  const DiscountEvent({
     required this.startMonth,
     required this.startDay,
     required this.endMonth,

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:my_reading_town/domain/rules/holiday_rules.dart';
 import 'package:my_reading_town/domain/entities/placed_building.dart';
 import 'package:my_reading_town/domain/entities/villager.dart';
 import 'package:my_reading_town/domain/entities/inventory_item.dart';
@@ -17,6 +18,7 @@ import 'package:my_reading_town/domain/rules/roulette_rules.dart';
 import 'package:my_reading_town/domain/rules/minigame_rules.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
+import 'package:my_reading_town/domain/rules/secret_codes_rules.dart';
 
 class VillageProvider extends ChangeNotifier {
   final VillageRepository _repo;
@@ -57,11 +59,14 @@ class VillageProvider extends ChangeNotifier {
   String _language = 'en';
   bool _tutorialCompleted = false;
   String? _rouletteLastFreeSpin;
+  String? _rouletteSpinWeek;
+  int _rouletteSpinWeekCount = 0;
   bool _hasNewBackpackItems = false;
   int _lastTotalPagesRead = 0;
   int _lastCompletedBooks = 0;
   List<String> _unlockedSpeciesIds = [];
   String? _pendingNewSpeciesId;
+  Map<String, String> _eventSpeciesOverrides = {};
   List<PendingVillagerChoice> _pendingVillagerChoices = [];
 
   List<PlacedBuilding> get placedBuildings => _placedBuildings;
@@ -88,6 +93,7 @@ class VillageProvider extends ChangeNotifier {
     }
     return result;
   }
+
   Set<String> get unlockedChunks => _unlockedChunks;
   int get expansionCount => _expansionCount;
   int get exp => _exp;
@@ -98,12 +104,24 @@ class VillageProvider extends ChangeNotifier {
   String get language => _language;
   bool get tutorialCompleted => _tutorialCompleted;
   String? get rouletteLastFreeSpin => _rouletteLastFreeSpin;
+  int get rouletteSpinWeekCount => _rouletteSpinWeekCount;
+  bool get rouletteSpinIsGuaranteed =>
+      _rouletteSpinWeekCount >= RouletteRules.guaranteedSpeciesAfterSpins;
+
+  static String _currentIsoWeek() {
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
+    final weekNum = ((dayOfYear - now.weekday + 10) ~/ 7);
+    return '${now.year}-W${weekNum.toString().padLeft(2, '0')}';
+  }
 
   bool get canSpinRouletteForFree {
     if (_rouletteLastFreeSpin == null) return true;
     final last = DateTime.parse(_rouletteLastFreeSpin!);
     final now = DateTime.now();
-    return !(last.year == now.year && last.month == now.month && last.day == now.day);
+    return !(last.year == now.year &&
+        last.month == now.month &&
+        last.day == now.day);
   }
 
   Duration get rouletteNextFreeSpinIn {
@@ -170,8 +188,8 @@ class VillageProvider extends ChangeNotifier {
   Duration minigameCooldownRemaining(String minigameId) =>
       _inventorySvc.minigameCooldownRemaining(minigameId, _minigameCooldowns);
 
-  bool get hasAnyMinigameAvailable => MinigameRules.configs.keys
-      .any((id) => !isMinigameOnCooldown(id));
+  bool get hasAnyMinigameAvailable =>
+      MinigameRules.configs.keys.any((id) => !isMinigameOnCooldown(id));
 
   bool _prevMinigameAvailable = false;
 
@@ -309,7 +327,8 @@ class VillageProvider extends ChangeNotifier {
     final specialMaps = await _repo.getSpecialTiles();
     _specialTiles = {
       for (final m in specialMaps)
-        tileKey(m['tile_x'] as int, m['tile_y'] as int): m['tile_type'] as String,
+        tileKey(m['tile_x'] as int, m['tile_y'] as int):
+            m['tile_type'] as String,
     };
 
     final chunkMaps = await _repo.getUnlockedChunks();
@@ -326,6 +345,9 @@ class VillageProvider extends ChangeNotifier {
     _language = gameState['language'] as String? ?? 'en';
     _tutorialCompleted = (gameState['tutorial_completed'] as int? ?? 0) == 1;
     _rouletteLastFreeSpin = gameState['roulette_last_free_spin'] as String?;
+    final spinWeekData = await _repo.getRouletteSpinWeekData();
+    _rouletteSpinWeek = spinWeekData.week;
+    _rouletteSpinWeekCount = spinWeekData.count;
 
     _inventoryItems = await _inventorySvc.loadInventoryItems();
     await _crystallizeExpiredSpeedups();
@@ -335,6 +357,8 @@ class VillageProvider extends ChangeNotifier {
     _lastTotalPagesRead = await _bookRepo.getTotalPagesRead();
     _lastCompletedBooks = await _bookRepo.getCompletedBooksCount();
     _unlockedSpeciesIds = await _repo.getUnlockedSpeciesIds();
+    _eventSpeciesOverrides = await _repo.getEventSpeciesOverrides();
+    await _resolveEventSpeciesRewards();
 
     final choiceMaps = await _repo.getPendingVillagerChoices();
     _pendingVillagerChoices =
@@ -350,8 +374,8 @@ class VillageProvider extends ChangeNotifier {
         _villagers, _placedBuildings, walkableTiles,
         unlockedSpeciesIds: _unlockedSpeciesIds,
         pendingChoiceCountByHouse: pendingCountByHouse);
-    _villagerSvc.updateVillagerHappiness(
-        _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+    _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+        walkableTiles, _activePowerups, _playerLevel);
     notifyListeners();
   }
 
@@ -375,8 +399,23 @@ class VillageProvider extends ChangeNotifier {
       await _repo.setRouletteLastFreeSpin(now);
       _rouletteLastFreeSpin = now;
     }
+    final currentWeek = _currentIsoWeek();
+    if (_rouletteSpinWeek != currentWeek) {
+      _rouletteSpinWeekCount = 0;
+      _rouletteSpinWeek = currentWeek;
+    }
+    _rouletteSpinWeekCount++;
+    await _repo.setRouletteSpinWeekData(
+        _rouletteSpinWeek!, _rouletteSpinWeekCount);
     notifyListeners();
     return true;
+  }
+
+  Future<void> resetRouletteSpinWeekCount() async {
+    _rouletteSpinWeekCount = 0;
+    await _repo.setRouletteSpinWeekData(
+        _rouletteSpinWeek ?? _currentIsoWeek(), 0);
+    notifyListeners();
   }
 
   Future<void> applyRouletteReward(Map<String, dynamic> reward) async {
@@ -522,8 +561,8 @@ class VillageProvider extends ChangeNotifier {
           _villagers, _placedBuildings, walkableTiles,
           unlockedSpeciesIds: _unlockedSpeciesIds,
           pendingChoiceCountByHouse: pendingCountByHouse);
-      _villagerSvc.updateVillagerHappiness(
-          _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+      _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+          walkableTiles, _activePowerups, _playerLevel);
       notifyListeners();
     }
     return completed;
@@ -542,8 +581,9 @@ class VillageProvider extends ChangeNotifier {
         _pendingVillagerChoices.where((c) => c.houseId == building.id).length;
     final newSlots = cap - currentInHouse - pendingForHouse;
 
-    final availableSpecies =
-        _unlockedSpeciesIds.isNotEmpty ? _unlockedSpeciesIds : VillageRules.villagerSpecies;
+    final availableSpecies = _unlockedSpeciesIds.isNotEmpty
+        ? _unlockedSpeciesIds
+        : VillageRules.villagerSpecies;
 
     for (int i = 0; i < newSlots; i++) {
       final seed = DateTime.now().millisecondsSinceEpoch + i * 31337;
@@ -621,8 +661,8 @@ class VillageProvider extends ChangeNotifier {
         _villagers, _placedBuildings, walkableTiles,
         unlockedSpeciesIds: _unlockedSpeciesIds,
         pendingChoiceCountByHouse: pendingCountByHouse);
-    _villagerSvc.updateVillagerHappiness(
-        _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+    _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+        walkableTiles, _activePowerups, _playerLevel);
     await refreshResources();
     notifyListeners();
     return true;
@@ -657,8 +697,8 @@ class VillageProvider extends ChangeNotifier {
         _villagers, _placedBuildings, walkableTiles,
         unlockedSpeciesIds: _unlockedSpeciesIds,
         pendingChoiceCountByHouse: pendingCountByHouse);
-    _villagerSvc.updateVillagerHappiness(
-        _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+    _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+        walkableTiles, _activePowerups, _playerLevel);
     notifyListeners();
     return true;
   }
@@ -746,8 +786,8 @@ class VillageProvider extends ChangeNotifier {
         houseId: houseId));
     _pendingVillagerChoices.removeWhere((c) => c.id == choiceId);
     await _repo.deletePendingVillagerChoice(choiceId);
-    _villagerSvc.updateVillagerHappiness(
-        _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+    _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+        walkableTiles, _activePowerups, _playerLevel);
     notifyListeners();
   }
 
@@ -775,12 +815,53 @@ class VillageProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<({bool found, bool alreadyUsed, List<SecretReward> rewards})>
+      redeemSecretCode(String input) async {
+    final secretCode = SecretCodesRules.findCode(input);
+    if (secretCode == null)
+      return (found: false, alreadyUsed: false, rewards: <SecretReward>[]);
+
+    final normalized = input.trim().toUpperCase();
+    final alreadyUsed = await _repo.isSecretCodeUsed(normalized);
+    if (alreadyUsed)
+      return (found: true, alreadyUsed: true, rewards: <SecretReward>[]);
+
+    for (final reward in secretCode.rewards) {
+      switch (reward.type) {
+        case SecretRewardType.coins:
+          await addResources(coins: reward.amount);
+          break;
+        case SecretRewardType.gems:
+          await addResources(gems: reward.amount);
+          break;
+        case SecretRewardType.wood:
+          await addResources(wood: reward.amount);
+          break;
+        case SecretRewardType.metal:
+          await addResources(metal: reward.amount);
+          break;
+        case SecretRewardType.item:
+          if (reward.itemType != null) {
+            await addItemToInventory(reward.itemType!, amount: reward.amount);
+            _hasNewBackpackItems = true;
+          }
+          break;
+        case SecretRewardType.species:
+          break;
+      }
+    }
+
+    await _repo.markSecretCodeUsed(normalized);
+    notifyListeners();
+    return (found: true, alreadyUsed: false, rewards: secretCode.rewards);
+  }
+
   Future<bool> useBookItem(int villagerId) async {
     final result = await _inventorySvc.useBookItem(
         villagerId, _inventoryItems, _activePowerups);
     if (result) {
-      _villagerSvc.updateVillagerHappiness(
-          _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+      _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+          walkableTiles, _activePowerups, _playerLevel);
       _notifyBookItemUsed();
       notifyListeners();
     }
@@ -833,8 +914,8 @@ class VillageProvider extends ChangeNotifier {
 
   Future<void> cleanupExpiredPowerups() async {
     await _inventorySvc.cleanupExpiredPowerups(_activePowerups);
-    _villagerSvc.updateVillagerHappiness(
-        _villagers, _placedBuildings, walkableTiles, _activePowerups, _playerLevel);
+    _villagerSvc.updateVillagerHappiness(_villagers, _placedBuildings,
+        walkableTiles, _activePowerups, _playerLevel);
     notifyListeners();
   }
 
@@ -856,9 +937,60 @@ class VillageProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<({bool success, bool isDuplicate, String? speciesId, String? speciesNameKey})>
-      claimMissionReward(String missionId) async {
-    const empty = (success: false, isDuplicate: false, speciesId: null, speciesNameKey: null);
+  Future<void> _resolveEventSpeciesRewards() async {
+    final now = DateTime.now();
+    final activeEvents = HolidayRules.activeEvents(now);
+    bool changed = false;
+    for (final event in activeEvents) {
+      final key = '${event.id}_${now.year}';
+      if (_eventSpeciesOverrides.containsKey(key)) continue;
+      final missions = MissionData.getMissionsForBranch(event.branch);
+      Mission? target;
+      for (final m in missions.reversed) {
+        if (m.reward.speciesId != null) {
+          target = m;
+          break;
+        }
+      }
+      if (target == null) continue;
+      final originalId = target.reward.speciesId!;
+      String resolvedId;
+      if (!_unlockedSpeciesIds.contains(originalId)) {
+        resolvedId = originalId;
+      } else if (event.branch == MissionBranch.christmas &&
+          !_unlockedSpeciesIds.contains('reindeer')) {
+        resolvedId = 'reindeer';
+      } else {
+        final replacement =
+            SpeciesRules.pickRandomSpeciesReward(_unlockedSpeciesIds, Random());
+        resolvedId = replacement?.id ?? originalId;
+      }
+      _eventSpeciesOverrides[key] = resolvedId;
+      changed = true;
+    }
+    if (changed) await _repo.setEventSpeciesOverrides(_eventSpeciesOverrides);
+  }
+
+  String? getEventSpeciesReward(MissionBranch branch) {
+    final event = HolidayRules.eventForBranch(branch);
+    if (event == null) return null;
+    final key = '${event.id}_${DateTime.now().year}';
+    return _eventSpeciesOverrides[key];
+  }
+
+  Future<
+      ({
+        bool success,
+        bool isDuplicate,
+        String? speciesId,
+        String? speciesNameKey
+      })> claimMissionReward(String missionId) async {
+    const empty = (
+      success: false,
+      isDuplicate: false,
+      speciesId: null,
+      speciesNameKey: null
+    );
     final mission = MissionData.getMissionById(missionId);
     if (mission == null) return empty;
 
@@ -876,7 +1008,14 @@ class VillageProvider extends ChangeNotifier {
     if (missionId == 'vl_book_happy') _bookItemUsedSinceActive = false;
 
     if (reward.speciesId != null) {
-      final speciesResult = await applySpeciesBonus(reward.speciesId!);
+      String speciesId = reward.speciesId!;
+      final event = HolidayRules.eventForBranch(mission.branch);
+      if (event != null) {
+        final key = '${event.id}_${DateTime.now().year}';
+        final override = _eventSpeciesOverrides[key];
+        if (override != null) speciesId = override;
+      }
+      final speciesResult = await applySpeciesBonus(speciesId);
       notifyListeners();
       return (
         success: true,
@@ -887,7 +1026,12 @@ class VillageProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    return (success: true, isDuplicate: false, speciesId: null, speciesNameKey: null);
+    return (
+      success: true,
+      isDuplicate: false,
+      speciesId: null,
+      speciesNameKey: null
+    );
   }
 
   void _notifyBookItemUsed() {

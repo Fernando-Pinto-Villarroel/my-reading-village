@@ -1108,7 +1108,7 @@ class _VillagerImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/images/${species}_villager.png',
+      'assets/images/villagers/$species/${species}_villager.png',
       width: size,
       fit: BoxFit.contain,
       errorBuilder: (_, __, ___) => SizedBox(

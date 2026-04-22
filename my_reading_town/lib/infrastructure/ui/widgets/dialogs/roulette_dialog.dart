@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:ui' as ui;
-import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:confetti/confetti.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
@@ -13,6 +13,7 @@ import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.d
 import 'package:my_reading_town/domain/rules/roulette_rules.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/common/species_bonus_popup.dart';
 
 // Circus palette — bold, vivid, alternating so adjacent segments never share a hue
 const List<Color> _circusColors = [
@@ -48,38 +49,37 @@ class _RouletteReward {
 }
 
 List<_RouletteReward> _buildRewards(VillagerSpeciesData? weeklySpecies) {
-  final speciesAsset = weeklySpecies != null
-      ? 'assets/images/${weeklySpecies.id}_villager.png'
-      : 'assets/images/cat_villager.png';
+  final speciesAsset =
+      'assets/images/villagers/${weeklySpecies!.id}/${weeklySpecies.id}_villager.png';
 
   return [
     _RouletteReward(
       key: 'coins_30',
       type: 'coins',
       amount: 30,
-      assetPath: 'assets/images/coin.png',
+      assetPath: 'assets/images/resources/coin.png',
       iconBuilder: (s) => ResourceIcon.coin(size: s),
     ),
     _RouletteReward(
       key: 'gems_5',
       type: 'gems',
       amount: 5,
-      assetPath: 'assets/images/gem.png',
+      assetPath: 'assets/images/resources/gem.png',
       iconBuilder: (s) => ResourceIcon.gem(size: s),
     ),
     _RouletteReward(
       key: 'wood_30',
       type: 'wood',
       amount: 30,
-      assetPath: 'assets/images/wood.png',
+      assetPath: 'assets/images/resources/wood.png',
       iconBuilder: (s) => ResourceIcon.wood(size: s),
     ),
     _RouletteReward(
       key: 'sandwich',
       type: 'sandwich',
-      assetPath: 'assets/images/sandwich_item.png',
-      iconBuilder: (s) =>
-          Image.asset('assets/images/sandwich_item.png', width: s, height: s),
+      assetPath: 'assets/images/items/sandwich_item.png',
+      iconBuilder: (s) => Image.asset('assets/images/items/sandwich_item.png',
+          width: s, height: s),
     ),
     _RouletteReward(
       key: 'species',
@@ -90,43 +90,44 @@ List<_RouletteReward> _buildRewards(VillagerSpeciesData? weeklySpecies) {
         speciesAsset,
         width: s,
         height: s,
-        errorBuilder: (_, __, ___) => Icon(Icons.pets, size: s, color: AppTheme.gemPurple),
+        errorBuilder: (_, __, ___) =>
+            Icon(Icons.pets, size: s, color: AppTheme.darkLavender),
       ),
     ),
     _RouletteReward(
       key: 'metal_15',
       type: 'metal',
       amount: 15,
-      assetPath: 'assets/images/metal.png',
+      assetPath: 'assets/images/resources/metal.png',
       iconBuilder: (s) => ResourceIcon.metal(size: s),
     ),
     _RouletteReward(
       key: 'gems_15',
       type: 'gems',
       amount: 15,
-      assetPath: 'assets/images/gem.png',
+      assetPath: 'assets/images/resources/gem.png',
       iconBuilder: (s) => ResourceIcon.gem(size: s),
     ),
     _RouletteReward(
       key: 'hammer',
       type: 'hammer',
-      assetPath: 'assets/images/hammer_item.png',
-      iconBuilder: (s) =>
-          Image.asset('assets/images/hammer_item.png', width: s, height: s),
+      assetPath: 'assets/images/items/hammer_item.png',
+      iconBuilder: (s) => Image.asset('assets/images/items/hammer_item.png',
+          width: s, height: s),
     ),
     _RouletteReward(
       key: 'book',
       type: 'book',
-      assetPath: 'assets/images/book_item.png',
+      assetPath: 'assets/images/items/book_item.png',
       iconBuilder: (s) =>
-          Image.asset('assets/images/book_item.png', width: s, height: s),
+          Image.asset('assets/images/items/book_item.png', width: s, height: s),
     ),
     _RouletteReward(
       key: 'glasses',
       type: 'glasses',
-      assetPath: 'assets/images/glasses_item.png',
-      iconBuilder: (s) =>
-          Image.asset('assets/images/glasses_item.png', width: s, height: s),
+      assetPath: 'assets/images/items/glasses_item.png',
+      iconBuilder: (s) => Image.asset('assets/images/items/glasses_item.png',
+          width: s, height: s),
     ),
   ];
 }
@@ -194,7 +195,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
     super.dispose();
   }
 
-  Future<bool> _showGemConfirmDialog(BuildContext context, LanguageProvider lang, int gemCost) async {
+  Future<bool> _showGemConfirmDialog(
+      BuildContext context, LanguageProvider lang, int gemCost) async {
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -207,7 +209,10 @@ class _RouletteDialogState extends State<_RouletteDialog>
             SizedBox(width: 8),
             Text(
               lang.translate('store_confirm_title'),
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.darkText),
+              style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkText),
             ),
           ],
         ),
@@ -227,7 +232,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.darkLavender,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
               lang.translate('store_confirm_buy'),
@@ -247,7 +253,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
     if (!wasFree) {
       final gemCost = RouletteRules.gemCostPerSpin;
       if (village.gems < gemCost) {
-        if (mounted) showErrorToast(context, lang.translate('store_not_enough_gems'));
+        if (mounted)
+          showErrorToast(context, lang.translate('store_not_enough_gems'));
         return;
       }
       final confirmed = await _showGemConfirmDialog(context, lang, gemCost);
@@ -268,10 +275,15 @@ class _RouletteDialogState extends State<_RouletteDialog>
       _isSpinning = true;
     });
 
-    final targetIndex = RouletteRules.pickWeightedIndex(
-      _random,
-      _rewards.map((r) => r.key).toList(),
-    );
+    final isGuaranteed = village.rouletteSpinIsGuaranteed;
+    final speciesIndex = _rewards.indexWhere((r) => r.type == 'species');
+
+    final targetIndex = (isGuaranteed && speciesIndex >= 0)
+        ? speciesIndex
+        : RouletteRules.pickWeightedIndex(
+            _random,
+            _rewards.map((r) => r.key).toList(),
+          );
     final segmentAngle = 2 * pi / _rewards.length;
 
     // The rotation angle at which segment targetIndex's midpoint sits under
@@ -311,13 +323,16 @@ class _RouletteDialogState extends State<_RouletteDialog>
     if (reward.type == 'species' && _weeklySpecies != null) {
       final result = await village.applySpeciesBonus(_weeklySpecies!.id);
       if (!mounted || result == null) return;
+      await village.resetRouletteSpinWeekCount();
+      if (!mounted) return;
+      final speciesData = _weeklySpecies!;
+      final isDuplicate = result.isDuplicate;
       await showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (ctx) => _SpeciesBonusPopup(
-          speciesData: _weeklySpecies!,
-          isDuplicate: result.isDuplicate,
-          lang: lang,
+        builder: (ctx) => SpeciesBonusPopup(
+          speciesData: speciesData,
+          isDuplicate: isDuplicate,
         ),
       );
     } else {
@@ -361,201 +376,231 @@ class _RouletteDialogState extends State<_RouletteDialog>
       canPop: canDismiss,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () { if (canDismiss) Navigator.of(context).pop(); },
+        onTap: () {
+          if (canDismiss) Navigator.of(context).pop();
+        },
         child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           backgroundColor: AppTheme.cream,
           insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: GestureDetector(
-        onTap: () {},
-        child: SingleChildScrollView(
-          child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Row(
-                children: [
-                  Text(
-                    lang.translate('roulette'),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkText,
+          child: GestureDetector(
+            onTap: () {},
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        Text(
+                          lang.translate('roulette'),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.darkText,
+                          ),
+                        ),
+                        Spacer(),
+                        if (!_isSpinning && !_showingReward)
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                      ],
                     ),
-                  ),
-                  Spacer(),
-                  if (!_isSpinning && !_showingReward)
-                    IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                ],
-              ),
 
-              // "Next free spin" countdown — only shown when not spinning/showing reward
-              if (!isFree && !_isSpinning && !_showingReward) ...[
-                SizedBox(height: 4),
-                Text(
-                  lang
-                      .translate('roulette_next_free')
-                      .replaceAll('{hours}', '${timeLeft.inHours}')
-                      .replaceAll('{minutes}', '${timeLeft.inMinutes % 60}')
-                      .replaceAll('{seconds}', '${timeLeft.inSeconds % 60}'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.darkText.withValues(alpha: 0.5),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-
-              SizedBox(height: 20),
-
-              // ── Wheel ──────────────────────────────────────────────────
-              // Outer Stack: wheel + fixed pointer (clips none so pointer
-              // can overlap the gold ring from above)
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.topCenter,
-                children: [
-                  // Gold-ringed wheel container
-                  Container(
-                    width: 296,
-                    height: 296,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [Color(0xFFFFD700), Color(0xFFB8860B)],
-                        stops: [0.93, 1.0],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFFB8860B).withValues(alpha: 0.5),
-                          blurRadius: 14,
-                          spreadRadius: 2,
+                    SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.workspace_premium,
+                            size: 14, color: AppTheme.gemPurple),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            lang.translate('roulette_grand_prize_guarantee'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.gemPurple,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Spinning wheel
-                          Transform.rotate(
-                            angle: _currentAngle,
-                            child: CustomPaint(
-                              size: Size(280, 280),
-                              painter: _WheelPainter(
-                                rewards: _rewards,
-                                images: _segmentImages,
-                                imagesLoaded: _imagesLoaded,
-                              ),
+
+                    // "Next free spin" countdown — only shown when not spinning/showing reward
+                    if (!isFree && !_isSpinning && !_showingReward) ...[
+                      SizedBox(height: 4),
+                      Text(
+                        lang
+                            .translate('roulette_next_free')
+                            .replaceAll('{hours}', '${timeLeft.inHours}')
+                            .replaceAll(
+                                '{minutes}', '${timeLeft.inMinutes % 60}')
+                            .replaceAll(
+                                '{seconds}', '${timeLeft.inSeconds % 60}'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.darkText.withValues(alpha: 0.5),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+
+                    SizedBox(height: 20),
+
+                    // ── Wheel ──────────────────────────────────────────────────
+                    // Outer Stack: wheel + fixed pointer (clips none so pointer
+                    // can overlap the gold ring from above)
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.topCenter,
+                      children: [
+                        // Gold-ringed wheel container
+                        Container(
+                          width: 296,
+                          height: 296,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [Color(0xFFFFD700), Color(0xFFB8860B)],
+                              stops: [0.93, 1.0],
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFFB8860B).withValues(alpha: 0.5),
+                                blurRadius: 14,
+                                spreadRadius: 2,
+                              ),
+                            ],
                           ),
-                          // Centre pin
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Color(0xFFB8860B), width: 3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.25),
-                                  blurRadius: 6,
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Spinning wheel
+                                Transform.rotate(
+                                  angle: _currentAngle,
+                                  child: CustomPaint(
+                                    size: Size(280, 280),
+                                    painter: _WheelPainter(
+                                      rewards: _rewards,
+                                      images: _segmentImages,
+                                      imagesLoaded: _imagesLoaded,
+                                    ),
+                                  ),
+                                ),
+                                // Centre pin
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Color(0xFFB8860B), width: 3),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black
+                                            .withValues(alpha: 0.25),
+                                        blurRadius: 6,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(Icons.casino,
+                                      size: 22, color: Color(0xFFB8860B)),
                                 ),
                               ],
                             ),
-                            child: Icon(Icons.casino,
-                                size: 22, color: Color(0xFFB8860B)),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // ▼ Fixed pointer — sits outside the spinning part, at 12 o'clock
-                  // `top: -18` so the tip lands on the wheel's outer gold ring
-                  Positioned(
-                    top: -18,
-                    child: CustomPaint(
-                      size: Size(32, 36),
-                      painter: _PointerPainter(),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 24),
-
-              // ── Spin button area ───────────────────────────────────────
-              // "Not enough gems" only shown after the reward popup is gone
-              if (!_isSpinning && !_showingReward && !canAfford)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    lang
-                        .translate('roulette_not_enough_gems')
-                        .replaceAll('{gems}', '$gemCost'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.red.shade400,
-                    ),
-                  ),
-                ),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: (!_isSpinning && !_showingReward && canAfford)
-                      ? _spin
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isFree ? AppTheme.coinGold : AppTheme.gemPurple,
-                    foregroundColor: AppTheme.darkText,
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (isFree) ...[
-                        Icon(Icons.stars, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          lang.translate('roulette_free_spin'),
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                      ] else ...[
-                        ResourceIcon.gem(size: 20),
-                        SizedBox(width: 6),
-                        Text(
-                          '$gemCost ${lang.translate('gems')} — ${lang.translate('roulette_spin')}',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+
+                        // ▼ Fixed pointer — sits outside the spinning part, at 12 o'clock
+                        // `top: -18` so the tip lands on the wheel's outer gold ring
+                        Positioned(
+                          top: -18,
+                          child: CustomPaint(
+                            size: Size(32, 36),
+                            painter: _PointerPainter(),
+                          ),
                         ),
                       ],
-                    ],
-                  ),
+                    ),
+
+                    SizedBox(height: 24),
+
+                    // ── Spin button area ───────────────────────────────────────
+                    // "Not enough gems" only shown after the reward popup is gone
+                    if (!_isSpinning && !_showingReward && !canAfford)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          lang
+                              .translate('roulette_not_enough_gems')
+                              .replaceAll('{gems}', '$gemCost'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.red.shade400,
+                          ),
+                        ),
+                      ),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed:
+                            (!_isSpinning && !_showingReward && canAfford)
+                                ? _spin
+                                : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isFree ? AppTheme.coinGold : AppTheme.gemPurple,
+                          foregroundColor: AppTheme.darkText,
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isFree) ...[
+                              Icon(Icons.stars, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                lang.translate('roulette_free_spin'),
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ] else ...[
+                              ResourceIcon.gem(size: 20),
+                              SizedBox(width: 6),
+                              Text(
+                                '$gemCost ${lang.translate('gems')} — ${lang.translate('roulette_spin')}',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
-        ),
-      ),
-    ),
-  );
+    );
   }
 }
 
@@ -780,7 +825,8 @@ class _WheelPainter extends CustomPainter {
     // Filled segments
     for (int i = 0; i < rewards.length; i++) {
       final startAngle = i * segmentAngle - pi / 2;
-      fillPaint.color = rewards[i].color ?? _circusColors[i % _circusColors.length];
+      fillPaint.color =
+          rewards[i].color ?? _circusColors[i % _circusColors.length];
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         startAngle,
@@ -903,210 +949,4 @@ class _WheelPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _WheelPainter old) =>
       old.imagesLoaded != imagesLoaded;
-}
-
-// ── Species bonus popup ────────────────────────────────────────────────────────
-
-class _SpeciesBonusPopup extends StatefulWidget {
-  final VillagerSpeciesData speciesData;
-  final bool isDuplicate;
-  final LanguageProvider lang;
-
-  const _SpeciesBonusPopup({
-    required this.speciesData,
-    required this.isDuplicate,
-    required this.lang,
-  });
-
-  @override
-  State<_SpeciesBonusPopup> createState() => _SpeciesBonusPopupState();
-}
-
-class _SpeciesBonusPopupState extends State<_SpeciesBonusPopup>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animCtrl;
-  late Animation<double> _scaleAnim;
-  late ConfettiController _confettiCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _animCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-    _scaleAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.bounceOut);
-    _confettiCtrl = ConfettiController(duration: const Duration(seconds: 3));
-    _animCtrl.forward();
-    _confettiCtrl.play();
-  }
-
-  @override
-  void dispose() {
-    _animCtrl.dispose();
-    _confettiCtrl.dispose();
-    super.dispose();
-  }
-
-  Color _rarityColor(VillagerRarity rarity) {
-    switch (rarity) {
-      case VillagerRarity.common: return const Color(0xFF9E9E9E);
-      case VillagerRarity.rare: return const Color(0xFF2196F3);
-      case VillagerRarity.extraordinary: return const Color(0xFF9C27B0);
-      case VillagerRarity.legendary: return const Color(0xFFFF9800);
-      case VillagerRarity.godly: return const Color(0xFFF44336);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final lang = widget.lang;
-    final species = widget.speciesData;
-    final rarityColor = _rarityColor(species.rarity);
-    final isDuplicate = widget.isDuplicate;
-
-    return Material(
-      color: Colors.black.withValues(alpha: 0.5),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            top: 0,
-            child: ConfettiWidget(
-              confettiController: _confettiCtrl,
-              blastDirectionality: BlastDirectionality.explosive,
-              numberOfParticles: 30,
-              gravity: 0.25,
-              colors: [rarityColor, AppTheme.coinGold, AppTheme.pink, AppTheme.lavender],
-            ),
-          ),
-          ScaleTransition(
-            scale: _scaleAnim,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 32),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              decoration: BoxDecoration(
-                color: AppTheme.softWhite,
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: rarityColor, width: 2.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: rarityColor.withValues(alpha: 0.35),
-                    blurRadius: 20,
-                    spreadRadius: 4,
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    isDuplicate
-                        ? lang.translate('roulette_species_duplicate')
-                        : lang.translate('roulette_species_bonus'),
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDuplicate ? AppTheme.darkText : rarityColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 16),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: rarityColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/${species.id}_villager.png',
-                        width: 60,
-                        height: 60,
-                        filterQuality: FilterQuality.medium,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.pets,
-                          size: 40,
-                          color: rarityColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    lang.translate(species.nameKey),
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkText,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: rarityColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: rarityColor, width: 1),
-                    ),
-                    child: Text(
-                      lang.translate(SpeciesRules.rarityKey(species.rarity)),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: rarityColor,
-                      ),
-                    ),
-                  ),
-                  if (isDuplicate) ...[
-                    SizedBox(height: 12),
-                    Text(
-                      lang.translate('roulette_species_duplicate_desc')
-                          .replaceAll('{species}', lang.translate(species.nameKey))
-                          .replaceAll('{gems}', '${SpeciesRules.duplicateSpeciesGemCompensation}'),
-                      style: TextStyle(fontSize: 13, color: AppTheme.darkText.withValues(alpha: 0.7)),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ResourceIcon.gem(size: 20),
-                        SizedBox(width: 4),
-                        Text(
-                          '+${SpeciesRules.duplicateSpeciesGemCompensation} ${lang.translate('gems')}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.gemPurple,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: rarityColor,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                      ),
-                      child: Text(
-                        lang.translate('done'),
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

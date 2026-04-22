@@ -1,10 +1,10 @@
 class ReadingRules {
   static const int dailyPageLimit = 200;
-  static const int coinsPerPage = 4;
+  static const int coinsPerPage = 3;
   static const int woodPerPage = 2;
   static const int metalPerPage = 1;
   static const int bookCompletionGemBonus = 10;
-  static const int bookCompletionCoinBonus = 50;
+  static const int bookCompletionCoinBonus = 30;
 
   static Map<String, int> calculatePageRewards({
     required int actualPagesLogged,

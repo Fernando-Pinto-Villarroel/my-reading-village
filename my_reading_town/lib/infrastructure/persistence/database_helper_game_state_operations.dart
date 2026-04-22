@@ -8,14 +8,16 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     return results.first;
   }
 
-  Future<void> addResources({int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
+  Future<void> addResources(
+      {int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
     final db = await database;
     await db.rawUpdate(
         'UPDATE resources SET coins = coins + ?, gems = gems + ?, wood = wood + ?, metal = metal + ? WHERE id = 1',
         [coins, gems, wood, metal]);
   }
 
-  Future<void> subtractResources({int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
+  Future<void> subtractResources(
+      {int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
     final db = await database;
     await db.rawUpdate(
         'UPDATE resources SET coins = coins - ?, gems = gems - ?, wood = wood - ?, metal = metal - ? WHERE id = 1',
@@ -29,7 +31,12 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
 
   Future<int> insertVillager(String name, String species, int houseId) async {
     final db = await database;
-    return db.insert('villagers', {'name': name, 'species': species, 'happiness': 50, 'house_id': houseId});
+    return db.insert('villagers', {
+      'name': name,
+      'species': species,
+      'happiness': 50,
+      'house_id': houseId
+    });
   }
 
   Future<void> updateVillagerHappiness(int villagerId, int happiness) async {
@@ -48,7 +55,14 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     final db = await database;
     final result = await db.query('game_state', where: 'id = 1');
     if (result.isEmpty) {
-      return {'expansion_count': 0, 'exp': 0, 'player_level': 1, 'username': '', 'town_name': 'My Village', 'language': 'en'};
+      return {
+        'expansion_count': 0,
+        'exp': 0,
+        'player_level': 1,
+        'username': '',
+        'town_name': 'My Village',
+        'language': 'en'
+      };
     }
     return result.first;
   }
@@ -107,7 +121,25 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
 
   Future<void> setRouletteLastFreeSpin(String isoDate) async {
     final db = await database;
-    await db.update('game_state', {'roulette_last_free_spin': isoDate}, where: 'id = 1');
+    await db.update('game_state', {'roulette_last_free_spin': isoDate},
+        where: 'id = 1');
+  }
+
+  Future<({String? week, int count})> getRouletteSpinWeekData() async {
+    final state = await getGameState();
+    return (
+      week: state['roulette_spin_week'] as String?,
+      count: state['roulette_spin_week_count'] as int? ?? 0,
+    );
+  }
+
+  Future<void> setRouletteSpinWeekData(String week, int count) async {
+    final db = await database;
+    await db.update(
+      'game_state',
+      {'roulette_spin_week': week, 'roulette_spin_week_count': count},
+      where: 'id = 1',
+    );
   }
 
   Future<Map<String, dynamic>> getNotificationSettings() async {
@@ -149,7 +181,10 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     final db = await database;
     await db.insert(
       'species_unlocks',
-      {'species_id': speciesId, 'unlocked_at': DateTime.now().toIso8601String()},
+      {
+        'species_id': speciesId,
+        'unlocked_at': DateTime.now().toIso8601String()
+      },
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
@@ -168,6 +203,43 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
 
   Future<void> setEventNotifsScheduled(String value) async {
     final db = await database;
-    await db.update('game_state', {'event_notifs_scheduled': value}, where: 'id = 1');
+    await db.update('game_state', {'event_notifs_scheduled': value},
+        where: 'id = 1');
+  }
+
+  Future<Map<String, String>> getEventSpeciesOverrides() async {
+    final state = await getGameState();
+    final raw = state['event_species_overrides'] as String? ?? '{}';
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v as String));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> setEventSpeciesOverrides(Map<String, String> overrides) async {
+    final db = await database;
+    await db.update(
+        'game_state', {'event_species_overrides': jsonEncode(overrides)},
+        where: 'id = 1');
+  }
+
+  Future<bool> isSecretCodeUsed(String code) async {
+    final db = await database;
+    final normalized = code.toUpperCase();
+    final rows = await db
+        .query('used_secret_codes', where: 'code = ?', whereArgs: [normalized]);
+    return rows.isNotEmpty;
+  }
+
+  Future<void> markSecretCodeUsed(String code) async {
+    final db = await database;
+    final normalized = code.toUpperCase();
+    await db.insert(
+      'used_secret_codes',
+      {'code': normalized, 'redeemed_at': DateTime.now().toIso8601String()},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }

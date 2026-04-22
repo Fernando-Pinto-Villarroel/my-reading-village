@@ -184,7 +184,7 @@ class _VillagerChoiceDialogState extends State<_VillagerChoiceDialog>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
-                                'assets/images/${species[i]}_villager.png',
+                                'assets/images/villagers/${species[i]}/${species[i]}_villager.png',
                                 width: 60,
                                 height: 60,
                                 filterQuality: FilterQuality.medium,

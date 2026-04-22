@@ -9,6 +9,7 @@ import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/adapters/repositories/villager_favorites.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 import 'package:my_reading_town/domain/rules/holiday_rules.dart';
+import 'package:my_reading_town/domain/rules/store_rules.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/persistence/database_helper.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
@@ -29,9 +30,9 @@ class _SplashScreenState extends State<SplashScreen> {
   String _tapHint = 'tap for next tip';
 
   static const _backgroundImages = [
-    'assets/images/splash_bg_1.png',
-    'assets/images/splash_bg_2.png',
-    'assets/images/splash_bg_3.png',
+    'assets/images/backgrounds/splash_bg_1.png',
+    'assets/images/backgrounds/splash_bg_2.png',
+    'assets/images/backgrounds/splash_bg_3.png',
   ];
 
   late final String _backgroundImage;
@@ -67,6 +68,31 @@ class _SplashScreenState extends State<SplashScreen> {
         {'title': 'Time to read!', 'body': 'Your village is waiting for you!'}
       ];
     }
+  }
+
+  Future<void> _scheduleStoreDiscountNotifications(
+      NotificationService notif, String locale) async {
+    final lang = context.read<LanguageProvider>();
+    final now = DateTime.now();
+    final notifications = <({DateTime scheduledAt, String title, String body})>[];
+
+    for (final event in StoreRules.discountEvents) {
+      final start = DateTime(now.year, event.startMonth, event.startDay);
+      final end = DateTime(
+          now.year, event.endMonth, event.endDay, 23, 59, 59);
+      if (end.isBefore(now)) continue;
+      if (!start.isAfter(now)) continue;
+      final eventName = lang.translate(event.labelKey);
+      notifications.add((
+        scheduledAt: start,
+        title: lang.translate('notif_store_discount_title'),
+        body: lang
+            .translate('notif_store_discount_body')
+            .replaceAll('{event}', eventName),
+      ));
+    }
+
+    await notif.scheduleStoreDiscountNotifications(notifications: notifications);
   }
 
   Future<void> _scheduleEventReminders(
@@ -184,6 +210,7 @@ class _SplashScreenState extends State<SplashScreen> {
           messages: messages,
         );
         await _scheduleEventReminders(notif, locale);
+        await _scheduleStoreDiscountNotifications(notif, locale);
       } catch (_) {}
 
       await _setProgress(1.0);

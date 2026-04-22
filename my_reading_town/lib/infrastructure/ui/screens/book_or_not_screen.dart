@@ -21,7 +21,7 @@ const List<Color> _bgGradient = [
 
 const Color _accentColor = Color(0xFFE91E63);
 const Color _darkAccent = Color(0xFFAD1457);
-const String _villagerSprite = 'koala_villager.png';
+const String _villagerSprite = 'villagers/koala/koala_villager.png';
 
 class BookOrNotScreen extends StatefulWidget {
   const BookOrNotScreen({super.key});

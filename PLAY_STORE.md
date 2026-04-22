@@ -228,12 +228,38 @@ All packs are **Consumable** (can be repurchased).
 
 Species purchases are **Non-Consumable** (bought once; owning a species is permanent).
 
-| Product ID             | Name          | Rarity        | Price   |
-|------------------------|---------------|---------------|---------|
-| `species_polar_bear`   | Polar Bear    | Rare          | $1.99   |
-| `species_panda_bear`   | Panda Bear    | Extraordinary | $4.99   |
-| `species_monkey`       | Monkey        | Legendary     | $9.99   |
-| `species_lion`         | Lion          | Godly         | $19.99  |
+| Product ID               | Name          | Rarity        | Price   |
+|--------------------------|---------------|---------------|---------|
+| `species_grizzly_bear`   | Grizzly Bear  | Rare          | $1.99   |
+| `species_polar_bear`     | Polar Bear    | Rare          | $1.99   |
+| `species_panda_bear`     | Panda Bear    | Rare          | $1.99   |
+| `species_red_panda`      | Red Panda     | Rare          | $1.99   |
+| `species_sloth`          | Sloth         | Rare          | $1.99   |
+| `species_hedgehog`       | Hedgehog      | Rare          | $1.99   |
+| `species_capybara`       | Capybara      | Rare          | $1.99   |
+| `species_cow`            | Cow           | Rare          | $1.99   |
+| `species_sheep`          | Sheep         | Rare          | $1.99   |
+| `species_bull`           | Bull          | Extraordinary | $4.99   |
+| `species_otter`          | Otter         | Extraordinary | $4.99   |
+| `species_kangaroo`       | Kangaroo      | Extraordinary | $4.99   |
+| `species_reindeer`       | Reindeer      | Extraordinary | $4.99   |
+| `species_ferret`         | Ferret        | Extraordinary | $4.99   |
+| `species_mole`           | Mole          | Extraordinary | $4.99   |
+| `species_bat`            | Bat           | Extraordinary | $4.99   |
+| `species_donkey`         | Donkey        | Extraordinary | $4.99   |
+| `species_monkey`         | Monkey        | Legendary     | $9.99   |
+| `species_gorilla`        | Gorilla       | Legendary     | $9.99   |
+| `species_zebra`          | Zebra         | Legendary     | $9.99   |
+| `species_horse`          | Horse         | Legendary     | $9.99   |
+| `species_skunk`          | Skunk         | Legendary     | $9.99   |
+| `species_hyena`          | Hyena         | Legendary     | $9.99   |
+| `species_mouse`          | Mouse         | Legendary     | $9.99   |
+| `species_lion`           | Lion          | Godly         | $19.99  |
+| `species_armadillo`      | Armadillo     | Godly         | $19.99  |
+| `species_beaver`         | Beaver        | Godly         | $19.99  |
+| `species_fox`            | Fox           | Godly         | $19.99  |
+| `species_tiger`          | Tiger         | Godly         | $19.99  |
+| `species_leopard`        | Leopard       | Godly         | $19.99  |
 
 For each product:
 1. Set **Product ID** exactly as shown (must match the `id` field in `SpeciesRules.allSpecies` in `lib/domain/rules/species_rules.dart`).

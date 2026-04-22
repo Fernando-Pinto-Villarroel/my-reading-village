@@ -47,6 +47,7 @@ import 'package:my_reading_town/infrastructure/ui/widgets/dialogs/villager_choic
 import 'package:my_reading_town/infrastructure/ui/widgets/tour/tour_overlay.dart';
 import 'package:my_reading_town/app_constants.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/dialogs/secret_codes_dialog.dart';
 
 part 'game_screen_tap_handlers.dart';
 
@@ -86,6 +87,7 @@ class _GameScreenState extends State<GameScreen>
   bool _flipNextBuilding = false;
   late final TransformationController _transformController;
   late final TabController _buildingTabController;
+  AnimationController? _flyController;
   final GlobalKey _tourMissionsKey = GlobalKey();
   final GlobalKey _tourBuildKey = GlobalKey();
   final GlobalKey _tourReadingKey = GlobalKey();
@@ -135,7 +137,48 @@ class _GameScreenState extends State<GameScreen>
     _transformController.removeListener(_onTransformChanged);
     _transformController.dispose();
     _buildingTabController.dispose();
+    _flyController?.dispose();
     super.dispose();
+  }
+
+  void _flyToVillager(Villager villager) {
+    final villagerId = villager.id;
+    if (villagerId == null) return;
+
+    final walkingState = _game.getVillagerWalkingState(villagerId);
+    if (walkingState == null) return;
+
+    final worldPos = walkingState.isWalking
+        ? walkingState.targetPosition
+        : walkingState.position;
+
+    _flyController?.dispose();
+    _flyController = AnimationController(
+      duration: const Duration(milliseconds: 900),
+      vsync: this,
+    );
+
+    final startMatrix = _transformController.value.clone();
+    final targetMatrix = _game.buildFlyMatrix(worldPos.x, worldPos.y, 1.8);
+    final curved =
+        CurvedAnimation(parent: _flyController!, curve: Curves.easeInOut);
+
+    _flyController!.addListener(() {
+      final t = curved.value;
+      final lerped = Matrix4.zero();
+      for (int i = 0; i < 16; i++) {
+        lerped[i] = startMatrix[i] + (targetMatrix[i] - startMatrix[i]) * t;
+      }
+      _transformController.value = lerped;
+    });
+
+    _flyController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _game.highlightVillager(villagerId);
+      }
+    });
+
+    _flyController!.forward();
   }
 
   @override
@@ -162,7 +205,9 @@ class _GameScreenState extends State<GameScreen>
     if (!_tourInitialized) {
       _tourInitialized = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && !_villageProvider.tutorialCompleted && !AppConstants.testMode) {
+        if (mounted &&
+            !_villageProvider.tutorialCompleted &&
+            !AppConstants.testMode) {
           setState(() => _tourStep = kTourStepWelcome);
         }
       });
@@ -267,10 +312,11 @@ class _GameScreenState extends State<GameScreen>
         barrierDismissible: true,
         useSafeArea: false,
         builder: (ctx) => LevelUpPopup(
-            newLevel: newLevel, onDismiss: () {
-          Navigator.pop(ctx);
-          _checkNewSpecies();
-        }),
+            newLevel: newLevel,
+            onDismiss: () {
+              Navigator.pop(ctx);
+              _checkNewSpecies();
+            }),
       );
     }
   }
@@ -303,7 +349,7 @@ class _GameScreenState extends State<GameScreen>
           as RenderRepaintBoundary?;
       if (boundary == null || !mounted) return;
 
-      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final pixelRatio = MediaQuery.of(context).devicePixelRatio * 3.0;
       final tileBounds = _game.getOccupiedBounds();
 
       if (tileBounds == null) {
@@ -492,22 +538,21 @@ class _GameScreenState extends State<GameScreen>
     showVillagerInfoSheet(context,
         villager: villager,
         village: _villageProvider,
-        onSyncGameState: _syncGameState,
-        onNeedTapped: (type) {
-          setState(() {
-            _mode = GameMode.construction;
-            _buildingTabController.index = 0;
-            _scrollToBuildingType = type;
-            if (_villageProvider.canPlaceBuildingType(type)) {
-              _selectedBuildingType = type;
-            } else {
-              _selectedBuildingType = null;
-            }
-          });
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _scrollToBuildingType = null);
-          });
-        });
+        onSyncGameState: _syncGameState, onNeedTapped: (type) {
+      setState(() {
+        _mode = GameMode.construction;
+        _buildingTabController.index = 0;
+        _scrollToBuildingType = type;
+        if (_villageProvider.canPlaceBuildingType(type)) {
+          _selectedBuildingType = type;
+        } else {
+          _selectedBuildingType = null;
+        }
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _scrollToBuildingType = null);
+      });
+    });
   }
 
   @override
@@ -603,7 +648,8 @@ class _GameScreenState extends State<GameScreen>
                         _flipNextBuilding = false;
                       } else {
                         _mode = GameMode.construction;
-                        if (_tourStep == kTourStepBuildHighlight) _tourStep = kTourStepBuildExplain;
+                        if (_tourStep == kTourStepBuildHighlight)
+                          _tourStep = kTourStepBuildExplain;
                       }
                     });
                     _syncGameState();
@@ -627,8 +673,8 @@ class _GameScreenState extends State<GameScreen>
                     if (_tourStep == kTourStepMinigamesHighlight) {
                       setState(() => _tourStep = kTourStepMinigamesExplain);
                     } else {
-                      showMinigamesDialog(context,
-                          village: _villageProvider, onReturn: () {
+                      showMinigamesDialog(context, village: _villageProvider,
+                          onReturn: () {
                         _villageProvider.loadData();
                         _syncGameState();
                       });
@@ -696,7 +742,8 @@ class _GameScreenState extends State<GameScreen>
                     if (_tourStep == kTourStepSettingsHighlight) {
                       setState(() => _tourStep = kTourStepSettingsExplain);
                     } else {
-                      showSettingsDialog(context, _villageProvider, onRetakeTutorial: _startRetakeTutorial);
+                      showSettingsDialog(context, _villageProvider,
+                          onRetakeTutorial: _startRetakeTutorial);
                     }
                   },
                   onSpeciesBookTap: () {
@@ -706,6 +753,7 @@ class _GameScreenState extends State<GameScreen>
                       showSpeciesBookDialog(context);
                     }
                   },
+                  onSecretCodesTap: () => showSecretCodesDialog(context),
                 ),
               ],
             ),
@@ -758,14 +806,18 @@ class _GameScreenState extends State<GameScreen>
               storeButtonKey: _tourStoreKey,
               speciesButtonKey: _tourSpeciesKey,
               resourcesKey: _tourResourcesKey,
-              translate: (key, {fallback}) =>
-                  sl<LanguageProvider>().translate(key, fallback: fallback ?? key),
+              translate: (key, {fallback}) => sl<LanguageProvider>()
+                  .translate(key, fallback: fallback ?? key),
               onAdvance: _onTourAdvance,
               onGoBack: _onTourGoBack,
               onSkip: _onTourSkip,
               onBuildHighlightTap: _onBuildHighlightTap,
-              initialUsername: _villageProvider.username.isNotEmpty ? _villageProvider.username : null,
-              initialTownName: _villageProvider.townName.isNotEmpty ? _villageProvider.townName : null,
+              initialUsername: _villageProvider.username.isNotEmpty
+                  ? _villageProvider.username
+                  : null,
+              initialTownName: _villageProvider.townName.isNotEmpty
+                  ? _villageProvider.townName
+                  : null,
               onInputSubmit: _onTourInputSubmit,
             ),
         ],
@@ -862,11 +914,16 @@ class _NewSpeciesPopup extends StatelessWidget {
 
   Color get _rarityColor {
     switch (speciesData.rarity) {
-      case VillagerRarity.common: return const Color(0xFF78909C);
-      case VillagerRarity.rare: return const Color(0xFF1E88E5);
-      case VillagerRarity.extraordinary: return const Color(0xFF8E24AA);
-      case VillagerRarity.legendary: return const Color(0xFFEF6C00);
-      case VillagerRarity.godly: return const Color(0xFFE53935);
+      case VillagerRarity.common:
+        return const Color(0xFF78909C);
+      case VillagerRarity.rare:
+        return const Color(0xFF1E88E5);
+      case VillagerRarity.extraordinary:
+        return const Color(0xFF8E24AA);
+      case VillagerRarity.legendary:
+        return const Color(0xFFEF6C00);
+      case VillagerRarity.godly:
+        return const Color(0xFFE53935);
     }
   }
 
@@ -900,7 +957,7 @@ class _NewSpeciesPopup extends StatelessWidget {
               ),
               child: Center(
                 child: Image.asset(
-                  'assets/images/${speciesData.id}_villager.png',
+                  'assets/images/villagers/${speciesData.id}/${speciesData.id}_villager.png',
                   width: 70,
                   height: 70,
                   filterQuality: FilterQuality.medium,

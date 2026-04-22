@@ -23,48 +23,48 @@ class MinigameWinScreen extends StatelessWidget {
     if (rewardType != null && rewardType!.startsWith('coins_')) {
       final amount = rewardType!.split('_')[1];
       rewardText = context.t('minigame_reward_coins').replaceAll('{amount}', amount);
-      rewardAsset = 'assets/images/coin.png';
+      rewardAsset = 'assets/images/resources/coin.png';
       rewardColor = AppTheme.coinGold;
     } else if (rewardType != null && rewardType!.startsWith('wood_')) {
       final amount = rewardType!.split('_')[1];
       rewardText = context.t('minigame_reward_wood').replaceAll('{amount}', amount);
-      rewardAsset = 'assets/images/wood.png';
+      rewardAsset = 'assets/images/resources/wood.png';
       rewardColor = AppTheme.mint;
     } else if (rewardType != null && rewardType!.startsWith('metal_')) {
       final amount = rewardType!.split('_')[1];
       rewardText = context.t('minigame_reward_metal').replaceAll('{amount}', amount);
-      rewardAsset = 'assets/images/metal.png';
+      rewardAsset = 'assets/images/resources/metal.png';
       rewardColor = AppTheme.mediumOrange;
     } else {
       switch (rewardType) {
         case 'gems_5':
           rewardText = '+5 ${context.t('gems')}!';
-          rewardAsset = 'assets/images/gem.png';
+          rewardAsset = 'assets/images/resources/gem.png';
           rewardColor = AppTheme.gemPurple;
           break;
         case 'book':
           rewardText = 'x1 ${context.t('happiness_book')}!';
-          rewardAsset = 'assets/images/book_item.png';
+          rewardAsset = 'assets/images/items/book_item.png';
           rewardColor = AppTheme.pink;
           break;
         case 'sandwich':
           rewardText = 'x1 ${context.t('constructor_sandwich')}!';
-          rewardAsset = 'assets/images/sandwich_item.png';
+          rewardAsset = 'assets/images/items/sandwich_item.png';
           rewardColor = AppTheme.peach;
           break;
         case 'hammer':
           rewardText = 'x1 ${context.t('constructor_hammer')}!';
-          rewardAsset = 'assets/images/hammer_item.png';
+          rewardAsset = 'assets/images/items/hammer_item.png';
           rewardColor = AppTheme.coinGold;
           break;
         case 'glasses':
           rewardText = 'x1 ${context.t('magic_glasses')}!';
-          rewardAsset = 'assets/images/glasses_item.png';
+          rewardAsset = 'assets/images/items/glasses_item.png';
           rewardColor = AppTheme.mint;
           break;
         default:
           rewardText = context.t('claim_reward');
-          rewardAsset = 'assets/images/gem.png';
+          rewardAsset = 'assets/images/resources/gem.png';
           rewardColor = AppTheme.coinGold;
       }
     }

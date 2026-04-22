@@ -39,6 +39,51 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/backgrounds/
+    - assets/images/buildings/
+    - assets/images/decorations/
+    - assets/images/items/
+    - assets/images/logos/
+    - assets/images/resources/
+    - assets/images/villagers/armadillo/
+    - assets/images/villagers/bat/
+    - assets/images/villagers/beaver/
+    - assets/images/villagers/bull/
+    - assets/images/villagers/capybara/
+    - assets/images/villagers/cat/
+    - assets/images/villagers/cow/
+    - assets/images/villagers/dog/
+    - assets/images/villagers/donkey/
+    - assets/images/villagers/duck/
+    - assets/images/villagers/elephant/
+    - assets/images/villagers/ferret/
+    - assets/images/villagers/fox/
+    - assets/images/villagers/gorilla/
+    - assets/images/villagers/grizzly_bear/
+    - assets/images/villagers/hamster/
+    - assets/images/villagers/hedgehog/
+    - assets/images/villagers/horse/
+    - assets/images/villagers/hyena/
+    - assets/images/villagers/kangaroo/
+    - assets/images/villagers/koala/
+    - assets/images/villagers/leopard/
+    - assets/images/villagers/lion/
+    - assets/images/villagers/mole/
+    - assets/images/villagers/monkey/
+    - assets/images/villagers/mouse/
+    - assets/images/villagers/otter/
+    - assets/images/villagers/panda_bear/
+    - assets/images/villagers/pig/
+    - assets/images/villagers/polar_bear/
+    - assets/images/villagers/rabbit/
+    - assets/images/villagers/raccoon/
+    - assets/images/villagers/red_panda/
+    - assets/images/villagers/reindeer/
+    - assets/images/villagers/sheep/
+    - assets/images/villagers/skunk/
+    - assets/images/villagers/sloth/
+    - assets/images/villagers/tiger/
+    - assets/images/villagers/zebra/
     - assets/messages/en/
     - assets/messages/es/
     - assets/messages/fr/
@@ -48,7 +93,7 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: false
-  image_path: "assets/images/my_reading_town_icon_cropped.png"
+  image_path: "assets/images/logos/my_reading_town_icon_cropped.png"
   min_sdk_android: 21
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/my_reading_town_icon_cropped.png"
+  adaptive_icon_foreground: "assets/images/logos/my_reading_town_icon_cropped.png"

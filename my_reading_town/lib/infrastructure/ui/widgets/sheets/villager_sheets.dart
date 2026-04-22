@@ -92,7 +92,8 @@ void showVillagerInfoSheet(
               ],
               if (villager.happiness < 100) ...[
                 SizedBox(height: 8),
-                _missingNeedsBadges(village, villager, langProvider, sheetCtx, onNeedTapped),
+                _missingNeedsBadges(
+                    village, villager, langProvider, sheetCtx, onNeedTapped),
               ],
               SizedBox(height: 16),
               _infoRow(
@@ -232,7 +233,7 @@ Widget _happinessBookBadge(
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset('assets/images/book_item.png', width: 22, height: 22),
+        Image.asset('assets/images/items/book_item.png', width: 22, height: 22),
         SizedBox(width: 8),
         Text(langProvider.translate('happiness_book_active'),
             style: TextStyle(
@@ -287,7 +288,8 @@ Widget _missingNeedsBadges(
         decoration: BoxDecoration(
           color: tappable ? Colors.red.shade100 : Colors.red.shade50,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.red.shade300, width: tappable ? 1.5 : 1),
+          border:
+              Border.all(color: Colors.red.shade300, width: tappable ? 1.5 : 1),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

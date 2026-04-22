@@ -86,6 +86,50 @@ Output: always PNG (transparency requires it)
 
 ---
 
+# Mirror Tool
+
+Batch mirrors images horizontally or vertically, preserving the original size, content, transparency, and format.
+
+## Usage
+
+1. Place your images in `images-to-mirror/`
+2. Run the script with `--horizontal` or `--vertical`
+3. Find results in `images-to-mirror/output/`
+
+### Mirror horizontally (flip left-right)
+
+```bash
+.venv/bin/python3 mirror.py --horizontal
+```
+
+### Mirror vertically (flip top-bottom)
+
+```bash
+.venv/bin/python3 mirror.py --vertical
+```
+
+### Custom input/output directories
+
+```bash
+.venv/bin/python3 mirror.py --horizontal --input /path/to/images --output /path/to/results
+```
+
+## How it works
+
+1. Reads each image preserving its original mode (RGBA, RGB, palette, etc.)
+2. Flips left-right (`--horizontal`) or top-bottom (`--vertical`) using lossless pixel transposition
+3. Saves as PNG — no size change, no background added or removed, no content altered
+
+Original images are never modified. Output is always a new file in the output directory.
+
+## Supported formats
+
+Input: PNG, JPG, JPEG, BMP, WebP, TIFF
+
+Output: always PNG
+
+---
+
 # Autocrop Tool
 
 Batch crops images by removing the outer empty space around the image core.

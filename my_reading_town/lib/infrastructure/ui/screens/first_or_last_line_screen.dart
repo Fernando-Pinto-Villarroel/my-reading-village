@@ -21,7 +21,7 @@ const List<Color> _bgGradient = [
 
 const Color _accentColor = Color(0xFFFFA726);
 const Color _darkAccent = Color(0xFFE65100);
-const String _villagerSprite = 'hamster_villager.png';
+const String _villagerSprite = 'villagers/hamster/hamster_villager.png';
 
 class FirstOrLastLineScreen extends StatefulWidget {
   const FirstOrLastLineScreen({super.key});

@@ -14,6 +14,7 @@ mixin _GameTapHandlers on State<GameScreen> {
   void _syncGameState();
   void _onExpansionSignTapped(int chunkX, int chunkY);
   void _checkPendingVillagerChoices();
+  void _flyToVillager(Villager v);
 
   void _handleTileTap(int tileX, int tileY) {
     final village = _villageProvider;
@@ -42,7 +43,8 @@ mixin _GameTapHandlers on State<GameScreen> {
           showBuildingInfoSheet(context,
               building: building,
               village: village,
-              onSyncGameState: _syncGameState);
+              onSyncGameState: _syncGameState,
+              onLocateVillager: _flyToVillager);
         }
       } else {
         showConstructingBuildingSheet(context,

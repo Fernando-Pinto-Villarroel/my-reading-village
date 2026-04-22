@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/domain/entities/placed_building.dart';
+import 'package:my_reading_town/domain/entities/villager.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/shared_utils.dart';
@@ -14,6 +15,7 @@ void showBuildingInfoSheet(
   required PlacedBuilding building,
   required VillageProvider village,
   required VoidCallback onSyncGameState,
+  void Function(Villager)? onLocateVillager,
 }) {
   final langProvider = context.read<LanguageProvider>();
   final isDecoration = building.isDecoration;
@@ -97,7 +99,7 @@ void showBuildingInfoSheet(
                     color: AppTheme.darkText.withValues(alpha: 0.6)),
               ),
               if (building.type == 'house' && building.id != null)
-                _buildResidentsList(village, building, langProvider),
+                _buildResidentsList(village, building, langProvider, sheetCtx, onLocateVillager),
               SizedBox(height: 16),
               if (atMaxLevel)
                 Text(
@@ -210,8 +212,13 @@ String _buildingDescription(
   return '${langProvider.translate('covers_label')} ${VillageRules.buildingCapacity(building.type, effectiveLevel)} ${langProvider.translate('villager_needs_label')}';
 }
 
-Widget _buildResidentsList(VillageProvider village, PlacedBuilding building,
-    LanguageProvider langProvider) {
+Widget _buildResidentsList(
+  VillageProvider village,
+  PlacedBuilding building,
+  LanguageProvider langProvider,
+  BuildContext sheetCtx,
+  void Function(Villager)? onLocateVillager,
+) {
   final residents = village.villagersInHouse(building.id!);
   if (residents.isEmpty) return SizedBox.shrink();
   return Column(
@@ -238,6 +245,24 @@ Widget _buildResidentsList(VillageProvider village, PlacedBuilding building,
                     style: TextStyle(
                         fontSize: 11,
                         color: AppTheme.darkText.withValues(alpha: 0.5))),
+                if (onLocateVillager != null) ...[
+                  SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(sheetCtx);
+                      onLocateVillager(v);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.lavender.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.location_on_rounded,
+                          size: 16, color: AppTheme.lavender),
+                    ),
+                  ),
+                ],
               ],
             ),
           )),

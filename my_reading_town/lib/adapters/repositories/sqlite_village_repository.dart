@@ -129,6 +129,14 @@ class SqliteVillageRepository implements VillageRepository {
       _db.setRouletteLastFreeSpin(isoDate);
 
   @override
+  Future<({String? week, int count})> getRouletteSpinWeekData() =>
+      _db.getRouletteSpinWeekData();
+
+  @override
+  Future<void> setRouletteSpinWeekData(String week, int count) =>
+      _db.setRouletteSpinWeekData(week, count);
+
+  @override
   Future<List<String>> getUnlockedSpeciesIds() => _db.getUnlockedSpeciesIds();
 
   @override
@@ -137,6 +145,14 @@ class SqliteVillageRepository implements VillageRepository {
   @override
   Future<bool> isSpeciesUnlocked(String speciesId) =>
       _db.isSpeciesUnlocked(speciesId);
+
+  @override
+  Future<Map<String, String>> getEventSpeciesOverrides() =>
+      _db.getEventSpeciesOverrides();
+
+  @override
+  Future<void> setEventSpeciesOverrides(Map<String, String> overrides) =>
+      _db.setEventSpeciesOverrides(overrides);
 
   @override
   Future<List<Map<String, dynamic>>> getPendingVillagerChoices() =>
@@ -152,4 +168,10 @@ class SqliteVillageRepository implements VillageRepository {
   @override
   Future<void> deletePendingVillagerChoice(int id) =>
       _db.deletePendingVillagerChoice(id);
+
+  @override
+  Future<bool> isSecretCodeUsed(String code) => _db.isSecretCodeUsed(code);
+
+  @override
+  Future<void> markSecretCodeUsed(String code) => _db.markSecretCodeUsed(code);
 }

@@ -187,7 +187,7 @@ class ReadingService {
       'wood': woodEarned,
       'metal': metalEarned,
       'exp': 0,
-      'bookCompleted': completionBonusEarned,
+      'bookCompleted': bookCompleted,
       'newPagesRead': newPagesRead,
       'rewardablePages': rewardablePages,
       'newMaxRewarded': newMaxRewarded,

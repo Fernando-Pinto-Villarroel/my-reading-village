@@ -9,21 +9,8 @@ import 'package:my_reading_town/domain/rules/species_rules.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/common/species_bonus_popup.dart';
 
-Color _rarityColor(VillagerRarity rarity) {
-  switch (rarity) {
-    case VillagerRarity.common:
-      return const Color(0xFF78909C);
-    case VillagerRarity.rare:
-      return const Color(0xFF1E88E5);
-    case VillagerRarity.extraordinary:
-      return const Color(0xFF8E24AA);
-    case VillagerRarity.legendary:
-      return const Color(0xFFEF6C00);
-    case VillagerRarity.godly:
-      return const Color(0xFFE53935);
-  }
-}
 
 class MissionColors {
   static const Color basicConstruction = AppTheme.mint;
@@ -374,7 +361,7 @@ class RewardBadges extends StatelessWidget {
         ? SpeciesRules.findById(reward.speciesId!)
         : null;
     final speciesColor =
-        speciesData != null ? _rarityColor(speciesData.rarity) : AppTheme.gemPurple;
+        speciesData != null ? rarityColorForSpecies(speciesData.rarity) : AppTheme.gemPurple;
 
     return Wrap(
       spacing: 6,
@@ -407,7 +394,7 @@ class RewardBadges extends StatelessWidget {
               width: 20,
               height: 20,
               child: Image.asset(
-                'assets/images/${reward.speciesId}_villager.png',
+                'assets/images/villagers/${reward.speciesId}/${reward.speciesId}_villager.png',
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) =>
                     Icon(Icons.pets, size: 14, color: speciesColor),
@@ -517,127 +504,14 @@ class ClaimButton extends StatelessWidget {
     final speciesData = result.speciesId != null
         ? SpeciesRules.findById(result.speciesId!)
         : null;
-    final rarityColor =
-        speciesData != null ? _rarityColor(speciesData.rarity) : AppTheme.gemPurple;
-    final speciesName = result.speciesNameKey != null
-        ? context.t(result.speciesNameKey!, fallback: result.speciesNameKey!)
-        : '';
+    if (speciesData == null) return;
 
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppTheme.cream,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (result.isDuplicate) ...[
-                Icon(Icons.warning_amber_rounded,
-                    size: 48, color: AppTheme.coinGold),
-                const SizedBox(height: 8),
-                Text(
-                  context.t('roulette_species_duplicate'),
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkText),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context
-                      .t('roulette_species_duplicate_desc')
-                      .replaceAll('{species}', speciesName)
-                      .replaceAll('{gems}',
-                          '${SpeciesRules.duplicateSpeciesGemCompensation}'),
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.darkText.withValues(alpha: 0.7)),
-                  textAlign: TextAlign.center,
-                ),
-              ] else ...[
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: rarityColor.withValues(alpha: 0.12),
-                    border: Border.all(color: rarityColor, width: 2.5),
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/${result.speciesId}_villager.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) =>
-                          Icon(Icons.pets, size: 48, color: rarityColor),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.t('species_new'),
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkText),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  speciesName,
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: rarityColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 6),
-                if (speciesData != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: rarityColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: rarityColor),
-                    ),
-                    child: Text(
-                      context.t(SpeciesRules.rarityKey(speciesData.rarity)),
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: rarityColor),
-                    ),
-                  ),
-              ],
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 32, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [AppTheme.pink, AppTheme.lavender]),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    context.t('done'),
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      barrierDismissible: false,
+      builder: (ctx) => SpeciesBonusPopup(
+        speciesData: speciesData,
+        isDuplicate: result.isDuplicate,
       ),
     );
   }

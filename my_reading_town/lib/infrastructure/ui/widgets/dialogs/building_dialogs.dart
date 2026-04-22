@@ -221,7 +221,7 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
             children: [
               _dragHandle(),
               SizedBox(height: 16),
-              Image.asset('assets/images/building_construction.png',
+              Image.asset('assets/images/buildings/building_construction.png',
                   width: 88, height: 88, filterQuality: FilterQuality.medium),
               SizedBox(height: 8),
               Text(

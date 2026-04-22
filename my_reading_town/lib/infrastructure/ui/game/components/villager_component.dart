@@ -37,6 +37,18 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
 
   double _zzzTimer = 0;
 
+  bool isHighlighted = false;
+  double _auraTimer = 0.0;
+  static const double _auraDuration = 2.5;
+
+  bool get isWalking => !_isWaiting;
+  Vector2 get targetPosition => _targetPosition;
+
+  void startHighlight() {
+    isHighlighted = true;
+    _auraTimer = 0;
+  }
+
   final List<String> _recentTiles = [];
   String? _claimedTile;
   int _lastDx = 0;
@@ -158,6 +170,14 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
       _bobOffset = sin(_bobTimer * 8) * 3;
     } else {
       _bobOffset = sin(_bobTimer * 2) * 1;
+    }
+
+    if (isHighlighted) {
+      _auraTimer += dt;
+      if (_auraTimer >= _auraDuration) {
+        isHighlighted = false;
+        _auraTimer = 0;
+      }
     }
 
     if (villager.isSad && missingBuildingTypes.isNotEmpty) {
@@ -309,7 +329,7 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
     final type =
         missingBuildingTypes[_bubbleIconIndex % missingBuildingTypes.length];
 
-    final bubbleX = size.x * 0.7;
+    final bubbleX = _facingRight ? size.x * 0.7 + 4.0 : size.x * 0.3 - 4.0;
     final bubbleY = -40.0;
     final bubbleR = 34.0;
 
@@ -327,9 +347,11 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
         ..strokeWidth = 2.0,
     );
 
-    canvas.drawCircle(Offset(bubbleX - 16, bubbleY + bubbleR + 6), 7,
+    final tailOffsetX = _facingRight ? -3.0 : 3.0;
+    final tailOffsetX2 = _facingRight ? -8.0 : 8.0;
+    canvas.drawCircle(Offset(bubbleX + tailOffsetX, bubbleY + bubbleR + 10), 7,
         Paint()..color = const Color(0xDDFFFFFF));
-    canvas.drawCircle(Offset(bubbleX - 10, bubbleY + bubbleR + 16), 4,
+    canvas.drawCircle(Offset(bubbleX + tailOffsetX2, bubbleY + bubbleR + 24), 4,
         Paint()..color = const Color(0xBBFFFFFF));
 
     _drawNeedIcon(canvas, type, bubbleX, bubbleY);
@@ -379,6 +401,7 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
     final bubbleH = painter.height + padV * 2;
     final bubbleX = size.x * 0.5 - bubbleW / 2;
     final bubbleY = -bubbleH - 14;
+    final centerX = bubbleX + bubbleW / 2;
 
     final rrect = RRect.fromRectAndRadius(
       Rect.fromLTWH(bubbleX, bubbleY, bubbleW, bubbleH),
@@ -393,14 +416,16 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
         ..strokeWidth = 1.0,
     );
 
+    final tailOffsetX = _facingRight ? 20.0 : -28.0;
+    final tailOffsetX2 = _facingRight ? 16.0 : -20.0;
     canvas.drawCircle(
-      Offset(size.x * 0.5 - 6, bubbleY + bubbleH + 4),
-      4,
+      Offset(centerX + tailOffsetX, bubbleY + bubbleH + 10),
+      6,
       Paint()..color = const Color(0xDDFFFFFF),
     );
     canvas.drawCircle(
-      Offset(size.x * 0.5 - 2, bubbleY + bubbleH + 10),
-      2.5,
+      Offset(centerX + tailOffsetX2, bubbleY + bubbleH + 24),
+      3,
       Paint()..color = const Color(0xBBFFFFFF),
     );
 
@@ -413,6 +438,22 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
 
     canvas.save();
     canvas.translate(0, _bobOffset);
+
+    if (isHighlighted) {
+      final progress = _auraTimer / _auraDuration;
+      final alpha = (0.75 * (1.0 - progress)).clamp(0.0, 0.75);
+      final pulse = 1.0 + 0.25 * sin(_auraTimer * 8.0);
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(size.x / 2, size.y / 2),
+          width: size.x * 1.6 * pulse,
+          height: size.y * 1.4 * pulse,
+        ),
+        Paint()
+          ..color = Color.fromARGB((alpha * 255).round(), 255, 215, 0)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+      );
+    }
 
     if (!_facingRight) {
       canvas.translate(size.x, 0);

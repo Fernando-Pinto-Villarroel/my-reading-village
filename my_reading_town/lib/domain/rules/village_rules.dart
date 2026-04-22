@@ -92,7 +92,7 @@ class VillageRules {
 
   static int expForLevel(int level) {
     if (level <= 1) return 0;
-    return (100 * pow(1.5, level - 2)).round();
+    return (100 * pow(1.2, level - 2)).round();
   }
 
   static int playerLevelFromExp(int totalExp) {
@@ -484,7 +484,8 @@ class VillageRules {
   }
 
   static String spriteForBuilding(String type, int level) {
-    if (level <= 1) return '$type.png';
-    return '${type}_lv$level.png';
+    final dir = isDecorationType(type) ? 'decorations' : 'buildings';
+    if (level <= 1) return '$dir/$type.png';
+    return '$dir/${type}_lv$level.png';
   }
 }

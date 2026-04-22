@@ -25,7 +25,7 @@ class BuildingComponent extends PositionComponent {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _constructionSprite = await Sprite.load('building_construction.png');
+    _constructionSprite = await Sprite.load('buildings/building_construction.png');
     await _loadLevelSprite();
   }
 

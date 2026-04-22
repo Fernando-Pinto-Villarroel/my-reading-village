@@ -221,7 +221,7 @@ class _LevelUpPopupState extends State<LevelUpPopup>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Image.asset(
-                                  'assets/images/$type.png',
+                                  'assets/images/${VillageRules.spriteForBuilding(type, 1)}',
                                   width: 32,
                                   height: 32,
                                   filterQuality: FilterQuality.medium,

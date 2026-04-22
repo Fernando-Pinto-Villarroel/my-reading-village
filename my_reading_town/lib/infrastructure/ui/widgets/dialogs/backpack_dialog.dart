@@ -79,7 +79,7 @@ void showBackpackDialog(BuildContext context, VillageProvider village) {
                       ),
                       const SizedBox(height: 6),
                       _ItemTile(
-                        assetPath: 'assets/images/book_item.png',
+                        assetPath: 'assets/images/items/book_item.png',
                         name: langProvider.translate('happiness_book'),
                         description:
                             langProvider.translate('happiness_book_desc'),
@@ -92,7 +92,7 @@ void showBackpackDialog(BuildContext context, VillageProvider village) {
                       ),
                       const SizedBox(height: 8),
                       _ItemTile(
-                        assetPath: 'assets/images/sandwich_item.png',
+                        assetPath: 'assets/images/items/sandwich_item.png',
                         name: langProvider.translate('constructor_sandwich'),
                         description: village.isSpeedBoostActive
                             ? langProvider.translate('already_active')
@@ -110,7 +110,7 @@ void showBackpackDialog(BuildContext context, VillageProvider village) {
                       ),
                       const SizedBox(height: 8),
                       _ItemTile(
-                        assetPath: 'assets/images/hammer_item.png',
+                        assetPath: 'assets/images/items/hammer_item.png',
                         name: langProvider.translate('constructor_hammer'),
                         description: village.isHammerActive
                             ? langProvider.translate('already_active')
@@ -128,7 +128,7 @@ void showBackpackDialog(BuildContext context, VillageProvider village) {
                       ),
                       const SizedBox(height: 8),
                       _ItemTile(
-                        assetPath: 'assets/images/glasses_item.png',
+                        assetPath: 'assets/images/items/glasses_item.png',
                         name: langProvider.translate('magic_glasses'),
                         description: village.isGlassesActive
                             ? langProvider.translate('already_active')
@@ -170,27 +170,27 @@ class _ActivePowerupTile extends StatelessWidget {
     switch (powerup.type) {
       case 'book_happiness':
         name = langProvider.translate('happiness_boost');
-        assetPath = 'assets/images/book_item.png';
+        assetPath = 'assets/images/items/book_item.png';
         color = AppTheme.pink;
         break;
       case 'sandwich_speed':
         name = langProvider.translate('speed_2x');
-        assetPath = 'assets/images/sandwich_item.png';
+        assetPath = 'assets/images/items/sandwich_item.png';
         color = AppTheme.peach;
         break;
       case 'hammer_constructor':
         name = langProvider.translate('extra_constructor');
-        assetPath = 'assets/images/hammer_item.png';
+        assetPath = 'assets/images/items/hammer_item.png';
         color = AppTheme.coinGold;
         break;
       case 'glasses_reading':
         name = langProvider.translate('reading_boost');
-        assetPath = 'assets/images/glasses_item.png';
+        assetPath = 'assets/images/items/glasses_item.png';
         color = AppTheme.mint;
         break;
       default:
         name = powerup.type;
-        assetPath = 'assets/images/gem.png';
+        assetPath = 'assets/images/resources/gem.png';
         color = AppTheme.lavender;
     }
 

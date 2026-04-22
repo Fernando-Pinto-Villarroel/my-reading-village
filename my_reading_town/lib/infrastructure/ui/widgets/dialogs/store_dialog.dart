@@ -93,9 +93,7 @@ class _StoreDialogState extends State<_StoreDialog>
                       lang: lang,
                       discounts: _discounts,
                       storeService: _storeService),
-                  _SpeciesTab(
-                      lang: lang,
-                      storeService: _storeService),
+                  _SpeciesTab(lang: lang, storeService: _storeService),
                 ],
               ),
             ),
@@ -164,13 +162,10 @@ class _StoreTabBar extends StatefulWidget {
 }
 
 class _StoreTabBarState extends State<_StoreTabBar> {
-  final ScrollController _scrollController = ScrollController();
-
   bool get _hasDiscounts => widget.discounts.isNotEmpty;
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -279,14 +274,10 @@ class _StoreTabBarState extends State<_StoreTabBar> {
           color: AppTheme.softWhite,
           child: fill
               ? tabBar
-              : PrimaryScrollController(
-                  controller: _scrollController,
-                  child: Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    trackVisibility: true,
-                    child: tabBar,
-                  ),
+              : Scrollbar(
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: tabBar,
                 ),
         );
       },
@@ -484,7 +475,7 @@ class _PowerupsTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _PowerupSection(
-            assetPath: 'assets/images/book_item.png',
+            assetPath: 'assets/images/items/book_item.png',
             labelKey: 'happiness_book',
             descKey: 'happiness_book_desc',
             items: StoreRules.bookItems,
@@ -494,7 +485,7 @@ class _PowerupsTab extends StatelessWidget {
           ),
           SizedBox(height: 16),
           _PowerupSection(
-            assetPath: 'assets/images/sandwich_item.png',
+            assetPath: 'assets/images/items/sandwich_item.png',
             labelKey: 'constructor_sandwich',
             descKey: 'sandwich_desc',
             items: StoreRules.sandwichItems,
@@ -504,7 +495,7 @@ class _PowerupsTab extends StatelessWidget {
           ),
           SizedBox(height: 16),
           _PowerupSection(
-            assetPath: 'assets/images/hammer_item.png',
+            assetPath: 'assets/images/items/hammer_item.png',
             labelKey: 'constructor_hammer',
             descKey: 'hammer_desc',
             items: StoreRules.hammerItems,
@@ -514,7 +505,7 @@ class _PowerupsTab extends StatelessWidget {
           ),
           SizedBox(height: 16),
           _PowerupSection(
-            assetPath: 'assets/images/glasses_item.png',
+            assetPath: 'assets/images/items/glasses_item.png',
             labelKey: 'magic_glasses',
             descKey: 'glasses_desc',
             items: StoreRules.glassesItems,
@@ -820,7 +811,8 @@ class _PacksTab extends StatelessWidget {
       await village.addItemToInventory('book', amount: pack.bookPowerups);
     }
     if (pack.sandwichPowerups > 0) {
-      await village.addItemToInventory('sandwich', amount: pack.sandwichPowerups);
+      await village.addItemToInventory('sandwich',
+          amount: pack.sandwichPowerups);
     }
     if (pack.hammerPowerups > 0) {
       await village.addItemToInventory('hammer', amount: pack.hammerPowerups);
@@ -1108,13 +1100,19 @@ class _PackContentsRow extends StatelessWidget {
     add(ResourceIcon.wood(size: 17), pack.wood);
     add(ResourceIcon.metal(size: 17), pack.metal);
     add(ResourceIcon.gem(size: 17), pack.gems);
-    add(Image.asset('assets/images/book_item.png', width: 22, height: 22),
+    add(Image.asset('assets/images/items/book_item.png', width: 22, height: 22),
         pack.bookPowerups);
-    add(Image.asset('assets/images/sandwich_item.png', width: 22, height: 22),
+    add(
+        Image.asset('assets/images/items/sandwich_item.png',
+            width: 22, height: 22),
         pack.sandwichPowerups);
-    add(Image.asset('assets/images/hammer_item.png', width: 22, height: 22),
+    add(
+        Image.asset('assets/images/items/hammer_item.png',
+            width: 22, height: 22),
         pack.hammerPowerups);
-    add(Image.asset('assets/images/glasses_item.png', width: 22, height: 22),
+    add(
+        Image.asset('assets/images/items/glasses_item.png',
+            width: 22, height: 22),
         pack.glassesPowerups);
 
     return Wrap(children: items);
@@ -1181,7 +1179,8 @@ class _DiscountBannerState extends State<_DiscountBanner> {
     final h = d.inHours;
     final m = d.inMinutes % 60;
     final s = d.inSeconds % 60;
-    if (h > 0) return '${h}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+    if (h > 0)
+      return '${h}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
     return '${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
   }
 
@@ -1409,11 +1408,16 @@ class _SpeciesTab extends StatelessWidget {
 
   Color _rarityColor(VillagerRarity rarity) {
     switch (rarity) {
-      case VillagerRarity.common: return const Color(0xFF9E9E9E);
-      case VillagerRarity.rare: return const Color(0xFF2196F3);
-      case VillagerRarity.extraordinary: return const Color(0xFF9C27B0);
-      case VillagerRarity.legendary: return const Color(0xFFFF9800);
-      case VillagerRarity.godly: return const Color(0xFFF44336);
+      case VillagerRarity.common:
+        return const Color(0xFF9E9E9E);
+      case VillagerRarity.rare:
+        return const Color(0xFF2196F3);
+      case VillagerRarity.extraordinary:
+        return const Color(0xFF9C27B0);
+      case VillagerRarity.legendary:
+        return const Color(0xFFFF9800);
+      case VillagerRarity.godly:
+        return const Color(0xFFF44336);
     }
   }
 
@@ -1440,7 +1444,8 @@ class _SpeciesTab extends StatelessWidget {
     if (result.state == StorePurchaseState.success) {
       await village.unlockSpeciesFromStore(species.id);
       if (context.mounted) {
-        showSuccessToast(context, lang.translate('store_species_unlock_success'));
+        showSuccessToast(
+            context, lang.translate('store_species_unlock_success'));
       }
     } else if (result.state == StorePurchaseState.error) {
       _showError(context, lang, result.errorMessage);
@@ -1526,7 +1531,8 @@ class _SpeciesTab extends StatelessWidget {
     final diff = tomorrow.difference(now);
     final h = diff.inHours;
     final m = diff.inMinutes % 60;
-    return lang.translate('store_species_refresh')
+    return lang
+        .translate('store_species_refresh')
         .replaceAll('{time}', '${h}h ${m.toString().padLeft(2, '0')}m');
   }
 }
@@ -1573,7 +1579,7 @@ class _SpeciesStoreCard extends StatelessWidget {
               ),
               child: Center(
                 child: Image.asset(
-                  'assets/images/${species.id}_villager.png',
+                  'assets/images/villagers/${species.id}/${species.id}_villager.png',
                   width: 48,
                   height: 48,
                   filterQuality: FilterQuality.medium,
@@ -1636,8 +1642,8 @@ class _SpeciesStoreCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                lang.translate('store_species_buy')
-                    .replaceAll('{price}', '\$${species.realPrice?.toStringAsFixed(2) ?? '0.00'}'),
+                lang.translate('store_species_buy').replaceAll('{price}',
+                    '\$${species.realPrice?.toStringAsFixed(2) ?? '0.00'}'),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,

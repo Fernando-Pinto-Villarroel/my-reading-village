@@ -33,7 +33,7 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
   List<String> _shuffledOptions = [];
   String? _selectedAnswer;
   bool? _isCorrect;
-  String _villagerSprite = 'cat_villager.png';
+  String _villagerSprite = 'villagers/cat/cat_villager.png';
   bool _isLoading = true;
   bool _showResult = false;
   bool _hasWon = false;
@@ -86,7 +86,7 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
       _selectedAnswer = null;
       _isCorrect = null;
       _showResult = false;
-      _villagerSprite = '${species}_villager.png';
+      _villagerSprite = 'villagers/$species/${species}_villager.png';
     });
   }
 

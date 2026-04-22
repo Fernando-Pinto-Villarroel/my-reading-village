@@ -187,7 +187,8 @@ class VillageGame extends FlameGame {
     for (final entry in _buildingComponents.entries) {
       final b = _buildingsById[entry.key];
       if (b != null) {
-        entry.value.isRoadConnected = _isBuildingRoadConnected(b, _walkableTiles);
+        entry.value.isRoadConnected =
+            _isBuildingRoadConnected(b, _walkableTiles);
       }
     }
   }
@@ -266,11 +267,20 @@ class VillageGame extends FlameGame {
     final startTiles = <String>{};
     for (int dx = 0; dx < b.tileWidth; dx++) {
       for (int dy = 0; dy < b.tileHeight; dy++) {
-        for (final d in [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+        for (final d in [
+          [-1, 0],
+          [1, 0],
+          [0, -1],
+          [0, 1]
+        ]) {
           final nx = b.tileX + dx + d[0];
           final ny = b.tileY + dy + d[1];
-          if (nx >= b.tileX && nx < b.tileX + b.tileWidth &&
-              ny >= b.tileY && ny < b.tileY + b.tileHeight) { continue; }
+          if (nx >= b.tileX &&
+              nx < b.tileX + b.tileWidth &&
+              ny >= b.tileY &&
+              ny < b.tileY + b.tileHeight) {
+            continue;
+          }
           final key = '$nx,$ny';
           if (walkableTiles.contains(key)) startTiles.add(key);
         }
@@ -283,11 +293,20 @@ class VillageGame extends FlameGame {
       if (h.type != 'house' || !h.isConstructed || h.id == b.id) continue;
       for (int dx = 0; dx < h.tileWidth; dx++) {
         for (int dy = 0; dy < h.tileHeight; dy++) {
-          for (final d in [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+          for (final d in [
+            [-1, 0],
+            [1, 0],
+            [0, -1],
+            [0, 1]
+          ]) {
             final nx = h.tileX + dx + d[0];
             final ny = h.tileY + dy + d[1];
-            if (nx >= h.tileX && nx < h.tileX + h.tileWidth &&
-                ny >= h.tileY && ny < h.tileY + h.tileHeight) { continue; }
+            if (nx >= h.tileX &&
+                nx < h.tileX + h.tileWidth &&
+                ny >= h.tileY &&
+                ny < h.tileY + h.tileHeight) {
+              continue;
+            }
             final key = '$nx,$ny';
             if (walkableTiles.contains(key)) sourceTiles.add(key);
           }
@@ -306,7 +325,12 @@ class VillageGame extends FlameGame {
       final parts = current.split(',');
       final cx = int.parse(parts[0]);
       final cy = int.parse(parts[1]);
-      for (final d in [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+      for (final d in [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1]
+      ]) {
         final key = '${cx + d[0]},${cy + d[1]}';
         if (sourceTiles.contains(key)) return true;
         if (walkableTiles.contains(key) && visited.add(key)) queue.add(key);
@@ -346,14 +370,16 @@ class VillageGame extends FlameGame {
         comp.updateBuilding(building);
         comp.position = worldPos;
         comp.size = compSize;
-        comp.isRoadConnected = _isBuildingRoadConnected(building, _walkableTiles);
+        comp.isRoadConnected =
+            _isBuildingRoadConnected(building, _walkableTiles);
       } else {
         final comp = BuildingComponent(
           building: building,
           position: worldPos,
           size: compSize,
         );
-        comp.isRoadConnected = _isBuildingRoadConnected(building, _walkableTiles);
+        comp.isRoadConnected =
+            _isBuildingRoadConnected(building, _walkableTiles);
         _buildingComponents[building.id!] = comp;
         world.add(comp);
       }
@@ -391,8 +417,8 @@ class VillageGame extends FlameGame {
       final v = villagers[i];
       // Calculate missing needs for this specific villager
       final villagerMissingNeeds = _villagerService != null
-          ? _villagerService!.missingNeedsForVillager(
-              v, villagers, _buildingsById.values.toList(), _walkableTiles, playerLevel)
+          ? _villagerService!.missingNeedsForVillager(v, villagers,
+              _buildingsById.values.toList(), _walkableTiles, playerLevel)
           : missingBuildingTypes;
 
       if (v.id != null && existingById.containsKey(v.id!)) {
@@ -438,10 +464,12 @@ class VillageGame extends FlameGame {
             );
           } else {
             spawnPos = Vector2(
-              int.parse(_walkableTilesList[i % _walkableTilesList.length].split(',')[0]) *
+              int.parse(_walkableTilesList[i % _walkableTilesList.length]
+                          .split(',')[0]) *
                       UiConstants.tilePixelSize +
                   UiConstants.tilePixelSize / 2,
-              int.parse(_walkableTilesList[i % _walkableTilesList.length].split(',')[1]) *
+              int.parse(_walkableTilesList[i % _walkableTilesList.length]
+                          .split(',')[1]) *
                       UiConstants.tilePixelSize +
                   UiConstants.tilePixelSize / 2,
             );
@@ -494,8 +522,67 @@ class VillageGame extends FlameGame {
       maxY = maxY == null ? bMaxY : max(maxY, bMaxY);
     }
 
+    for (final entry in _specialTiles.entries) {
+      if (entry.value == 'grass') continue;
+      final parts = entry.key.split(',');
+      final tx = int.parse(parts[0]);
+      final ty = int.parse(parts[1]);
+      minX = minX == null ? tx : min(minX, tx);
+      minY = minY == null ? ty : min(minY, ty);
+      maxX = maxX == null ? tx : max(maxX, tx);
+      maxY = maxY == null ? ty : max(maxY, ty);
+    }
+
     if (minX == null) return null;
     return (minX: minX, minY: minY!, maxX: maxX!, maxY: maxY!);
+  }
+
+  Vector2? villagerWorldPosition(int villagerId) {
+    for (final comp in _villagerComponents) {
+      if (comp.villager.id == villagerId) return comp.position.clone();
+    }
+    return null;
+  }
+
+  ({Vector2 position, bool isWalking, Vector2 targetPosition})?
+      getVillagerWalkingState(int villagerId) {
+    for (final comp in _villagerComponents) {
+      if (comp.villager.id == villagerId) {
+        return (
+          position: comp.position.clone(),
+          isWalking: comp.isWalking,
+          targetPosition: comp.targetPosition.clone()
+        );
+      }
+    }
+    return null;
+  }
+
+  void highlightVillager(int villagerId) {
+    for (final comp in _villagerComponents) {
+      if (comp.villager.id == villagerId) {
+        comp.startHighlight();
+        break;
+      }
+    }
+  }
+
+  Matrix4 buildFlyMatrix(double wx, double wy, double flameZoom) {
+    final clampedZoom =
+        flameZoom.clamp(UiConstants.minZoom, UiConstants.maxZoom);
+    final scale = clampedZoom / UiConstants.defaultZoom;
+    final centerWorld =
+        VillageRules.defaultAreaCenterTile * UiConstants.tilePixelSize +
+            UiConstants.tilePixelSize / 2;
+    final W = size.x;
+    final H = size.y;
+    final childCenterX = W / 2 + (wx - centerWorld) * UiConstants.defaultZoom;
+    final childCenterY = H / 2 + (wy - centerWorld) * UiConstants.defaultZoom;
+    final tx = W / 2 - scale * childCenterX;
+    final ty = H / 2 - scale * childCenterY;
+    return Matrix4.identity()
+      ..scale(scale, scale, 1.0)
+      ..setTranslationRaw(tx, ty, 0.0);
   }
 
   void applyCameraTransform(double scale, double tx, double ty) {

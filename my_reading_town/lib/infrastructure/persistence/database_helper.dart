@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:my_reading_town/app_constants.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
@@ -164,11 +168,14 @@ class DatabaseHelper {
         language TEXT NOT NULL DEFAULT 'en',
         tutorial_completed INTEGER NOT NULL DEFAULT 0,
         roulette_last_free_spin TEXT,
+        roulette_spin_week TEXT,
+        roulette_spin_week_count INTEGER NOT NULL DEFAULT 0,
         notif_days_enabled TEXT NOT NULL DEFAULT '1111111',
         notif_start_hour INTEGER NOT NULL DEFAULT 8,
         notif_end_hour INTEGER NOT NULL DEFAULT 22,
         notif_per_day INTEGER NOT NULL DEFAULT 2,
-        event_notifs_scheduled TEXT
+        event_notifs_scheduled TEXT,
+        event_species_overrides TEXT NOT NULL DEFAULT '{}'
       )
     ''');
 
@@ -225,6 +232,13 @@ class DatabaseHelper {
         name1 TEXT NOT NULL,
         name2 TEXT NOT NULL,
         name3 TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS used_secret_codes (
+        code TEXT PRIMARY KEY,
+        redeemed_at TEXT NOT NULL
       )
     ''');
 

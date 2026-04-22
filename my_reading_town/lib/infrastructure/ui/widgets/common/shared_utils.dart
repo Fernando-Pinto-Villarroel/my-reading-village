@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_reading_town/domain/rules/village_rules.dart';
 
 bool isLandscape(BuildContext context) =>
     MediaQuery.of(context).orientation == Orientation.landscape;
@@ -40,7 +41,7 @@ const ColorFilter blackFilter = ColorFilter.mode(Colors.black, BlendMode.srcATop
 
 Widget buildAssetPreview(String type, double size, bool enabled) {
   final image = Image.asset(
-    'assets/images/$type.png',
+    'assets/images/${VillageRules.spriteForBuilding(type, 1)}',
     width: size,
     height: size,
     filterQuality: FilterQuality.medium,
