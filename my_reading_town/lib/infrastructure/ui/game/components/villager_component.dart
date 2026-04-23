@@ -133,6 +133,15 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
     priority = 200 + position.y.toInt();
     _refreshSprite();
 
+    // Handle highlighting timer regardless of day/night mode
+    if (isHighlighted) {
+      _auraTimer += dt;
+      if (_auraTimer >= _auraDuration) {
+        isHighlighted = false;
+        _auraTimer = 0;
+      }
+    }
+
     if (_isNightMode()) {
       _isWaiting = true;
       _showBubble = false;
@@ -170,14 +179,6 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
       _bobOffset = sin(_bobTimer * 8) * 3;
     } else {
       _bobOffset = sin(_bobTimer * 2) * 1;
-    }
-
-    if (isHighlighted) {
-      _auraTimer += dt;
-      if (_auraTimer >= _auraDuration) {
-        isHighlighted = false;
-        _auraTimer = 0;
-      }
     }
 
     if (villager.isSad && missingBuildingTypes.isNotEmpty) {
