@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:my_reading_town/app_constants.dart';
 import 'package:my_reading_town/domain/rules/holiday_rules.dart';
 import 'package:my_reading_town/domain/entities/placed_building.dart';
 import 'package:my_reading_town/domain/entities/villager.dart';
@@ -18,6 +19,7 @@ import 'package:my_reading_town/domain/rules/roulette_rules.dart';
 import 'package:my_reading_town/domain/rules/minigame_rules.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
+import 'package:my_reading_town/domain/rules/store_rules.dart';
 import 'package:my_reading_town/domain/rules/secret_codes_rules.dart';
 
 class VillageProvider extends ChangeNotifier {
@@ -69,6 +71,21 @@ class VillageProvider extends ChangeNotifier {
   Map<String, String> _eventSpeciesOverrides = {};
   List<PendingVillagerChoice> _pendingVillagerChoices = [];
 
+  int _adRouletteAdsToday = 0;
+  int _adRouletteSpinsToday = 0;
+  bool _adRouletteHasPendingSpin = false;
+  String? _adRouletteDate;
+  int _adGemsAdsToday = 0;
+  bool _adGemsClaimed = false;
+  String? _adGemsDate;
+
+  final Map<int, DateTime> _constructionSkipCooldowns = {};
+  final Map<String, DateTime> _adCooldownTimes = {};
+  final Set<int> _newlyConfirmedVillagerIds = {};
+
+  String _storeDiscountSeenKey = '';
+  String _storeGemSeenDate = '';
+
   List<PlacedBuilding> get placedBuildings => _placedBuildings;
   List<Villager> get villagers => _villagers;
   List<PendingVillagerChoice> get pendingVillagerChoices =>
@@ -115,17 +132,10 @@ class VillageProvider extends ChangeNotifier {
     return '${now.year}-W${weekNum.toString().padLeft(2, '0')}';
   }
 
-  bool get canSpinRouletteForFree {
-    if (_rouletteLastFreeSpin == null) return true;
-    final last = DateTime.parse(_rouletteLastFreeSpin!);
-    final now = DateTime.now();
-    return !(last.year == now.year &&
-        last.month == now.month &&
-        last.day == now.day);
-  }
+  bool get canSpinRouletteForFree => canSpinDailyFree || _adRouletteHasPendingSpin;
 
   Duration get rouletteNextFreeSpinIn {
-    if (canSpinRouletteForFree) return Duration.zero;
+    if (canSpinDailyFree) return Duration.zero;
     final last = DateTime.parse(_rouletteLastFreeSpin!);
     final nextDay = DateTime(last.year, last.month, last.day + 1);
     final remaining = nextDay.difference(DateTime.now());
@@ -138,6 +148,50 @@ class VillageProvider extends ChangeNotifier {
 
   bool isSpeciesUnlocked(String speciesId) =>
       _unlockedSpeciesIds.contains(speciesId);
+
+  bool get canSpinDailyFree {
+    if (_rouletteLastFreeSpin == null) return true;
+    final last = DateTime.parse(_rouletteLastFreeSpin!);
+    final now = DateTime.now();
+    return !(last.year == now.year &&
+        last.month == now.month &&
+        last.day == now.day);
+  }
+
+  bool get hasAdFreeSpin => _adRouletteHasPendingSpin;
+  int get adRouletteAdsToday => _adRouletteAdsToday;
+  int get adRouletteSpinsToday => _adRouletteSpinsToday;
+  bool get canWatchAdForRoulette =>
+      !_adRouletteHasPendingSpin && _adRouletteSpinsToday < 3;
+  bool get adGemsClaimed => _adGemsClaimed;
+  int get adGemsAdsToday => _adGemsAdsToday;
+
+  bool get hasUnseenStoreDiscount {
+    final key = StoreRules.computeActiveDiscountKey();
+    if (key == null) return false;
+    return key != _storeDiscountSeenKey;
+  }
+
+  bool get hasUnseenFreeGems =>
+      !_adGemsClaimed && _storeGemSeenDate != _todayStr();
+
+  bool get hasStoreNotification => hasUnseenStoreDiscount || hasUnseenFreeGems;
+
+  Future<void> markStoreDiscountSeen() async {
+    final key = StoreRules.computeActiveDiscountKey();
+    if (key == null || key == _storeDiscountSeenKey) return;
+    _storeDiscountSeenKey = key;
+    await _repo.saveStoreDiscountSeenKey(key);
+    notifyListeners();
+  }
+
+  Future<void> markStoreFreeGemsSeen() async {
+    final today = _todayStr();
+    if (_storeGemSeenDate == today) return;
+    _storeGemSeenDate = today;
+    await _repo.saveStoreGemSeenDate(today);
+    notifyListeners();
+  }
 
   void clearNewBackpackItems() {
     if (!_hasNewBackpackItems) return;
@@ -360,6 +414,20 @@ class VillageProvider extends ChangeNotifier {
     _eventSpeciesOverrides = await _repo.getEventSpeciesOverrides();
     await _resolveEventSpeciesRewards();
 
+    final adState = await _repo.getAdState();
+    _adRouletteAdsToday = adState.rouletteAdsToday;
+    _adRouletteSpinsToday = adState.rouletteSpinsToday;
+    _adRouletteHasPendingSpin = adState.roulettePendingSpin;
+    _adRouletteDate = adState.rouletteDate;
+    _adGemsAdsToday = adState.gemsAdsToday;
+    _adGemsClaimed = adState.gemsClaimed;
+    _adGemsDate = adState.gemsDate;
+    await _resetAdDailyIfNeeded();
+
+    final storeSeenData = await _repo.getStoreSeenData();
+    _storeDiscountSeenKey = storeSeenData.discountSeenKey;
+    _storeGemSeenDate = storeSeenData.gemSeenDate;
+
     final choiceMaps = await _repo.getPendingVillagerChoices();
     _pendingVillagerChoices =
         choiceMaps.map((m) => PendingVillagerChoice.fromMap(m)).toList();
@@ -388,16 +456,20 @@ class VillageProvider extends ChangeNotifier {
   static int get rouletteGemCost => RouletteRules.gemCostPerSpin;
 
   Future<bool> spinRoulette() async {
-    final isFree = canSpinRouletteForFree;
+    final isDailyFree = canSpinDailyFree;
+    final isAdFree = _adRouletteHasPendingSpin;
+    final isFree = isDailyFree || isAdFree;
     if (!isFree && _gems < rouletteGemCost) return false;
     if (!isFree) {
       await _repo.subtractResources(gems: rouletteGemCost);
       _gems -= rouletteGemCost;
-    }
-    if (isFree) {
+    } else if (isDailyFree) {
       final now = DateTime.now().toIso8601String();
       await _repo.setRouletteLastFreeSpin(now);
       _rouletteLastFreeSpin = now;
+    } else {
+      _adRouletteHasPendingSpin = false;
+      await _persistAdState();
     }
     final currentWeek = _currentIsoWeek();
     if (_rouletteSpinWeek != currentWeek) {
@@ -410,6 +482,8 @@ class VillageProvider extends ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  bool get wasDailyFreeForNotification => canSpinDailyFree;
 
   Future<void> resetRouletteSpinWeekCount() async {
     _rouletteSpinWeekCount = 0;
@@ -627,20 +701,19 @@ class VillageProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<bool> speedUpConstruction(int buildingId) async {
+  Future<int?> speedUpConstruction(int buildingId) async {
     final idx = _placedBuildings.indexWhere((b) => b.id == buildingId);
-    if (idx == -1) return false;
+    if (idx == -1) return null;
     final building = _placedBuildings[idx];
 
     final result = await _buildingSvc.speedUpConstruction(
         buildingId, _placedBuildings, _gems, _activePowerups);
-    if (!result) return false;
+    if (!result) return null;
 
     final expAmount = _buildingSvc.getExpForConstruction(building);
     building.isConstructed = true;
     building.constructionStart =
         DateTime.now().subtract(Duration(hours: 24)).toIso8601String();
-    await addExp(expAmount);
 
     final placedMaps = await _repo.getPlacedBuildings();
     _placedBuildings =
@@ -665,7 +738,7 @@ class VillageProvider extends ChangeNotifier {
         walkableTiles, _activePowerups, _playerLevel);
     await refreshResources();
     notifyListeners();
-    return true;
+    return expAmount;
   }
 
   Future<bool> cancelConstruction(int buildingId) async {
@@ -778,6 +851,7 @@ class VillageProvider extends ChangeNotifier {
   Future<void> confirmVillagerChoice(
       int choiceId, int houseId, String species, String name) async {
     final villagerId = await _repo.insertVillager(name, species, houseId);
+    _newlyConfirmedVillagerIds.add(villagerId);
     _villagers.add(Villager(
         id: villagerId,
         name: name,
@@ -818,13 +892,15 @@ class VillageProvider extends ChangeNotifier {
   Future<({bool found, bool alreadyUsed, List<SecretReward> rewards})>
       redeemSecretCode(String input) async {
     final secretCode = SecretCodesRules.findCode(input);
-    if (secretCode == null)
+    if (secretCode == null) {
       return (found: false, alreadyUsed: false, rewards: <SecretReward>[]);
+    }
 
     final normalized = input.trim().toUpperCase();
     final alreadyUsed = await _repo.isSecretCodeUsed(normalized);
-    if (alreadyUsed)
+    if (alreadyUsed) {
       return (found: true, alreadyUsed: true, rewards: <SecretReward>[]);
+    }
 
     for (final reward in secretCode.rewards) {
       switch (reward.type) {
@@ -998,7 +1074,8 @@ class VillageProvider extends ChangeNotifier {
     final result = await _missionSvc.claimMissionReward(
         missionId, _missionProgress,
         totalPagesRead: _lastTotalPagesRead,
-        completedBooks: _lastCompletedBooks);
+        completedBooks: _lastCompletedBooks,
+        buildings: _placedBuildings);
     if (!result) return empty;
 
     if (reward.exp > 0) await addExp(reward.exp);
@@ -1041,5 +1118,121 @@ class VillageProvider extends ChangeNotifier {
             MissionConditionType.villagerHappinessWithBook) {
       _bookItemUsedSinceActive = true;
     }
+  }
+
+  static String _todayStr() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _resetAdDailyIfNeeded() async {
+    final today = _todayStr();
+    bool changed = false;
+    if (_adRouletteDate != today) {
+      _adRouletteAdsToday = 0;
+      _adRouletteSpinsToday = 0;
+      _adRouletteDate = today;
+      changed = true;
+    }
+    if (_adGemsDate != today) {
+      _adGemsAdsToday = 0;
+      _adGemsClaimed = false;
+      _adGemsDate = today;
+      changed = true;
+    }
+    if (changed) await _persistAdState();
+  }
+
+  Future<void> _persistAdState() => _repo.saveAdState(
+        rouletteAdsToday: _adRouletteAdsToday,
+        rouletteSpinsToday: _adRouletteSpinsToday,
+        roulettePendingSpin: _adRouletteHasPendingSpin,
+        rouletteDate: _adRouletteDate ?? _todayStr(),
+        gemsAdsToday: _adGemsAdsToday,
+        gemsClaimed: _adGemsClaimed,
+        gemsDate: _adGemsDate ?? _todayStr(),
+      );
+
+  Set<int> consumeNewlyConfirmedVillagerIds() {
+    final ids = Set<int>.from(_newlyConfirmedVillagerIds);
+    _newlyConfirmedVillagerIds.clear();
+    return ids;
+  }
+
+  Duration? adCooldownRemainingFor(String placement) {
+    final lastTime = _adCooldownTimes[placement];
+    if (lastTime == null) return null;
+    final elapsed = DateTime.now().difference(lastTime);
+    final remainingMs = AppConstants.adSkipCooldownMs - elapsed.inMilliseconds;
+    return remainingMs > 0 ? Duration(milliseconds: remainingMs) : null;
+  }
+
+  void recordAdCooldown(String placement) {
+    _adCooldownTimes[placement] = DateTime.now();
+    notifyListeners();
+  }
+
+   Duration? constructionSkipCooldownRemaining(int buildingId) {
+     final lastSkip = _constructionSkipCooldowns[buildingId];
+     if (lastSkip == null) return null;
+     final elapsed = DateTime.now().difference(lastSkip);
+     final remainingMs = AppConstants.adSkipCooldownMs - elapsed.inMilliseconds;
+     return remainingMs > 0 ? Duration(milliseconds: remainingMs) : null;
+   }
+
+   Future<bool> skipConstructionTime(int buildingId, Duration skipAmount) async {
+     // In simulation mode (googleAds=false), apply only a minimal cooldown for rapid testing.
+     // In production (googleAds=true), enforce AdMob's minimum 30-second cooldown.
+     final cooldownMs = AppConstants.adSkipCooldownMs;
+     final lastSkip = _constructionSkipCooldowns[buildingId];
+     if (lastSkip != null &&
+         DateTime.now().difference(lastSkip).inMilliseconds < cooldownMs) {
+       return false;
+     }
+     final idx = _placedBuildings.indexWhere((b) => b.id == buildingId);
+     if (idx == -1) return false;
+     final b = _placedBuildings[idx];
+     if (b.isConstructed || b.constructionStart == null) return false;
+     _constructionSkipCooldowns[buildingId] = DateTime.now();
+     final currentStart = DateTime.parse(b.constructionStart!);
+     // Calculate real skip duration to achieve exactly skipAmount of effective time reduction
+     final realSkip = BuildingService.calculateRealSkipForEffectiveSkip(
+         b, activePowerups, skipAmount);
+     final newStart = currentStart.subtract(realSkip);
+     b.constructionStart = newStart.toIso8601String();
+     await _repo.updateConstructionStart(b.id!, b.constructionStart!);
+     notifyListeners();
+     return true;
+   }
+
+  Future<bool> watchAdForRoulette() async {
+    await _resetAdDailyIfNeeded();
+    if (_adRouletteHasPendingSpin) return false;
+    if (_adRouletteSpinsToday >= 3) return false;
+    _adRouletteAdsToday++;
+    if (_adRouletteAdsToday >= 3) {
+      _adRouletteHasPendingSpin = true;
+      _adRouletteAdsToday = 0;
+      _adRouletteSpinsToday++;
+    }
+    await _persistAdState();
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> watchAdForGems() async {
+    await _resetAdDailyIfNeeded();
+    if (_adGemsClaimed) return false;
+    if (_adGemsAdsToday >= 3) return false;
+    _adGemsAdsToday++;
+    bool claimed = false;
+    if (_adGemsAdsToday >= 3) {
+      _adGemsClaimed = true;
+      await addResources(gems: 5);
+      claimed = true;
+    }
+    await _persistAdState();
+    notifyListeners();
+    return claimed;
   }
 }

@@ -19,6 +19,7 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     'mission_progress',
     'species_unlocks',
     'pending_villager_choices',
+    'used_secret_codes',
   ];
 
   Future<Map<String, dynamic>> exportAllTables() async {

@@ -35,8 +35,60 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+
+    final dropdownItems = Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        SizedBox(height: 6),
+        SizedBox(
+          key: photoButtonKey,
+          child: SideMenuButton(
+            icon: Icons.camera_alt,
+            isActive: false,
+            onTap: onPhotoTap,
+          ),
+        ),
+        SizedBox(height: 6),
+        SizedBox(
+          key: speciesButtonKey,
+          child: SideMenuButton(
+            icon: Icons.collections_bookmark,
+            isActive: false,
+            onTap: onSpeciesBookTap,
+          ),
+        ),
+        SizedBox(height: 6),
+        SideMenuButton(
+          icon: Icons.key_rounded,
+          isActive: false,
+          onTap: onSecretCodesTap,
+        ),
+        SizedBox(height: 6),
+        SizedBox(
+          key: statsButtonKey,
+          child: SideMenuButton(
+            icon: Icons.bar_chart,
+            isActive: false,
+            onTap: onStatsTap,
+          ),
+        ),
+        SizedBox(height: 6),
+        SizedBox(
+          key: settingsButtonKey,
+          child: SideMenuButton(
+            icon: Icons.settings,
+            isActive: false,
+            onTap: onSettingsTap,
+          ),
+        ),
+      ],
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: (isLandscape && menuOpen) ? MainAxisSize.max : MainAxisSize.min,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -46,50 +98,14 @@ class SideMenu extends StatelessWidget {
             DropdownToggleButton(isOpen: menuOpen, onTap: onToggleMenu),
           ],
         ),
-        if (menuOpen) ...[
-          SizedBox(height: 6),
-          SizedBox(
-            key: photoButtonKey,
-            child: SideMenuButton(
-              icon: Icons.camera_alt,
-              isActive: false,
-              onTap: onPhotoTap,
-            ),
-          ),
-          SizedBox(height: 6),
-          SizedBox(
-            key: speciesButtonKey,
-            child: SideMenuButton(
-              icon: Icons.collections_bookmark,
-              isActive: false,
-              onTap: onSpeciesBookTap,
-            ),
-          ),
-          SizedBox(height: 6),
-          SideMenuButton(
-            icon: Icons.key_rounded,
-            isActive: false,
-            onTap: onSecretCodesTap,
-          ),
-          SizedBox(height: 6),
-          SizedBox(
-            key: statsButtonKey,
-            child: SideMenuButton(
-              icon: Icons.bar_chart,
-              isActive: false,
-              onTap: onStatsTap,
-            ),
-          ),
-          SizedBox(height: 6),
-          SizedBox(
-            key: settingsButtonKey,
-            child: SideMenuButton(
-              icon: Icons.settings,
-              isActive: false,
-              onTap: onSettingsTap,
-            ),
-          ),
-        ],
+        if (menuOpen)
+          isLandscape
+              ? Flexible(
+                  child: SingleChildScrollView(
+                    child: dropdownItems,
+                  ),
+                )
+              : dropdownItems,
       ],
     );
   }

@@ -269,9 +269,10 @@ class _SecretCodesDialogState extends State<_SecretCodesDialog> {
   }
 
   Widget _buildSuccess(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -338,6 +339,7 @@ class _SecretCodesDialogState extends State<_SecretCodesDialog> {
           ),
         ),
       ],
+    ),
     );
   }
 }

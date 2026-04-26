@@ -27,15 +27,61 @@ Future<void> showReadingModal(BuildContext context) {
         ? BoxConstraints(
             maxWidth: 480, maxHeight: MediaQuery.of(context).size.height)
         : null,
-    builder: (ctx) => DraggableScrollableSheet(
-      initialChildSize: landscape ? 1.0 : 0.85,
-      minChildSize: landscape ? 0.5 : 0.4,
-      maxChildSize: 1.0,
-      builder: (ctx, scrollController) {
-        return _ReadingModalContent(scrollController: scrollController);
-      },
-    ),
+    builder: (ctx) => _ReadingSheet(landscape: landscape),
   );
+}
+
+class _ReadingSheet extends StatefulWidget {
+  final bool landscape;
+  const _ReadingSheet({required this.landscape});
+
+  @override
+  State<_ReadingSheet> createState() => _ReadingSheetState();
+}
+
+class _ReadingSheetState extends State<_ReadingSheet> {
+  final _sheetController = DraggableScrollableController();
+  bool _dismissing = false;
+
+  static const double _minSize = 0.05;
+  double get _initialSize => widget.landscape ? 1.0 : 0.85;
+
+  @override
+  void initState() {
+    super.initState();
+    _sheetController.addListener(_onSheetChanged);
+  }
+
+  void _onSheetChanged() {
+    if (!_sheetController.isAttached || _dismissing) return;
+    if (_sheetController.size <= _minSize + 0.02) {
+      _dismissing = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).pop();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _sheetController.removeListener(_onSheetChanged);
+    _sheetController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      controller: _sheetController,
+      initialChildSize: _initialSize,
+      minChildSize: _minSize,
+      maxChildSize: 1.0,
+      snap: true,
+      snapSizes: widget.landscape ? const [1.0] : const [0.85],
+      builder: (ctx, scrollController) =>
+          _ReadingModalContent(scrollController: scrollController),
+    );
+  }
 }
 
 class _ReadingModalContent extends StatelessWidget {
@@ -45,7 +91,10 @@ class _ReadingModalContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight < 120) return const SizedBox.shrink();
+        return DefaultTabController(
       length: 2,
       child: Padding(
         padding:
@@ -116,6 +165,8 @@ class _ReadingModalContent extends StatelessWidget {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

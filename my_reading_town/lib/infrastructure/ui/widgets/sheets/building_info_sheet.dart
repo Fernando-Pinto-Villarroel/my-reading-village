@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/domain/entities/placed_building.dart';
@@ -159,7 +161,10 @@ void showBuildingInfoSheet(
                             Navigator.pop(sheetCtx);
                             final success =
                                 await village.upgradeBuilding(building.id!);
-                            if (success) onSyncGameState();
+                            if (success) {
+                              sl<AudioService>().playConstructionWipSound();
+                              onSyncGameState();
+                            }
                           }
                         : null,
                     style: ElevatedButton.styleFrom(

@@ -52,6 +52,7 @@ class BackupService {
     'mission_progress',
     'species_unlocks',
     'pending_villager_choices',
+    'used_secret_codes',
   ];
 
   String? _validateBackup(Map<String, dynamic> data) {

@@ -1,5 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
@@ -49,6 +51,9 @@ class _SpeciesBonusPopupState extends State<SpeciesBonusPopup>
     _confettiCtrl = ConfettiController(duration: const Duration(seconds: 3));
     _animCtrl.forward();
     _confettiCtrl.play();
+    if (!widget.isDuplicate) {
+      sl<AudioService>().playVillagerUnlockedSound();
+    }
   }
 
   @override

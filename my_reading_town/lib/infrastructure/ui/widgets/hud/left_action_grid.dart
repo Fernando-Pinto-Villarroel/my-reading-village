@@ -189,14 +189,33 @@ class LeftActionGrid extends StatelessWidget {
               ],
             ),
             SizedBox(width: gap),
-            SizedBox(
-              key: storeButtonKey,
-              child: _ActionButton(
-                icon: Icons.storefront,
-                color: const Color(0xFF26C6DA),
-                size: btnSize,
-                onTap: onStoreTap,
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SizedBox(
+                  key: storeButtonKey,
+                  child: _ActionButton(
+                    icon: Icons.storefront,
+                    color: const Color(0xFF26C6DA),
+                    size: btnSize,
+                    onTap: onStoreTap,
+                  ),
+                ),
+                if (context.watch<VillageProvider>().hasStoreNotification)
+                  Positioned(
+                    top: -2,
+                    right: -2,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: AppTheme.coinGold,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

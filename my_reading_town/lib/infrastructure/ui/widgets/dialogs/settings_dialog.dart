@@ -14,6 +14,7 @@ import 'package:my_reading_town/infrastructure/ui/localization/language_provider
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/persistence/database_helper.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:my_reading_town/application/services/backup_service.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 
@@ -192,6 +193,10 @@ void showSettingsDialog(BuildContext context, VillageProvider village, {VoidCall
                     ),
                   ),
                 ],
+                SizedBox(height: 20),
+                Divider(color: AppTheme.darkText.withValues(alpha: 0.15)),
+                SizedBox(height: 4),
+                _MusicSettingsSection(),
                 SizedBox(height: 20),
                 Divider(color: AppTheme.darkText.withValues(alpha: 0.15)),
                 SizedBox(height: 4),
@@ -392,6 +397,228 @@ String _importErrorMessage(BuildContext context, String errorCode) {
     return lang.translate('import_error_not_json');
   }
   return lang.translate('import_error_invalid_file');
+}
+
+class _MusicSettingsSection extends StatefulWidget {
+  @override
+  State<_MusicSettingsSection> createState() => _MusicSettingsSectionState();
+}
+
+class _MusicSettingsSectionState extends State<_MusicSettingsSection> {
+  static const int _maxLevel = 5;
+  static const int _barCount = 5;
+
+  static const Color _musicBarActiveColor = Color(0xFF4CAF50);
+  static const Color _effectsBarActiveColor = Color(0xFF7C4DFF);
+  static const Color _barInactiveColor = Color(0xFFDDDDDD);
+
+  late int _musicLevel;
+  late int _effectsLevel;
+
+  @override
+  void initState() {
+    super.initState();
+    _musicLevel = sl<AudioService>().musicLevel;
+    _effectsLevel = sl<AudioService>().effectsLevel;
+  }
+
+  Future<void> _setMusicLevel(int level) async {
+    if (level < 0 || level > _maxLevel) return;
+    setState(() => _musicLevel = level);
+    await sl<AudioService>().setMusicVolume(level);
+  }
+
+  Future<void> _setEffectsLevel(int level) async {
+    if (level < 0 || level > _maxLevel) return;
+    setState(() => _effectsLevel = level);
+    await sl<AudioService>().setEffectsVolume(level);
+  }
+
+  Widget _buildVolumeRow({
+    required int level,
+    required Color activeColor,
+    required VoidCallback onDecrement,
+    required VoidCallback onIncrement,
+    required void Function(int) onBarTap,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _VolumeButton(
+          icon: Icons.chevron_left_rounded,
+          enabled: level > 0,
+          activeColor: activeColor,
+          onTap: onDecrement,
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(_barCount, (i) {
+              final filled = i < level;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onBarTap(i + 1),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 160),
+                    margin: EdgeInsets.symmetric(horizontal: 3),
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: filled ? activeColor : _barInactiveColor,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: filled
+                            ? activeColor.withValues(alpha: 0.7)
+                            : _barInactiveColor.withValues(alpha: 0.5),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        SizedBox(width: 10),
+        _VolumeButton(
+          icon: Icons.chevron_right_rounded,
+          enabled: level < _maxLevel,
+          activeColor: activeColor,
+          onTap: onIncrement,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              _musicLevel == 0
+                  ? Icons.music_off_rounded
+                  : Icons.music_note_rounded,
+              size: 20,
+              color: AppTheme.darkMint,
+            ),
+            SizedBox(width: 8),
+            Text(
+              context.t('music_settings'),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkText,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 14),
+        Text(
+          context.t('music_volume'),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.darkText.withValues(alpha: 0.7),
+          ),
+        ),
+        SizedBox(height: 10),
+        _buildVolumeRow(
+          level: _musicLevel,
+          activeColor: _musicBarActiveColor,
+          onDecrement: () => _setMusicLevel(_musicLevel - 1),
+          onIncrement: () => _setMusicLevel(_musicLevel + 1),
+          onBarTap: _setMusicLevel,
+        ),
+        SizedBox(height: 8),
+        Center(
+          child: Text(
+            '${(_musicLevel * 20)}%',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.darkMint,
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+        Text(
+          context.t('effects_volume'),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.darkText.withValues(alpha: 0.7),
+          ),
+        ),
+        SizedBox(height: 10),
+        _buildVolumeRow(
+          level: _effectsLevel,
+          activeColor: _effectsBarActiveColor,
+          onDecrement: () => _setEffectsLevel(_effectsLevel - 1),
+          onIncrement: () => _setEffectsLevel(_effectsLevel + 1),
+          onBarTap: _setEffectsLevel,
+        ),
+        SizedBox(height: 8),
+        Center(
+          child: Text(
+            '${(_effectsLevel * 20)}%',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: _effectsBarActiveColor,
+            ),
+          ),
+        ),
+        SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+class _VolumeButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+  final Color activeColor;
+
+  const _VolumeButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+    this.activeColor = AppTheme.darkMint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 120),
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: enabled
+              ? activeColor.withValues(alpha: 0.15)
+              : AppTheme.darkText.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: enabled
+                ? activeColor.withValues(alpha: 0.5)
+                : AppTheme.darkText.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: enabled
+              ? activeColor
+              : AppTheme.darkText.withValues(alpha: 0.3),
+        ),
+      ),
+    );
+  }
 }
 
 class _NotificationSettingsSection extends StatefulWidget {

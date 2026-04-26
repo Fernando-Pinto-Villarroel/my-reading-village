@@ -51,6 +51,7 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
         where: 'id = ?', whereArgs: [villagerId]);
   }
 
+
   Future<Map<String, dynamic>> getGameState() async {
     final db = await database;
     final result = await db.query('game_state', where: 'id = 1');
@@ -223,6 +224,91 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     await db.update(
         'game_state', {'event_species_overrides': jsonEncode(overrides)},
         where: 'id = 1');
+  }
+
+  Future<
+      ({
+        int rouletteAdsToday,
+        int rouletteSpinsToday,
+        bool roulettePendingSpin,
+        String? rouletteDate,
+        int gemsAdsToday,
+        bool gemsClaimed,
+        String? gemsDate,
+      })> getAdState() async {
+    final state = await getGameState();
+    return (
+      rouletteAdsToday: state['ad_roulette_ads_today'] as int? ?? 0,
+      rouletteSpinsToday: state['ad_roulette_spins_today'] as int? ?? 0,
+      roulettePendingSpin: (state['ad_roulette_pending_spin'] as int? ?? 0) == 1,
+      rouletteDate: state['ad_roulette_date'] as String?,
+      gemsAdsToday: state['ad_gems_ads_today'] as int? ?? 0,
+      gemsClaimed: (state['ad_gems_claimed_today'] as int? ?? 0) == 1,
+      gemsDate: state['ad_gems_date'] as String?,
+    );
+  }
+
+  Future<void> saveAdState({
+    required int rouletteAdsToday,
+    required int rouletteSpinsToday,
+    required bool roulettePendingSpin,
+    required String? rouletteDate,
+    required int gemsAdsToday,
+    required bool gemsClaimed,
+    required String? gemsDate,
+  }) async {
+    final db = await database;
+    await db.update(
+      'game_state',
+      {
+        'ad_roulette_ads_today': rouletteAdsToday,
+        'ad_roulette_spins_today': rouletteSpinsToday,
+        'ad_roulette_pending_spin': roulettePendingSpin ? 1 : 0,
+        'ad_roulette_date': rouletteDate,
+        'ad_gems_ads_today': gemsAdsToday,
+        'ad_gems_claimed_today': gemsClaimed ? 1 : 0,
+        'ad_gems_date': gemsDate,
+      },
+      where: 'id = 1',
+    );
+  }
+
+  Future<int> getMusicVolume() async {
+    final state = await getGameState();
+    return state['music_volume'] as int? ?? 3;
+  }
+
+  Future<void> saveMusicVolume(int level) async {
+    final db = await database;
+    await db.update('game_state', {'music_volume': level}, where: 'id = 1');
+  }
+
+  Future<int> getEffectsVolume() async {
+    final state = await getGameState();
+    return state['effects_volume'] as int? ?? 3;
+  }
+
+  Future<void> saveEffectsVolume(int level) async {
+    final db = await database;
+    await db.update('game_state', {'effects_volume': level}, where: 'id = 1');
+  }
+
+  Future<({String discountSeenKey, String gemSeenDate})> getStoreSeenData() async {
+    final state = await getGameState();
+    return (
+      discountSeenKey: state['store_discount_seen_key'] as String? ?? '',
+      gemSeenDate: state['store_gems_seen_date'] as String? ?? '',
+    );
+  }
+
+  Future<void> saveStoreDiscountSeenKey(String key) async {
+    final db = await database;
+    await db.update('game_state', {'store_discount_seen_key': key}, where: 'id = 1');
+  }
+
+  Future<void> saveStoreGemSeenDate(String date) async {
+    final db = await database;
+    await db.update('game_state', {'store_gems_seen_date': date}, where: 'id = 1');
   }
 
   Future<bool> isSecretCodeUsed(String code) async {

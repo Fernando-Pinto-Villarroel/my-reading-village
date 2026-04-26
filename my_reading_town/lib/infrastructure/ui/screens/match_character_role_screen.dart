@@ -11,6 +11,7 @@ import 'package:my_reading_town/infrastructure/ui/widgets/common/match_character
 import 'package:my_reading_town/infrastructure/ui/widgets/popups/minigame_win_screen.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 
@@ -43,7 +44,14 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
   @override
   void initState() {
     super.initState();
+    sl<AudioService>().startSuspenseMusic();
     _loadQuestions();
+  }
+
+  @override
+  void dispose() {
+    sl<AudioService>().stopSuspenseMusic();
+    super.dispose();
   }
 
   Future<void> _loadQuestions() async {
@@ -102,6 +110,7 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
     });
 
     if (isCorrect) {
+      sl<AudioService>().playCorrectSound();
       _consecutiveWins++;
       if (_consecutiveWins >= _config.winsNeeded) {
         _onGameWon();
@@ -111,6 +120,7 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
         });
       }
     } else {
+      sl<AudioService>().playWrongSound();
       _consecutiveWins = 0;
       _usedIndices.clear();
       Future.delayed(const Duration(milliseconds: 1800), () {
@@ -133,6 +143,8 @@ class _MatchCharacterRoleScreenState extends State<MatchCharacterRoleScreen> {
         body: lang.translate('notif_minigame_ready_body').replaceAll('{name}', name),
       );
     }
+    sl<AudioService>().stopSuspenseMusic(resumeMusic: false);
+    sl<AudioService>().playWinnerSound();
     setState(() {
       _hasWon = true;
       _rewardType = rewardType;

@@ -40,6 +40,18 @@ class NotificationService {
   tz.TZDateTime _fromDeviceMs(int epochMs) =>
       tz.TZDateTime.fromMillisecondsSinceEpoch(tz.local, epochMs);
 
+  AndroidNotificationDetails _androidDetails(
+      String channelId, String channelName) {
+    return AndroidNotificationDetails(
+      channelId,
+      channelName,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/launcher_icon',
+      sound: const RawResourceAndroidNotificationSound('mobile_notification'),
+    );
+  }
+
   Future<void> initialize() async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
@@ -118,13 +130,7 @@ class NotificationService {
           body: msg['body'] ?? '',
           scheduledDate: scheduledDate,
           notificationDetails: NotificationDetails(
-            android: AndroidNotificationDetails(
-              _dailyChannelId,
-              _dailyChannelName,
-              importance: Importance.high,
-              priority: Priority.high,
-              icon: '@mipmap/launcher_icon',
-            ),
+            android: _androidDetails(_dailyChannelId, _dailyChannelName),
           ),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         );
@@ -151,13 +157,7 @@ class NotificationService {
       body: '$buildingName $body',
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _constructionChannelId,
-          _constructionChannelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/launcher_icon',
-        ),
+        android: _androidDetails(_constructionChannelId, _constructionChannelName),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
@@ -187,13 +187,7 @@ class NotificationService {
       body: body,
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _minigameChannelId,
-          _minigameChannelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/launcher_icon',
-        ),
+        android: _androidDetails(_minigameChannelId, _minigameChannelName),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
@@ -215,13 +209,7 @@ class NotificationService {
       body: body,
       scheduledDate: scheduledDate,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _rouletteChannelId,
-          _rouletteChannelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/launcher_icon',
-        ),
+        android: _androidDetails(_rouletteChannelId, _rouletteChannelName),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
@@ -247,13 +235,7 @@ class NotificationService {
         body: n.body,
         scheduledDate: _fromDeviceMs(n.scheduledAt.millisecondsSinceEpoch),
         notificationDetails: NotificationDetails(
-          android: AndroidNotificationDetails(
-            _eventChannelId,
-            _eventChannelName,
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/launcher_icon',
-          ),
+          android: _androidDetails(_eventChannelId, _eventChannelName),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -279,13 +261,7 @@ class NotificationService {
         body: n.body,
         scheduledDate: _fromDeviceMs(n.scheduledAt.millisecondsSinceEpoch),
         notificationDetails: NotificationDetails(
-          android: AndroidNotificationDetails(
-            _storeDiscountChannelId,
-            _storeDiscountChannelName,
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/launcher_icon',
-          ),
+          android: _androidDetails(_storeDiscountChannelId, _storeDiscountChannelName),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );

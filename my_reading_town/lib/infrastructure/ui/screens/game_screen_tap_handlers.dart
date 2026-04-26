@@ -13,7 +13,7 @@ mixin _GameTapHandlers on State<GameScreen> {
   Set<int> get _notifiedCompletions;
   void _syncGameState();
   void _onExpansionSignTapped(int chunkX, int chunkY);
-  void _checkPendingVillagerChoices();
+  Future<void> _checkPendingVillagerChoices();
   void _flyToVillager(Villager v);
 
   void _handleTileTap(int tileX, int tileY) {
@@ -50,20 +50,22 @@ mixin _GameTapHandlers on State<GameScreen> {
         showConstructingBuildingSheet(context,
             building: building, village: village, onSpeedUp: () async {
           Navigator.pop(context);
-          final success = await village.speedUpConstruction(building.id!);
-          if (success) {
-            sl<NotificationService>()
+          final expAmount = await village.speedUpConstruction(building.id!);
+          if (expAmount != null) {
+            await sl<NotificationService>()
                 .cancelConstructionNotification(building.id!);
             _syncGameState();
             _notifiedCompletions.add(building.id!);
-            if (mounted) showConstructionCompleteDialog(context, building);
-            if (mounted) _checkPendingVillagerChoices();
+            if (mounted) await showConstructionCompleteDialog(context, building);
+            _notifiedCompletions.remove(building.id!);
+            if (mounted) await _checkPendingVillagerChoices();
+            if (mounted) await village.addExp(expAmount);
           }
         }, onCancel: () async {
           Navigator.pop(context);
           final success = await village.cancelConstruction(building.id!);
           if (success) {
-            sl<NotificationService>()
+            await sl<NotificationService>()
                 .cancelConstructionNotification(building.id!);
             _syncGameState();
           }
@@ -98,7 +100,11 @@ mixin _GameTapHandlers on State<GameScreen> {
     if (_selectedBuildingType != null &&
         VillageRules.isTileType(_selectedBuildingType!)) {
       if (!village.isTileUnlocked(tileX, tileY)) return;
-      if (village.hasBuildingAt(tileX, tileY)) return;
+      final hasBuildingHere = village.hasBuildingAt(tileX, tileY);
+      final isBuildableTile = _selectedBuildingType == 'grass' ||
+          _selectedBuildingType == 'sand' ||
+          _selectedBuildingType == 'rock';
+      if (hasBuildingHere && !isBuildableTile) return;
       if (_selectedBuildingType == 'road') {
         village.toggleRoad(tileX, tileY);
       } else if (_selectedBuildingType == 'grass') {
@@ -180,6 +186,7 @@ mixin _GameTapHandlers on State<GameScreen> {
       tileHeight: VillageRules.buildingTileHeight(_selectedBuildingType!),
       isDecoration: isDecoration,
     );
+    sl<AudioService>().playConstructionWipSound();
 
     if (!isDecoration) {
       final placed = village.getBuildingAt(tileX, tileY);

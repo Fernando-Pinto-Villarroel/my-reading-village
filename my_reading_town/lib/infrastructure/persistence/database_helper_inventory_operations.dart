@@ -81,6 +81,7 @@ extension DatabaseHelperInventoryOperations on DatabaseHelper {
     String? activatedAt,
     int? pagesAtActivation,
     int? booksAtActivation,
+    int? buildingCountAtActivation,
   }) async {
     final db = await database;
     await db.insert(
@@ -92,6 +93,7 @@ extension DatabaseHelperInventoryOperations on DatabaseHelper {
         'activated_at': activatedAt,
         'pages_at_activation': pagesAtActivation,
         'books_at_activation': booksAtActivation,
+        'building_count_at_activation': buildingCountAtActivation,
       },
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
@@ -101,6 +103,7 @@ extension DatabaseHelperInventoryOperations on DatabaseHelper {
     if (activatedAt != null) updates['activated_at'] = activatedAt;
     if (pagesAtActivation != null) updates['pages_at_activation'] = pagesAtActivation;
     if (booksAtActivation != null) updates['books_at_activation'] = booksAtActivation;
+    if (buildingCountAtActivation != null) updates['building_count_at_activation'] = buildingCountAtActivation;
     if (updates.isNotEmpty) {
       await db.update('mission_progress', updates,
           where: 'mission_id = ?', whereArgs: [missionId]);

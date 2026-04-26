@@ -45,4 +45,26 @@ abstract class VillageRepository {
   Future<void> deletePendingVillagerChoice(int id);
   Future<bool> isSecretCodeUsed(String code);
   Future<void> markSecretCodeUsed(String code);
+  Future<
+      ({
+        int rouletteAdsToday,
+        int rouletteSpinsToday,
+        bool roulettePendingSpin,
+        String? rouletteDate,
+        int gemsAdsToday,
+        bool gemsClaimed,
+        String? gemsDate,
+      })> getAdState();
+  Future<void> saveAdState({
+    required int rouletteAdsToday,
+    required int rouletteSpinsToday,
+    required bool roulettePendingSpin,
+    required String? rouletteDate,
+    required int gemsAdsToday,
+    required bool gemsClaimed,
+    required String? gemsDate,
+  });
+  Future<({String discountSeenKey, String gemSeenDate})> getStoreSeenData();
+  Future<void> saveStoreDiscountSeenKey(String key);
+  Future<void> saveStoreGemSeenDate(String date);
 }

@@ -9,6 +9,10 @@ enum MissionBranch {
   halloween,
   christmas,
   easter,
+  thanksgiving,
+  newYear,
+  sanValentin,
+  carnival,
 }
 
 enum MissionConditionType {
@@ -25,6 +29,7 @@ enum MissionConditionType {
   haveDecorationMinCoinCost,
   haveDecorationMinGemCost,
   reachSpecialTileCount,
+  buySpecificDecorationSinceActivation,
 }
 
 class MissionReward {
@@ -86,6 +91,7 @@ class MissionProgress {
   String? activatedAt;
   int? pagesAtActivation;
   int? booksAtActivation;
+  int? buildingCountAtActivation;
 
   MissionProgress({
     required this.missionId,
@@ -94,6 +100,7 @@ class MissionProgress {
     this.activatedAt,
     this.pagesAtActivation,
     this.booksAtActivation,
+    this.buildingCountAtActivation,
   });
 
   factory MissionProgress.fromMap(Map<String, dynamic> map) {
@@ -104,6 +111,7 @@ class MissionProgress {
       activatedAt: map['activated_at'] as String?,
       pagesAtActivation: map['pages_at_activation'] as int?,
       booksAtActivation: map['books_at_activation'] as int?,
+      buildingCountAtActivation: map['building_count_at_activation'] as int?,
     );
   }
 
@@ -115,6 +123,7 @@ class MissionProgress {
       'activated_at': activatedAt,
       'pages_at_activation': pagesAtActivation,
       'books_at_activation': booksAtActivation,
+      'building_count_at_activation': buildingCountAtActivation,
     };
   }
 }

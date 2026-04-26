@@ -9,49 +9,114 @@ class BuildingService {
 
   static String tileKey(int x, int y) => '$x,$y';
 
-  static Duration effectiveRemainingTime(
-      PlacedBuilding b, List<ActivePowerup> powerups) {
-    if (b.isConstructed || b.constructionStart == null) return Duration.zero;
-    final start = DateTime.parse(b.constructionStart!);
-    final total = Duration(minutes: b.constructionDurationMinutes);
-    final now = DateTime.now();
-    if (!now.isAfter(start)) return total;
+   static Duration effectiveRemainingTime(
+       PlacedBuilding b, List<ActivePowerup> powerups) {
+     if (b.isConstructed || b.constructionStart == null) return Duration.zero;
+     final start = DateTime.parse(b.constructionStart!);
+     final total = Duration(minutes: b.constructionDurationMinutes);
+     final now = DateTime.now();
+     if (!now.isAfter(start)) return total;
 
-    double effectiveElapsedMs = 0.0;
-    DateTime cursor = start;
+     double effectiveElapsedMs = 0.0;
+     DateTime cursor = start;
 
-    final boosts = powerups.where((p) => p.type == 'sandwich_speed').toList()
-      ..sort((a, b) => DateTime.parse(a.activatedAt)
-          .compareTo(DateTime.parse(b.activatedAt)));
+     final boosts = powerups.where((p) => p.type == 'sandwich_speed').toList()
+       ..sort((a, b) => DateTime.parse(a.activatedAt)
+           .compareTo(DateTime.parse(b.activatedAt)));
 
-    for (final boost in boosts) {
-      if (!cursor.isBefore(now)) break;
-      final boostStart = DateTime.parse(boost.activatedAt);
-      final boostEnd = boostStart.add(Duration(hours: boost.durationHours));
+     for (final boost in boosts) {
+       if (!cursor.isBefore(now)) break;
+       final boostStart = DateTime.parse(boost.activatedAt);
+       final boostEnd = boostStart.add(Duration(hours: boost.durationHours));
 
-      if (cursor.isBefore(boostStart)) {
-        final segEnd = boostStart.isBefore(now) ? boostStart : now;
-        effectiveElapsedMs +=
-            segEnd.difference(cursor).inMilliseconds.toDouble();
-        cursor = segEnd;
-      }
-      if (cursor.isBefore(boostEnd) && cursor.isBefore(now)) {
-        final segEnd = boostEnd.isBefore(now) ? boostEnd : now;
-        effectiveElapsedMs +=
-            segEnd.difference(cursor).inMilliseconds.toDouble() * 2.0;
-        cursor = segEnd;
-      }
-    }
+       if (cursor.isBefore(boostStart)) {
+         final segEnd = boostStart.isBefore(now) ? boostStart : now;
+         effectiveElapsedMs +=
+             segEnd.difference(cursor).inMilliseconds.toDouble();
+         cursor = segEnd;
+       }
+       if (cursor.isBefore(boostEnd) && cursor.isBefore(now)) {
+         final segEnd = boostEnd.isBefore(now) ? boostEnd : now;
+         effectiveElapsedMs +=
+             segEnd.difference(cursor).inMilliseconds.toDouble() * 2.0;
+         cursor = segEnd;
+       }
+     }
 
-    if (cursor.isBefore(now)) {
-      effectiveElapsedMs += now.difference(cursor).inMilliseconds.toDouble();
-    }
+     if (cursor.isBefore(now)) {
+       effectiveElapsedMs += now.difference(cursor).inMilliseconds.toDouble();
+     }
 
-    final remainingMs = total.inMilliseconds - effectiveElapsedMs;
-    return remainingMs <= 0
-        ? Duration.zero
-        : Duration(milliseconds: remainingMs.round());
-  }
+     final remainingMs = total.inMilliseconds - effectiveElapsedMs;
+     return remainingMs <= 0
+         ? Duration.zero
+         : Duration(milliseconds: remainingMs.round());
+   }
+
+   /// Computes the effective elapsed time (in milliseconds) for the interval [start, end],
+   /// taking into account active sandwich speed boosts (which double time).
+   static double _computeEffectiveElapsedMs(DateTime start, DateTime end, List<ActivePowerup> powerups) {
+     if (start.isAfter(end)) return 0.0;
+     double effectiveMs = 0.0;
+     DateTime cursor = start;
+     final boosts = powerups
+         .where((p) => p.type == 'sandwich_speed')
+         .toList()
+       ..sort((a, b) => DateTime.parse(a.activatedAt).compareTo(DateTime.parse(b.activatedAt)));
+     for (final boost in boosts) {
+       if (!cursor.isBefore(end)) break;
+       final boostStart = DateTime.parse(boost.activatedAt);
+       final boostEnd = boostStart.add(Duration(hours: boost.durationHours));
+       if (cursor.isBefore(boostStart)) {
+         final segEnd = boostStart.isBefore(end) ? boostStart : end;
+         effectiveMs += segEnd.difference(cursor).inMilliseconds.toDouble();
+         cursor = segEnd;
+       }
+       if (cursor.isBefore(boostEnd) && cursor.isBefore(end)) {
+         final segEnd = boostEnd.isBefore(end) ? boostEnd : end;
+         effectiveMs += segEnd.difference(cursor).inMilliseconds.toDouble() * 2.0;
+         cursor = segEnd;
+       }
+     }
+     if (cursor.isBefore(end)) {
+       effectiveMs += end.difference(cursor).inMilliseconds.toDouble();
+     }
+     return effectiveMs;
+   }
+
+   /// Calculates the real-time [Duration] to subtract from a building's construction start
+   /// so that the effective remaining time is reduced by [effectiveSkip], accounting for
+   /// active sandwich speed boosts.
+   static Duration calculateRealSkipForEffectiveSkip(
+       PlacedBuilding building, List<ActivePowerup> powerups, Duration effectiveSkip) {
+     final constructionStartStr = building.constructionStart;
+     if (constructionStartStr == null) return Duration.zero;
+     final S = DateTime.parse(constructionStartStr);
+     final desiredMs = effectiveSkip.inMilliseconds;
+     if (desiredMs <= 0) return Duration.zero;
+
+     // Cap the effective skip to the current remaining time to avoid overskipping
+     final currentRemaining = effectiveRemainingTime(building, powerups);
+     final targetMs = effectiveSkip < currentRemaining
+         ? effectiveSkip.inMilliseconds
+         : currentRemaining.inMilliseconds;
+     if (targetMs <= 0) return Duration.zero;
+
+     // Binary search for minimal real skip D (in ms) such that effective duration >= targetMs
+     int low = 0;
+     int high = targetMs;
+     while (low < high) {
+       int mid = (low + high) ~/ 2;
+       final candidateStart = S.subtract(Duration(milliseconds: mid));
+       final effDur = _computeEffectiveElapsedMs(candidateStart, S, powerups);
+       if (effDur >= targetMs) {
+         high = mid;
+       } else {
+         low = mid + 1;
+       }
+     }
+     return Duration(milliseconds: low);
+   }
 
   bool isBuildingRoadConnected(
       PlacedBuilding b, Set<String> walkableTiles, List<PlacedBuilding> allBuildings) {

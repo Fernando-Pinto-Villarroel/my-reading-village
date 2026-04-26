@@ -390,6 +390,7 @@ class VillageGame extends FlameGame {
     List<Villager> villagers, {
     List<String> missingBuildingTypes = const [],
     Map<int, String> houseRoadTiles = const {},
+    Set<int> houseSpawnIds = const {},
   }) {
     if (_walkableTilesList.isEmpty) return;
 
@@ -427,6 +428,8 @@ class VillageGame extends FlameGame {
         existingById[v.id!]!.missingBuildingTypes = villagerMissingNeeds;
       } else {
         Vector2 spawnPos;
+        bool spawnFromHouse = false;
+
         if (_isNightMode &&
             v.houseId != null &&
             _buildingsById.containsKey(v.houseId)) {
@@ -439,41 +442,26 @@ class VillageGame extends FlameGame {
           final y = (house.tileY + house.tileHeight - 0.5) *
               UiConstants.tilePixelSize;
           spawnPos = Vector2(x, y);
+        } else if (v.id != null &&
+            houseSpawnIds.contains(v.id) &&
+            v.houseId != null &&
+            _buildingsById.containsKey(v.houseId)) {
+          final house = _buildingsById[v.houseId!]!;
+          spawnPos = Vector2(
+            (house.tileX + house.tileWidth / 2.0) * UiConstants.tilePixelSize,
+            (house.tileY + house.tileHeight - 0.5) * UiConstants.tilePixelSize,
+          );
+          spawnFromHouse = true;
         } else {
-          String? spawnTile;
-          if (v.houseId != null) {
-            spawnTile = houseRoadTiles[v.houseId];
-          }
-          if (spawnTile != null) {
-            final parts = spawnTile.split(',');
-            spawnPos = Vector2(
-              int.parse(parts[0]) * UiConstants.tilePixelSize +
-                  UiConstants.tilePixelSize / 2,
-              int.parse(parts[1]) * UiConstants.tilePixelSize +
-                  UiConstants.tilePixelSize / 2,
-            );
-          } else if (v.houseId != null &&
-              _buildingsById.containsKey(v.houseId)) {
-            final house = _buildingsById[v.houseId!]!;
-            final slot = _villagerComponents
-                .where((c) => c.villager.houseId == v.houseId)
-                .length;
-            spawnPos = Vector2(
-              (house.tileX + 0.5 + slot * 0.5) * UiConstants.tilePixelSize,
-              (house.tileY + house.tileHeight) * UiConstants.tilePixelSize,
-            );
-          } else {
-            spawnPos = Vector2(
-              int.parse(_walkableTilesList[i % _walkableTilesList.length]
-                          .split(',')[0]) *
-                      UiConstants.tilePixelSize +
-                  UiConstants.tilePixelSize / 2,
-              int.parse(_walkableTilesList[i % _walkableTilesList.length]
-                          .split(',')[1]) *
-                      UiConstants.tilePixelSize +
-                  UiConstants.tilePixelSize / 2,
-            );
-          }
+          final rng = Random();
+          final tile = _walkableTilesList[rng.nextInt(_walkableTilesList.length)];
+          final parts = tile.split(',');
+          spawnPos = Vector2(
+            int.parse(parts[0]) * UiConstants.tilePixelSize +
+                UiConstants.tilePixelSize / 2,
+            int.parse(parts[1]) * UiConstants.tilePixelSize +
+                UiConstants.tilePixelSize / 2,
+          );
         }
 
         final comp = VillagerComponent(
@@ -483,6 +471,7 @@ class VillageGame extends FlameGame {
           occupancyMap: _villagerOccupancy,
           missingBuildingTypes: villagerMissingNeeds,
           onTapped: onVillagerTapped,
+          spawnFromHouse: spawnFromHouse,
         );
         _villagerComponents.add(comp);
         world.add(comp);
@@ -581,7 +570,7 @@ class VillageGame extends FlameGame {
     final tx = W / 2 - scale * childCenterX;
     final ty = H / 2 - scale * childCenterY;
     return Matrix4.identity()
-      ..scale(scale, scale, 1.0)
+      ..scaleByVector3(Vector3(scale, scale, 1.0))
       ..setTranslationRaw(tx, ty, 0.0);
   }
 

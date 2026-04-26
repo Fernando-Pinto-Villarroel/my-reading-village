@@ -5,14 +5,20 @@ import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/domain/entities/placed_building.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
+import 'package:my_reading_town/application/services/ad_service.dart';
 import 'package:my_reading_town/application/services/building_service.dart';
+import 'package:my_reading_town/application/services/notification_service.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/shared_utils.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 
-void showConstructionCompleteDialog(
+Future<void> showConstructionCompleteDialog(
     BuildContext context, PlacedBuilding building) {
+  sl<AudioService>().playConstructionCompletedSound();
   final langProvider = context.read<LanguageProvider>();
   final isUpgrade = building.level > 1;
   final template = VillageRules.findTemplate(building.type);
@@ -21,7 +27,7 @@ void showConstructionCompleteDialog(
       ? (baseExp * VillageRules.upgradeExpMultiplier).round()
       : baseExp;
 
-  showDialog(
+  return showDialog(
     context: context,
     builder: (ctx) => Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -161,11 +167,57 @@ class ConstructionSheetContent extends StatefulWidget {
 
 class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
   Timer? _timer;
+  bool _watchingAd = false;
 
   @override
   void initState() {
     super.initState();
+    final remaining = BuildingService.effectiveRemainingTime(
+        widget.building, widget.village.activePowerups);
+    if (remaining.inSeconds <= 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _closeOwnRoute());
+      return;
+    }
     _startTimer();
+  }
+
+  void _closeOwnRoute() {
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route == null) return;
+    final navigator = Navigator.of(context);
+    if (route.isCurrent) {
+      navigator.pop();
+    } else {
+      navigator.removeRoute(route);
+    }
+  }
+
+  Future<void> _watchAdForTimeSkip() async {
+    if (_watchingAd) return;
+    // Check cooldown before showing ad
+    final cooldown = widget.village.constructionSkipCooldownRemaining(widget.building.id!);
+    if (cooldown != null) return; // Cooldown active, button should be disabled anyway
+    setState(() => _watchingAd = true);
+    final lang = context.read<LanguageProvider>();
+    final village = context.read<VillageProvider>();
+    final earned = await sl<AdService>().showRewardedAd(context, lang);
+    if (!mounted) return;
+    if (earned && widget.building.id != null) {
+      await village.skipConstructionTime(
+          widget.building.id!, const Duration(minutes: 10));
+      final remaining = BuildingService.effectiveRemainingTime(
+          widget.building, village.activePowerups);
+      sl<NotificationService>().scheduleConstructionComplete(
+        buildingId: widget.building.id!,
+        buildingName: widget.building.name,
+        remaining: remaining,
+        title: lang.translate('notification_construction_title'),
+        body: lang.translate('notification_construction_body'),
+      );
+      if (mounted) showSuccessToast(context, lang.translate('ad_construction_skipped'));
+    }
+    if (mounted) setState(() => _watchingAd = false);
   }
 
   void _startTimer() {
@@ -174,7 +226,15 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
         ? const Duration(milliseconds: 500)
         : const Duration(seconds: 1);
     _timer = Timer.periodic(interval, (_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      final remaining = BuildingService.effectiveRemainingTime(
+          widget.building, widget.village.activePowerups);
+      if (remaining.inSeconds <= 0) {
+        _timer?.cancel();
+        _closeOwnRoute();
+        return;
+      }
+      setState(() {});
     });
   }
 
@@ -205,6 +265,13 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
     final timeText = hours > 0
         ? '${hours}h ${mins}m ${secs}s $remainingLabel'
         : '${mins}m ${secs}s $remainingLabel';
+
+    // Check ad cooldown
+    final cooldown = widget.village.constructionSkipCooldownRemaining(widget.building.id!);
+    final bool canWatchAd = !_watchingAd && cooldown == null;
+    final String adButtonText = cooldown != null
+        ? '${context.t('ad_construction_skip_btn')} (${cooldown.inSeconds}s)'
+        : context.t('ad_construction_skip_btn');
 
     return Padding(
       padding:
@@ -290,6 +357,40 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
                     ),
                   ),
                 ),
+               if (remaining.inSeconds > 0) ...[
+                 SizedBox(height: 8),
+                 SizedBox(
+                   width: double.infinity,
+                   height: 46,
+                   child: OutlinedButton.icon(
+                     onPressed: canWatchAd ? _watchAdForTimeSkip : null,
+                     icon: _watchingAd
+                         ? SizedBox(
+                             width: 18,
+                             height: 18,
+                             child: CircularProgressIndicator(
+                                 strokeWidth: 2,
+                                 color: AppTheme.darkSkyBlue),
+                           )
+                         : Icon(Icons.play_circle_outline, size: 20),
+                     label: Text(
+                       adButtonText,
+                       style: TextStyle(
+                           fontSize: 15, fontWeight: FontWeight.bold),
+                     ),
+                     style: OutlinedButton.styleFrom(
+                       foregroundColor: canWatchAd ? AppTheme.darkSkyBlue : AppTheme.darkSkyBlue.withValues(alpha: 0.4),
+                       side: BorderSide(
+                           color: canWatchAd
+                               ? AppTheme.darkSkyBlue.withValues(alpha: 0.6)
+                               : AppTheme.darkSkyBlue.withValues(alpha: 0.2),
+                           width: 1.5),
+                       shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(16)),
+                     ),
+                   ),
+                 ),
+               ],
               SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,

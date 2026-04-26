@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:flame/game.dart' hide Matrix4;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -81,6 +82,7 @@ class _GameScreenState extends State<GameScreen>
   bool _menuOpen = false;
   bool _resourceHudExpanded = true;
   bool _villagerChoiceDialogShowing = false;
+  bool _checkingConstructions = false;
   bool _isCapturing = false;
   final GlobalKey _gameRepaintKey = GlobalKey();
   @override
@@ -141,6 +143,7 @@ class _GameScreenState extends State<GameScreen>
     super.dispose();
   }
 
+  @override
   void _flyToVillager(Villager villager) {
     final villagerId = villager.id;
     if (villagerId == null) return;
@@ -199,9 +202,6 @@ class _GameScreenState extends State<GameScreen>
     );
     _syncGameState();
     _villageProvider.checkMissions();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _checkPendingVillagerChoices();
-    });
     if (!_tourInitialized) {
       _tourInitialized = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -225,9 +225,12 @@ class _GameScreenState extends State<GameScreen>
     _game.playerLevel = village.playerLevel;
     _game.updateUnlockedChunks(village.unlockedChunks);
     _game.updatePlacedBuildings(village.placedBuildings);
-    _game.updateVillagers(village.villagers,
-        missingBuildingTypes: village.missingBuildingTypes,
-        houseRoadTiles: village.houseAdjacentRoadTiles);
+    _game.updateVillagers(
+      village.villagers,
+      missingBuildingTypes: village.missingBuildingTypes,
+      houseRoadTiles: village.houseAdjacentRoadTiles,
+      houseSpawnIds: village.consumeNewlyConfirmedVillagerIds(),
+    );
     _game.updateActivePowerups(village.activePowerups);
     _game.isConstructionMode = _mode == GameMode.construction;
     _game.isRoadMode = _mode == GameMode.road ||
@@ -263,62 +266,83 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void _checkConstructions() async {
-    if (!mounted) return;
-    final village = _villageProvider;
-    village.tickCooldowns();
-    final completed = await village.checkAndCompleteConstructions();
-    for (var building in completed) {
-      if (!_notifiedCompletions.contains(building.id)) {
-        _notifiedCompletions.add(building.id!);
-        if (mounted) showConstructionCompleteDialog(context, building);
+    if (_checkingConstructions) return;
+    _checkingConstructions = true;
+    try {
+      if (!mounted) return;
+      final village = _villageProvider;
+      village.tickCooldowns();
+      final completed = await village.checkAndCompleteConstructions();
+      // Consume level-up immediately so the notification path cannot show it
+      // prematurely — we will show it manually after the construction sequence.
+      final pendingLevel = village.consumeLevelUp();
+      for (var building in completed) {
+        if (!_notifiedCompletions.contains(building.id)) {
+          if (building.id != null) {
+            await sl<NotificationService>().cancelConstructionNotification(building.id!);
+          }
+          _notifiedCompletions.add(building.id!);
+          if (mounted) await showConstructionCompleteDialog(context, building);
+          _notifiedCompletions.remove(building.id);
+        }
       }
+      if (completed.isNotEmpty && mounted) {
+        _syncGameState();
+        await village.checkMissions();
+      }
+      if (mounted) await _checkPendingVillagerChoices();
+      if (mounted && pendingLevel != null) _showLevelUpDialog(pendingLevel);
+    } finally {
+      _checkingConstructions = false;
     }
-    if (completed.isNotEmpty && mounted) {
-      _syncGameState();
-      await village.checkMissions();
-    }
-    if (mounted) _checkPendingVillagerChoices();
   }
 
   @override
-  void _checkPendingVillagerChoices() {
-    if (!mounted || _villagerChoiceDialogShowing) return;
+  Future<void> _checkPendingVillagerChoices() async {
+    if (_villagerChoiceDialogShowing) return;
     final village = _villageProvider;
-    if (village.pendingVillagerChoices.isEmpty) return;
-
-    final choice = village.pendingVillagerChoices.first;
     final lang = sl<LanguageProvider>();
-
-    _villagerChoiceDialogShowing = true;
-    showVillagerChoiceDialog(
-      context,
-      choice: choice,
-      village: village,
-      lang: lang,
-      onComplete: () {
-        _villagerChoiceDialogShowing = false;
-        _syncGameState();
-        if (mounted) _checkPendingVillagerChoices();
-      },
-    );
+    while (mounted && village.pendingVillagerChoices.isNotEmpty) {
+      if (!mounted) return;
+      final choice = village.pendingVillagerChoices.first;
+      final completer = Completer<void>();
+      _villagerChoiceDialogShowing = true;
+      showVillagerChoiceDialog(
+        // ignore: use_build_context_synchronously
+        context,
+        choice: choice,
+        village: village,
+        lang: lang,
+        onComplete: () {
+          _villagerChoiceDialogShowing = false;
+          _syncGameState();
+          completer.complete();
+        },
+      );
+      await completer.future;
+    }
   }
 
   void _checkLevelUp() {
+    if (_checkingConstructions) return;
     final newLevel = _villageProvider.consumeLevelUp();
-    if (newLevel != null && mounted) {
-      showDialog(
-        context: context,
-        barrierColor: Colors.black.withAlpha(80),
-        barrierDismissible: true,
-        useSafeArea: false,
-        builder: (ctx) => LevelUpPopup(
-            newLevel: newLevel,
-            onDismiss: () {
-              Navigator.pop(ctx);
-              _checkNewSpecies();
-            }),
-      );
-    }
+    if (newLevel != null) _showLevelUpDialog(newLevel);
+  }
+
+  void _showLevelUpDialog(int level) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withAlpha(80),
+      barrierDismissible: true,
+      useSafeArea: false,
+      builder: (ctx) => LevelUpPopup(
+          newLevel: level,
+          onDismiss: () {
+            Navigator.pop(ctx);
+            _checkNewSpecies();
+          }),
+    );
   }
 
   void _checkNewSpecies() {
@@ -339,6 +363,7 @@ class _GameScreenState extends State<GameScreen>
 
   Future<void> _captureVillagePhoto() async {
     if (_isCapturing) return;
+    sl<AudioService>().playCameraSound();
     setState(() {
       _isCapturing = true;
       _menuOpen = false;
@@ -648,8 +673,9 @@ class _GameScreenState extends State<GameScreen>
                         _flipNextBuilding = false;
                       } else {
                         _mode = GameMode.construction;
-                        if (_tourStep == kTourStepBuildHighlight)
+                        if (_tourStep == kTourStepBuildHighlight) {
                           _tourStep = kTourStepBuildExplain;
+                        }
                       }
                     });
                     _syncGameState();
@@ -700,62 +726,11 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned(
             top: topPadding + (landscape ? 6 : 10),
+            bottom: landscape ? (bottomPadding + hudEdge) : null,
             right: rightPadding + hudEdge,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                HappinessIndicator(
-                    happiness: village.villageHappiness, landscape: landscape),
-                SizedBox(height: landscape ? 4 : 6),
-                ConstructorCounter(village: village, landscape: landscape),
-                SizedBox(height: landscape ? 6 : 10),
-                SideMenu(
-                  menuOpen: _menuOpen,
-                  readingButtonKey: _tourReadingKey,
-                  photoButtonKey: _tourPhotoKey,
-                  statsButtonKey: _tourStatsKey,
-                  settingsButtonKey: _tourSettingsKey,
-                  speciesButtonKey: _tourSpeciesKey,
-                  onToggleMenu: () => setState(() => _menuOpen = !_menuOpen),
-                  onReadingTap: () {
-                    if (_tourStep == kTourStepReadingHighlight) {
-                      setState(() => _tourStep = kTourStepReadingExplain);
-                    } else {
-                      showReadingModal(context);
-                    }
-                  },
-                  onPhotoTap: () {
-                    if (_tourStep == kTourStepPhotoHighlight) {
-                      setState(() => _tourStep = kTourStepPhotoExplain);
-                    } else {
-                      _captureVillagePhoto();
-                    }
-                  },
-                  onStatsTap: () {
-                    if (_tourStep == kTourStepStatsHighlight) {
-                      setState(() => _tourStep = kTourStepStatsExplain);
-                    } else {
-                      showStatsDialog(context, _villageProvider, _bookProvider);
-                    }
-                  },
-                  onSettingsTap: () {
-                    if (_tourStep == kTourStepSettingsHighlight) {
-                      setState(() => _tourStep = kTourStepSettingsExplain);
-                    } else {
-                      showSettingsDialog(context, _villageProvider,
-                          onRetakeTutorial: _startRetakeTutorial);
-                    }
-                  },
-                  onSpeciesBookTap: () {
-                    if (_tourStep == kTourStepSpeciesHighlight) {
-                      setState(() => _tourStep = kTourStepSpeciesExplain);
-                    } else {
-                      showSpeciesBookDialog(context);
-                    }
-                  },
-                  onSecretCodesTap: () => showSecretCodesDialog(context),
-                ),
-              ],
+            child: _buildRightColumn(
+              landscape: landscape,
+              village: village,
             ),
           ),
           if (_mode == GameMode.construction)
@@ -868,6 +843,70 @@ class _GameScreenState extends State<GameScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRightColumn({
+    required bool landscape,
+    required VillageProvider village,
+  }) {
+    final sideMenu = SideMenu(
+      menuOpen: _menuOpen,
+      readingButtonKey: _tourReadingKey,
+      photoButtonKey: _tourPhotoKey,
+      statsButtonKey: _tourStatsKey,
+      settingsButtonKey: _tourSettingsKey,
+      speciesButtonKey: _tourSpeciesKey,
+      onToggleMenu: () => setState(() => _menuOpen = !_menuOpen),
+      onReadingTap: () {
+        if (_tourStep == kTourStepReadingHighlight) {
+          setState(() => _tourStep = kTourStepReadingExplain);
+        } else {
+          showReadingModal(context);
+        }
+      },
+      onPhotoTap: () {
+        if (_tourStep == kTourStepPhotoHighlight) {
+          setState(() => _tourStep = kTourStepPhotoExplain);
+        } else {
+          _captureVillagePhoto();
+        }
+      },
+      onStatsTap: () {
+        if (_tourStep == kTourStepStatsHighlight) {
+          setState(() => _tourStep = kTourStepStatsExplain);
+        } else {
+          showStatsDialog(context, _villageProvider, _bookProvider);
+        }
+      },
+      onSettingsTap: () {
+        if (_tourStep == kTourStepSettingsHighlight) {
+          setState(() => _tourStep = kTourStepSettingsExplain);
+        } else {
+          showSettingsDialog(context, _villageProvider,
+              onRetakeTutorial: _startRetakeTutorial);
+        }
+      },
+      onSpeciesBookTap: () {
+        if (_tourStep == kTourStepSpeciesHighlight) {
+          setState(() => _tourStep = kTourStepSpeciesExplain);
+        } else {
+          showSpeciesBookDialog(context);
+        }
+      },
+      onSecretCodesTap: () => showSecretCodesDialog(context),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        HappinessIndicator(
+            happiness: village.villageHappiness, landscape: landscape),
+        SizedBox(height: landscape ? 4 : 6),
+        ConstructorCounter(village: village, landscape: landscape),
+        SizedBox(height: landscape ? 6 : 10),
+        if (landscape) Flexible(child: sideMenu) else sideMenu,
+      ],
     );
   }
 

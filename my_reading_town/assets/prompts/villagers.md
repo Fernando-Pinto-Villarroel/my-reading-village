@@ -518,6 +518,59 @@ i want this same hamster but sleeping, keep the same look, aesthetic, colors, an
 
 ---
 
+### platypus_villager.png (Happy — default state)
+
+```
+keeping the same kawaii cute design from the assets I'll show you, I need you to create this new other asset:
+cute kawaii platypus villager character sprite
+
+front view character
+standing upright on two legs
+full body visible
+looking directly forward
+same posture and clothing from the reference assets of other villagers (the arms position must also be the same from the refence assets, not greeting with his hand, keep the same position/posture from the reference images i gave you)
+
+adorable chubby platypus
+round chubby body
+short little legs
+small webbed feet
+flat wide duck-like bill (simplified kawaii style, cute and rounded, not protruding too much)
+flat rounded paddle tail behind the body
+small round eyes
+very simple design
+minimal details
+
+kawaii style
+pastel color palette — warm pastel brown-grey body with a soft cream belly and a light pastel teal or mint bill and feet
+clean simple outlines
+simple shapes
+
+face with very simple eyes (small black dot eyes)
+tiny curious cute smile
+super cute chubby proportions
+
+2D mobile game sprite
+top-down idle game village builder style
+high readability at small size
+
+white background
+simple and adorable character design
+```
+
+### platypus_villager_sad.png
+
+```
+i want this same platypus but with a sad expression, the only change is to make it sad, keep the look, the aesthetic, keep the design, everything must remain the same, only recreate the image with high fidelity but to make it sad, same colors, lightning, etc but to make it sad. the design of the eyes must also be the same, simple dot eyes, but sad
+```
+
+### platypus_villager_sleeping.png
+
+```
+i want this same platypus but sleeping, keep the same look, aesthetic, colors, and design identity, the platypus should be in a cute sleeping pose: eyes closed with small curved eyelashes (not dot eyes), sitting or slightly curled with flat tail visible and head tilted to one side, same pastel colors and kawaii style, same body proportions and outlines, same lighting and art style, only the sleeping pose and closed eyes change — everything else remains identical, NO "zzz" snoring expression needed. make it similar to the other image references i will give you
+```
+
+---
+
 ### polar_bear_villager.png (Happy — default state)
 
 ```
@@ -1458,6 +1511,60 @@ i want this same donkey but with a sad expression, the only change is to make it
 
 ```
 i want this same donkey but sleeping, keep the same look, aesthetic, colors, and design identity, the donkey should be in a cute sleeping pose: eyes closed with small curved eyelashes (not dot eyes), sitting or slightly curled with head tilted to one side, same pastel colors and kawaii style, same body proportions and outlines, same lighting and art style, only the sleeping pose and closed eyes change — everything else remains identical, NO "zzz" snoring expression needed. make it similar to the other image references i will give you
+```
+
+---
+
+### turkey_villager.png (Happy — default state)
+
+```
+keeping the same kawaii cute design from the assets I'll show you, I need you to create this new other asset:
+cute kawaii turkey villager character sprite
+
+front view character
+standing upright on two legs
+full body visible
+looking directly forward
+same posture and clothing from the reference assets of other villagers (the arms position must also be the same from the refence assets, not greeting with his hand, keep the same position/posture from the reference images i gave you)
+
+adorable chubby turkey
+round plump chubby body
+short sturdy little legs
+small rounded feet
+fan-shaped tail feathers spread behind the body (simplified kawaii style, clean rounded feather fan, not overly complex)
+small wattle under the beak (simplified, cute red teardrop shape)
+short rounded beak
+small round eyes
+very simple design
+minimal details
+
+kawaii style
+pastel color palette — warm pastel brown and copper tones with a soft cream belly, pastel red wattle, and iridescent pastel tail feathers in soft amber and teal accents
+clean simple outlines
+simple shapes
+
+face with very simple eyes (small black dot eyes)
+tiny proud cute smile
+super cute chubby proportions
+
+2D mobile game sprite
+top-down idle game village builder style
+high readability at small size
+
+white background
+simple and adorable character design
+```
+
+### turkey_villager_sad.png
+
+```
+i want this same turkey but with a sad expression, the only change is to make it sad, keep the look, the aesthetic, keep the design, everything must remain the same, only recreate the image with high fidelity but to make it sad, same colors, lightning, etc but to make it sad. the design of the eyes must also be the same, simple dot eyes, but sad
+```
+
+### turkey_villager_sleeping.png
+
+```
+i want this same turkey but sleeping, keep the same look, aesthetic, colors, and design identity, the turkey should be in a cute sleeping pose: eyes closed with small curved eyelashes (not dot eyes), sitting or slightly curled with fan tail still partially visible behind, head tilted to one side, same pastel colors and kawaii style, same body proportions and outlines, same lighting and art style, only the sleeping pose and closed eyes change — everything else remains identical, NO "zzz" snoring expression needed. make it similar to the other image references i will give you
 ```
 
 ---

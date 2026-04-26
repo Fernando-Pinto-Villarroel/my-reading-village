@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -6,7 +7,9 @@ import 'package:confetti/confetti.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
+import 'package:my_reading_town/application/services/ad_service.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
@@ -150,11 +153,11 @@ class _RouletteDialogState extends State<_RouletteDialog>
   late AnimationController _controller;
   late Animation<double> _rotationAnimation;
   bool _isSpinning = false;
-  // true while waiting for the reward popup to be dismissed — suppresses the
-  // "not enough gems" warning and the spin button during that window.
   bool _showingReward = false;
+  bool _watchingAdForSpin = false;
   double _currentAngle = 0.0;
   final Random _random = Random();
+  Timer? _adCooldownTimer;
 
   late List<_RouletteReward> _rewards;
   VillagerSpeciesData? _weeklySpecies;
@@ -191,8 +194,26 @@ class _RouletteDialogState extends State<_RouletteDialog>
 
   @override
   void dispose() {
+    _adCooldownTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _startAdCooldownTimer() {
+    _adCooldownTimer?.cancel();
+    _adCooldownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _adCooldownTimer?.cancel();
+        return;
+      }
+      final village = context.read<VillageProvider>();
+      final remaining = village.adCooldownRemainingFor('roulette');
+      if (remaining == null) {
+        _adCooldownTimer?.cancel();
+        _adCooldownTimer = null;
+      }
+      setState(() {});
+    });
   }
 
   Future<bool> _showGemConfirmDialog(
@@ -246,15 +267,39 @@ class _RouletteDialogState extends State<_RouletteDialog>
     return confirmed == true;
   }
 
+  Future<void> _watchAdForSpin() async {
+    if (_watchingAdForSpin || _isSpinning || _showingReward) return;
+    final village = context.read<VillageProvider>();
+    final lang = context.read<LanguageProvider>();
+    if (!village.canWatchAdForRoulette) return;
+    if (village.adCooldownRemainingFor('roulette') != null) return;
+    village.recordAdCooldown('roulette');
+    setState(() => _watchingAdForSpin = true);
+    final earned = await sl<AdService>().showRewardedAd(context, lang);
+    if (!mounted) return;
+    if (earned) {
+      await village.watchAdForRoulette();
+      if (mounted && village.hasAdFreeSpin) {
+        showSuccessToast(context, lang.translate('ad_roulette_spin_ready'));
+      }
+    }
+    if (mounted) {
+      setState(() => _watchingAdForSpin = false);
+      _startAdCooldownTimer();
+    }
+  }
+
   Future<void> _spin() async {
     final village = context.read<VillageProvider>();
     final lang = context.read<LanguageProvider>();
-    final wasFree = village.canSpinRouletteForFree;
-    if (!wasFree) {
+    final wasDailyFree = village.canSpinDailyFree;
+    final isFree = village.canSpinRouletteForFree;
+    if (!isFree) {
       final gemCost = RouletteRules.gemCostPerSpin;
       if (village.gems < gemCost) {
-        if (mounted)
+        if (mounted) {
           showErrorToast(context, lang.translate('store_not_enough_gems'));
+        }
         return;
       }
       final confirmed = await _showGemConfirmDialog(context, lang, gemCost);
@@ -262,7 +307,7 @@ class _RouletteDialogState extends State<_RouletteDialog>
     }
     final canSpin = await village.spinRoulette();
     if (!canSpin) return;
-    if (wasFree && mounted) {
+    if (wasDailyFree && mounted) {
       final remaining = village.rouletteNextFreeSpinIn;
       sl<NotificationService>().scheduleRouletteFreeSpin(
         remaining: remaining,
@@ -274,6 +319,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
     setState(() {
       _isSpinning = true;
     });
+
+    sl<AudioService>().startWheelSpinSound(const Duration(milliseconds: 4000));
 
     final isGuaranteed = village.rouletteSpinIsGuaranteed;
     final speciesIndex = _rewards.indexWhere((r) => r.type == 'species');
@@ -311,6 +358,7 @@ class _RouletteDialogState extends State<_RouletteDialog>
       ..duration = const Duration(milliseconds: 4000);
 
     await _controller.forward();
+    sl<AudioService>().stopWheelSpinSound();
 
     if (!mounted) return;
     setState(() {
@@ -364,13 +412,13 @@ class _RouletteDialogState extends State<_RouletteDialog>
     final village = context.watch<VillageProvider>();
     final lang = context.read<LanguageProvider>();
     final isFree = village.canSpinRouletteForFree;
+    final isDailyFree = village.canSpinDailyFree;
     final gems = village.gems;
     final gemCost = RouletteRules.gemCostPerSpin;
-    // Only evaluate affordability when we're in a neutral state
     final canAfford = isFree || gems >= gemCost;
     final timeLeft = village.rouletteNextFreeSpinIn;
 
-    final canDismiss = !_isSpinning && !_showingReward;
+    final canDismiss = !_isSpinning && !_showingReward && !_watchingAdForSpin;
 
     return PopScope(
       canPop: canDismiss,
@@ -433,8 +481,7 @@ class _RouletteDialogState extends State<_RouletteDialog>
                       ],
                     ),
 
-                    // "Next free spin" countdown — only shown when not spinning/showing reward
-                    if (!isFree && !_isSpinning && !_showingReward) ...[
+                    if (!isDailyFree && !_isSpinning && !_showingReward) ...[
                       SizedBox(height: 4),
                       Text(
                         lang
@@ -593,12 +640,190 @@ class _RouletteDialogState extends State<_RouletteDialog>
                         ),
                       ),
                     ),
+
+                    if (!_isSpinning && !_showingReward) ...[
+                      SizedBox(height: 16),
+                      _AdForSpinSection(
+                        village: village,
+                        lang: lang,
+                        onWatchAd: _watchAdForSpin,
+                        isWatching: _watchingAdForSpin,
+                        cooldown: village.adCooldownRemainingFor('roulette'),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Ad-for-spin section ────────────────────────────────────────────────────────
+
+class _AdForSpinSection extends StatelessWidget {
+  final VillageProvider village;
+  final LanguageProvider lang;
+  final VoidCallback onWatchAd;
+  final bool isWatching;
+  final Duration? cooldown;
+
+  const _AdForSpinSection({
+    required this.village,
+    required this.lang,
+    required this.onWatchAd,
+    required this.isWatching,
+    this.cooldown,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPending = village.hasAdFreeSpin;
+    final spinsToday = village.adRouletteSpinsToday;
+    final adsToday = village.adRouletteAdsToday;
+    final maxReached = spinsToday >= 3;
+
+    final Color sectionColor = AppTheme.darkSkyBlue;
+    final Color bgColor = AppTheme.skyBlue.withValues(alpha: 0.25);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: sectionColor.withValues(alpha: 0.4), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.play_circle_outline,
+                  size: 16, color: sectionColor),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  lang.translate('ad_roulette_section_title'),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: sectionColor),
+                ),
+              ),
+              Text(
+                lang.translate('ad_daily_limit_label'),
+                style: TextStyle(
+                    fontSize: 10,
+                    color: sectionColor.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          if (maxReached) ...[
+            Text(
+              lang.translate('ad_roulette_max_today'),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.darkText.withValues(alpha: 0.6)),
+            ),
+          ] else if (hasPending) ...[
+            Row(
+              children: [
+                Icon(Icons.stars, size: 16, color: AppTheme.coinGold),
+                SizedBox(width: 6),
+                Text(
+                  lang.translate('ad_roulette_spin_ready'),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.darkText),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Text(
+              lang.translate('ad_roulette_has_pending'),
+              style: TextStyle(
+                  fontSize: 11,
+                  color: AppTheme.darkText.withValues(alpha: 0.6)),
+            ),
+          ] else ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang
+                            .translate('ad_roulette_progress')
+                            .replaceAll('{count}', '$adsToday'),
+                        style: TextStyle(
+                            fontSize: 12, color: AppTheme.darkText),
+                      ),
+                      SizedBox(height: 4),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: adsToday / 3.0,
+                          backgroundColor:
+                              sectionColor.withValues(alpha: 0.15),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(sectionColor),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 10),
+                SizedBox(
+                  height: 34,
+                  child: ElevatedButton.icon(
+                    onPressed: (isWatching || cooldown != null) ? null : onWatchAd,
+                    icon: isWatching
+                        ? SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : Icon(Icons.play_arrow, size: 16),
+                    label: Text(
+                      cooldown != null
+                          ? '${lang.translate('ad_roulette_watch_ad_btn')} (${cooldown!.inSeconds}s)'
+                          : lang.translate('ad_roulette_watch_ad_btn'),
+                      style: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: sectionColor,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (spinsToday > 0) ...[
+              SizedBox(height: 4),
+              Text(
+                '${lang.translate('ad_roulette_spins_used')}: $spinsToday/3',
+                style: TextStyle(
+                    fontSize: 10,
+                    color: AppTheme.darkText.withValues(alpha: 0.5)),
+              ),
+            ],
+          ],
+        ],
       ),
     );
   }
@@ -631,6 +856,7 @@ class _RouletteRewardPopupState extends State<_RouletteRewardPopup>
     _confettiCtrl = ConfettiController(duration: const Duration(seconds: 2));
     _animCtrl.forward();
     _confettiCtrl.play();
+    sl<AudioService>().playWinnerSound();
   }
 
   @override

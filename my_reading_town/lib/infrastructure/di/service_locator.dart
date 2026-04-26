@@ -17,6 +17,8 @@ import 'package:my_reading_town/application/services/inventory_service.dart';
 import 'package:my_reading_town/application/services/mission_service.dart';
 import 'package:my_reading_town/application/services/player_service.dart';
 import 'package:my_reading_town/application/services/tag_service.dart';
+import 'package:my_reading_town/application/services/ad_service.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:my_reading_town/application/services/backup_service.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
@@ -45,6 +47,8 @@ void initServiceLocator() {
   sl.registerLazySingleton(() => MissionService(sl(), sl()));
   sl.registerLazySingleton(() => PlayerService(sl()));
   sl.registerLazySingleton(() => TagService(sl()));
+  sl.registerLazySingleton(() => AdService());
+  sl.registerLazySingleton(() => AudioService(sl()));
   sl.registerLazySingleton(() => BackupService(sl()));
   sl.registerLazySingleton(() => NotificationService());
 

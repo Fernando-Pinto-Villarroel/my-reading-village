@@ -46,11 +46,12 @@ class SqliteInventoryRepository implements InventoryRepository {
 
   @override
   Future<void> upsertMissionProgress(String missionId,
-          {bool? isCompleted, bool? isClaimed, String? activatedAt, int? pagesAtActivation, int? booksAtActivation}) =>
+          {bool? isCompleted, bool? isClaimed, String? activatedAt, int? pagesAtActivation, int? booksAtActivation, int? buildingCountAtActivation}) =>
       _db.upsertMissionProgress(missionId,
           isCompleted: isCompleted,
           isClaimed: isClaimed,
           activatedAt: activatedAt,
           pagesAtActivation: pagesAtActivation,
-          booksAtActivation: booksAtActivation);
+          booksAtActivation: booksAtActivation,
+          buildingCountAtActivation: buildingCountAtActivation);
 }

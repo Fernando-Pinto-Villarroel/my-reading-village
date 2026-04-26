@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:my_reading_town/app_constants.dart';
+import 'package:my_reading_town/domain/rules/species_rules.dart';
 
 enum StoreItemType { resource, powerup, gems, pack, species }
 
@@ -147,12 +148,12 @@ class StoreRules {
   ];
 
   static const List<StoreGemsItem> gemsItems = [
-    StoreGemsItem(gems: 50, basePrice: 0.99, productId: 'gems_50'),
-    StoreGemsItem(gems: 100, basePrice: 1.99, productId: 'gems_100'),
-    StoreGemsItem(gems: 200, basePrice: 3.99, productId: 'gems_200'),
-    StoreGemsItem(gems: 500, basePrice: 8.99, productId: 'gems_500'),
-    StoreGemsItem(gems: 1000, basePrice: 16.99, productId: 'gems_1000'),
-    StoreGemsItem(gems: 2000, basePrice: 29.99, productId: 'gems_2000'),
+    StoreGemsItem(gems: 50, basePrice: 0.59, productId: 'gems_50'),
+    StoreGemsItem(gems: 100, basePrice: 0.99, productId: 'gems_100'),
+    StoreGemsItem(gems: 200, basePrice: 1.99, productId: 'gems_200'),
+    StoreGemsItem(gems: 500, basePrice: 4.99, productId: 'gems_500'),
+    StoreGemsItem(gems: 1000, basePrice: 9.99, productId: 'gems_1000'),
+    StoreGemsItem(gems: 2000, basePrice: 17.99, productId: 'gems_2000'),
   ];
 
   static const List<StorePack> packs = [
@@ -167,8 +168,8 @@ class StoreRules {
       sandwichPowerups: 1,
       hammerPowerups: 0,
       glassesPowerups: 0,
-      basePrice: 1.49,
-      savingsPercent: 20,
+      basePrice: 0.99,
+      savingsPercent: 25,
       colorHex: 'FFB3BA',
     ),
     StorePack(
@@ -182,8 +183,8 @@ class StoreRules {
       sandwichPowerups: 0,
       hammerPowerups: 2,
       glassesPowerups: 0,
-      basePrice: 2.99,
-      savingsPercent: 25,
+      basePrice: 1.99,
+      savingsPercent: 30,
       colorHex: 'FFD700',
     ),
     StorePack(
@@ -197,7 +198,7 @@ class StoreRules {
       sandwichPowerups: 0,
       hammerPowerups: 0,
       glassesPowerups: 3,
-      basePrice: 4.99,
+      basePrice: 2.99,
       savingsPercent: 30,
       colorHex: 'B5B3FF',
     ),
@@ -212,7 +213,7 @@ class StoreRules {
       sandwichPowerups: 5,
       hammerPowerups: 5,
       glassesPowerups: 0,
-      basePrice: 9.99,
+      basePrice: 5.99,
       savingsPercent: 35,
       colorHex: 'B3FFD9',
     ),
@@ -227,7 +228,7 @@ class StoreRules {
       sandwichPowerups: 10,
       hammerPowerups: 10,
       glassesPowerups: 10,
-      basePrice: 19.99,
+      basePrice: 11.99,
       savingsPercent: 40,
       colorHex: 'FFCDD2',
     ),
@@ -240,8 +241,8 @@ class StoreRules {
     DiscountEvent(startMonth: 2,  startDay: 8,  endMonth: 2,  endDay: 15, labelKey: 'discount_valentines',  maxPct: 20),
     DiscountEvent(startMonth: 7,  startDay: 1,  endMonth: 7,  endDay: 8,  labelKey: 'discount_summer',      maxPct: 20),
     DiscountEvent(startMonth: 10, startDay: 24, endMonth: 10, endDay: 31, labelKey: 'discount_halloween',   maxPct: 30),
-    DiscountEvent(startMonth: 11, startDay: 23, endMonth: 11, endDay: 30, labelKey: 'discount_black_friday',maxPct: 40),
-    DiscountEvent(startMonth: 12, startDay: 19, endMonth: 12, endDay: 26, labelKey: 'discount_christmas',   maxPct: 50),
+    DiscountEvent(startMonth: 11, startDay: 23, endMonth: 11, endDay: 30, labelKey: 'discount_black_friday',maxPct: 50),
+    DiscountEvent(startMonth: 12, startDay: 19, endMonth: 12, endDay: 26, labelKey: 'discount_christmas',   maxPct: 40),
   ];
 
   static Map<String, DiscountInfo> computeDiscounts() {
@@ -290,7 +291,29 @@ class StoreRules {
       }
     }
 
+    for (final species in SpeciesRules.getSpecialSpecies()) {
+      final price = species.realPrice;
+      if (price == null || price < discountMinThreshold) continue;
+      final pct = 5 + rng.nextInt(active.maxPct - 4);
+      result[SpeciesRules.productIdForSpecies(species.id)] = DiscountInfo(
+        percent: pct.toDouble(),
+        labelKey: active.labelKey,
+        endsAt: endsAt!,
+      );
+    }
+
     return result;
+  }
+
+  static String? computeActiveDiscountKey() {
+    final now = DateTime.now();
+    if (AppConstants.testMode) return discountEvents.last.labelKey;
+    for (final event in discountEvents) {
+      final start = DateTime(now.year, event.startMonth, event.startDay);
+      final end = DateTime(now.year, event.endMonth, event.endDay, 23, 59, 59);
+      if (now.isAfter(start) && now.isBefore(end)) return event.labelKey;
+    }
+    return null;
   }
 
   static double applyDiscount(double basePrice, double discountPercent) {

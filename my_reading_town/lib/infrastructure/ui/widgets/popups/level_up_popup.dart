@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/domain/rules/village_rules.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
@@ -41,6 +43,7 @@ class _LevelUpPopupState extends State<LevelUpPopup>
     );
     _animController.forward();
     _confettiController.play();
+    sl<AudioService>().playLevelUpSound();
   }
 
   @override

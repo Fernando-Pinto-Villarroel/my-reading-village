@@ -79,24 +79,34 @@ class MissionService {
             mission.conditionType == MissionConditionType.booksCompleted);
   }
 
+  bool _isEventDecorationMission(Mission mission) {
+    return HolidayRules.isHolidayBranch(mission.branch) &&
+        mission.conditionType ==
+            MissionConditionType.buySpecificDecorationSinceActivation;
+  }
+
   Future<void> _ensureMissionActivated(
       Mission mission, Map<String, MissionProgress> progress,
-      {int? totalPagesRead, int? completedBooks}) async {
+      {int? totalPagesRead,
+      int? completedBooks,
+      List<PlacedBuilding>? buildings}) async {
     final p = _getOrCreateProgress(mission, progress);
 
     final needsActivationTime = p.activatedAt == null;
 
-    // Capture the baseline if:
-    // - Never set (null), OR
-    // - Was set to 0 but we now have real page data (fixes wrong baselines
-    //   saved when page counts weren't loaded yet)
     final currentPages = totalPagesRead ?? 0;
     final currentBooks = completedBooks ?? 0;
-    final needsBaseline = _isEventReadingMission(mission) &&
+    final needsPageBaseline = _isEventReadingMission(mission) &&
         (p.pagesAtActivation == null ||
             (p.pagesAtActivation == 0 && currentPages > 0));
 
-    if (!needsActivationTime && !needsBaseline) return;
+    final needsBuildingBaseline = _isEventDecorationMission(mission) &&
+        p.buildingCountAtActivation == null &&
+        buildings != null;
+
+    if (!needsActivationTime && !needsPageBaseline && !needsBuildingBaseline) {
+      return;
+    }
 
     if (needsActivationTime) {
       p.activatedAt = DateTime.now().toIso8601String();
@@ -104,17 +114,27 @@ class MissionService {
 
     int? pagesBaseline;
     int? booksBaseline;
-    if (needsBaseline) {
+    if (needsPageBaseline) {
       pagesBaseline = currentPages;
       booksBaseline = currentBooks;
       p.pagesAtActivation = pagesBaseline;
       p.booksAtActivation = booksBaseline;
     }
 
+    int? buildingBaseline;
+    if (needsBuildingBaseline) {
+      buildingBaseline = buildings
+          .where((b) =>
+              b.type == mission.buildingType && b.isConstructed)
+          .length;
+      p.buildingCountAtActivation = buildingBaseline;
+    }
+
     await _invRepo.upsertMissionProgress(mission.id,
         activatedAt: needsActivationTime ? p.activatedAt : null,
         pagesAtActivation: pagesBaseline,
-        booksAtActivation: booksBaseline);
+        booksAtActivation: booksBaseline,
+        buildingCountAtActivation: buildingBaseline);
   }
 
   Future<void> checkMissions({
@@ -135,7 +155,9 @@ class MissionService {
       if (p.isCompleted) continue;
 
       await _ensureMissionActivated(mission, progress,
-          totalPagesRead: totalPagesRead, completedBooks: completedBooks);
+          totalPagesRead: totalPagesRead,
+          completedBooks: completedBooks,
+          buildings: buildings);
 
       final isComplete = _checkMissionCondition(mission, p, buildings, villagers,
           activePowerups, bookItemUsedSinceActive,
@@ -228,6 +250,13 @@ class MissionService {
 
       case MissionConditionType.reachSpecialTileCount:
         return nonGrassTileCount >= (mission.targetCount ?? 1);
+
+      case MissionConditionType.buySpecificDecorationSinceActivation:
+        final baseline = missionProgress.buildingCountAtActivation ?? 0;
+        final current = buildings
+            .where((b) => b.type == mission.buildingType && b.isConstructed)
+            .length;
+        return current - baseline >= (mission.targetCount ?? 1);
     }
   }
 
@@ -326,12 +355,22 @@ class MissionService {
       case MissionConditionType.reachSpecialTileCount:
         current = nonGrassTileCount;
         return (current: current.clamp(0, target), target: target);
+
+      case MissionConditionType.buySpecificDecorationSinceActivation:
+        final baseline = missionProgress?.buildingCountAtActivation ?? 0;
+        current = buildings
+            .where((b) => b.type == mission.buildingType && b.isConstructed)
+            .length;
+        current = (current - baseline).clamp(0, target);
+        return (current: current, target: target);
     }
   }
 
   Future<bool> claimMissionReward(
       String missionId, Map<String, MissionProgress> progress,
-      {int? totalPagesRead, int? completedBooks}) async {
+      {int? totalPagesRead,
+      int? completedBooks,
+      List<PlacedBuilding>? buildings}) async {
     final mission = MissionData.getMissionById(missionId);
     if (mission == null) return false;
 
@@ -349,7 +388,9 @@ class MissionService {
     final nextMission = getActiveMission(mission.branch, progress);
     if (nextMission != null) {
       await _ensureMissionActivated(nextMission, progress,
-          totalPagesRead: totalPagesRead, completedBooks: completedBooks);
+          totalPagesRead: totalPagesRead,
+          completedBooks: completedBooks,
+          buildings: buildings);
     }
 
     return true;

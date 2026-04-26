@@ -10,6 +10,7 @@ import 'package:my_reading_town/adapters/repositories/villager_favorites.dart';
 import 'package:my_reading_town/application/services/notification_service.dart';
 import 'package:my_reading_town/domain/rules/holiday_rules.dart';
 import 'package:my_reading_town/domain/rules/store_rules.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/persistence/database_helper.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
@@ -218,6 +219,10 @@ class _SplashScreenState extends State<SplashScreen> {
     } catch (_) {
       await _setProgress(1.0);
     }
+
+    try {
+      await sl<AudioService>().startMusicLoop();
+    } catch (_) {}
 
     if (mounted) {
       await SystemChrome.setPreferredOrientations([

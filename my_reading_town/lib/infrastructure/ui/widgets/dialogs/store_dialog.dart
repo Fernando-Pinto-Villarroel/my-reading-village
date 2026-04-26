@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/app_constants.dart';
 import 'package:my_reading_town/domain/rules/store_rules.dart';
 import 'package:my_reading_town/domain/rules/species_rules.dart';
+import 'package:my_reading_town/application/services/ad_service.dart';
 import 'package:my_reading_town/application/services/store_service.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
@@ -36,10 +39,24 @@ class _StoreDialogState extends State<_StoreDialog>
     _discounts = StoreRules.computeDiscounts();
     _storeService = StoreService();
     _storeService.initialize();
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (_tabController.indexIsChanging) return;
+    final village = context.read<VillageProvider>();
+    final index = _tabController.index;
+    if (index == 2) {
+      village.markStoreFreeGemsSeen();
+      village.markStoreDiscountSeen();
+    } else if (index == 3 || index == 4) {
+      village.markStoreDiscountSeen();
+    }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     _storeService.dispose();
     super.dispose();
@@ -93,7 +110,7 @@ class _StoreDialogState extends State<_StoreDialog>
                       lang: lang,
                       discounts: _discounts,
                       storeService: _storeService),
-                  _SpeciesTab(lang: lang, storeService: _storeService),
+                  _SpeciesTab(lang: lang, storeService: _storeService, discounts: _discounts),
                 ],
               ),
             ),
@@ -244,7 +261,29 @@ class _StoreTabBarState extends State<_StoreTabBar> {
         widget.lang.translate('store_tab_packs'),
       ),
       tab(
-        const Icon(Icons.pets, size: 18),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Icon(Icons.pets, size: 18),
+            if (_hasDiscounts)
+              Positioned(
+                top: -4,
+                right: -6,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('%',
+                      style: TextStyle(
+                          fontSize: 7,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
+                ),
+              ),
+          ],
+        ),
         widget.lang.translate('store_tab_species'),
       ),
     ];
@@ -651,7 +690,7 @@ class _PowerupSection extends StatelessWidget {
   }
 }
 
-class _GemsTab extends StatelessWidget {
+class _GemsTab extends StatefulWidget {
   final LanguageProvider lang;
   final Map<String, DiscountInfo> discounts;
   final StoreService storeService;
@@ -663,6 +702,60 @@ class _GemsTab extends StatelessWidget {
   });
 
   @override
+  State<_GemsTab> createState() => _GemsTabState();
+}
+
+class _GemsTabState extends State<_GemsTab> {
+  bool _watchingAdForGems = false;
+  Timer? _adCooldownTimer;
+
+  @override
+  void dispose() {
+    _adCooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAdCooldownTimer() {
+    _adCooldownTimer?.cancel();
+    _adCooldownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) {
+        _adCooldownTimer?.cancel();
+        return;
+      }
+      final village = context.read<VillageProvider>();
+      final remaining = village.adCooldownRemainingFor('gems');
+      if (remaining == null) {
+        _adCooldownTimer?.cancel();
+        _adCooldownTimer = null;
+      }
+      setState(() {});
+    });
+  }
+
+  Future<void> _watchAdForGems() async {
+    if (_watchingAdForGems) return;
+    final village = context.read<VillageProvider>();
+    if (village.adGemsClaimed) return;
+    if (village.adCooldownRemainingFor('gems') != null) return;
+    village.recordAdCooldown('gems');
+    setState(() => _watchingAdForGems = true);
+    final earned =
+        await sl<AdService>().showRewardedAd(context, widget.lang);
+    if (!mounted) return;
+    if (earned) {
+      final claimed = await village.watchAdForGems();
+      if (mounted && claimed) {
+        showSuccessToast(
+            context, widget.lang.translate('ad_gems_received'));
+      }
+    }
+    if (mounted) {
+      setState(() => _watchingAdForGems = false);
+      _startAdCooldownTimer();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final village = context.watch<VillageProvider>();
 
@@ -670,7 +763,15 @@ class _GemsTab extends StatelessWidget {
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          _DiscountBanner(discounts: discounts, lang: lang),
+          _AdForGemsSection(
+            village: village,
+            lang: widget.lang,
+            onWatchAd: _watchAdForGems,
+            isWatching: _watchingAdForGems,
+            cooldown: village.adCooldownRemainingFor('gems'),
+          ),
+          SizedBox(height: 12),
+          _DiscountBanner(discounts: widget.discounts, lang: widget.lang),
           SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 2,
@@ -680,7 +781,7 @@ class _GemsTab extends StatelessWidget {
             mainAxisSpacing: 12,
             childAspectRatio: 1.05,
             children: StoreRules.gemsItems.map((item) {
-              final discount = discounts[item.productId];
+              final discount = widget.discounts[item.productId];
               final finalPrice = discount != null
                   ? StoreRules.applyDiscount(item.basePrice, discount.percent)
                   : item.basePrice;
@@ -688,13 +789,13 @@ class _GemsTab extends StatelessWidget {
                 item: item,
                 finalPrice: finalPrice,
                 discount: discount,
-                lang: lang,
+                lang: widget.lang,
                 onTap: () => _purchase(context, item, village, finalPrice),
               );
             }).toList(),
           ),
           SizedBox(height: 8),
-          if (!AppConstants.playStore) _SimulationNotice(lang: lang),
+          if (!AppConstants.playStore) _SimulationNotice(lang: widget.lang),
         ],
       ),
     );
@@ -711,20 +812,176 @@ class _GemsTab extends StatelessWidget {
       if (context.mounted) {
         _showSimulatedPurchase(
             context,
-            lang,
-            lang
+            widget.lang,
+            widget.lang
                 .translate('store_gems_received')
                 .replaceAll('{gems}', '${item.gems}'));
       }
       return;
     }
 
-    final result = await storeService.purchaseGems(item);
+    final result = await widget.storeService.purchaseGems(item);
     if (!context.mounted) return;
 
     if (result.state == StorePurchaseState.error) {
-      _showError(context, lang, result.errorMessage);
+      _showError(context, widget.lang, result.errorMessage);
     }
+  }
+}
+
+class _AdForGemsSection extends StatelessWidget {
+  final VillageProvider village;
+  final LanguageProvider lang;
+  final VoidCallback onWatchAd;
+  final bool isWatching;
+  final Duration? cooldown;
+
+  const _AdForGemsSection({
+    required this.village,
+    required this.lang,
+    required this.onWatchAd,
+    required this.isWatching,
+    this.cooldown,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final claimed = village.adGemsClaimed;
+    final adsToday = village.adGemsAdsToday;
+    const Color sectionColor = AppTheme.darkMint;
+    final Color bgColor = AppTheme.mint.withValues(alpha: 0.3);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: claimed
+            ? Colors.grey.withValues(alpha: 0.08)
+            : bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: claimed
+              ? Colors.grey.withValues(alpha: 0.3)
+              : sectionColor.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.play_circle_outline,
+                  size: 16,
+                  color: claimed ? Colors.grey : sectionColor),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  lang.translate('ad_gems_section_title'),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: claimed ? Colors.grey : sectionColor),
+                ),
+              ),
+              Text(
+                lang.translate('ad_daily_limit_label'),
+                style: TextStyle(
+                    fontSize: 10,
+                    color: (claimed ? Colors.grey : sectionColor)
+                        .withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          if (claimed) ...[
+            Text(
+              lang.translate('ad_gems_claimed_today'),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade500),
+            ),
+          ] else ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          ResourceIcon.gem(size: 18),
+                          SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              lang.translate('ad_gems_section_subtitle'),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.darkText),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        lang
+                            .translate('ad_gems_progress')
+                            .replaceAll('{count}', '$adsToday'),
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.darkText.withValues(alpha: 0.7)),
+                      ),
+                      SizedBox(height: 4),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: adsToday / 3.0,
+                          backgroundColor:
+                              sectionColor.withValues(alpha: 0.15),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(sectionColor),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 10),
+                SizedBox(
+                  height: 36,
+                  child: ElevatedButton.icon(
+                    onPressed: (isWatching || cooldown != null) ? null : onWatchAd,
+                    icon: isWatching
+                        ? SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : Icon(Icons.play_arrow, size: 16),
+                    label: Text(
+                      cooldown != null
+                          ? '${lang.translate('ad_gems_watch_btn')} (${cooldown!.inSeconds}s)'
+                          : lang.translate('ad_gems_watch_btn'),
+                      style: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: sectionColor,
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 
@@ -957,10 +1214,7 @@ class _PackCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              color.withValues(alpha: 0.3),
-              color.withValues(alpha: 0.1)
-            ],
+            colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.1)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -974,95 +1228,84 @@ class _PackCard extends StatelessWidget {
             ),
           ],
         ),
-        padding: EdgeInsets.all(14),
-        child: Row(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.card_giftcard, size: 26, color: Colors.white),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        child: Text(
-                          packName,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.darkText,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        packName,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.darkText,
                         ),
                       ),
-                      SizedBox(width: 5),
+                      SizedBox(height: 5),
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(7),
                         ),
                         child: Text(
-                          lang
-                              .translate('store_save')
-                              .replaceAll('{pct}', '${pack.savingsPercent}'),
+                          lang.translate('store_save').replaceAll('{pct}', '${pack.savingsPercent}'),
                           style: TextStyle(
-                              fontSize: 9,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                            fontSize: 10,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 5),
-                  _PackContentsRow(pack: pack),
-                ],
-              ),
-            ),
-            SizedBox(width: 10),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (discount != null) ...[
-                  _DiscountBadge(percent: discount!.percent),
-                  SizedBox(height: 4),
-                  Text(
-                    '\$${pack.basePrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey,
-                      decoration: TextDecoration.lineThrough,
+                ),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (discount != null) ...[
+                      _DiscountBadge(percent: discount!.percent),
+                      SizedBox(height: 4),
+                      Text(
+                        '\$${pack.basePrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                    ],
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '\$${finalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2),
-                ],
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '\$${finalPrice.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
+            SizedBox(height: 10),
+            Divider(height: 1, color: color.withValues(alpha: 0.4)),
+            SizedBox(height: 10),
+            _PackContentsColumn(pack: pack, lang: lang),
           ],
         ),
       ),
@@ -1070,52 +1313,58 @@ class _PackCard extends StatelessWidget {
   }
 }
 
-class _PackContentsRow extends StatelessWidget {
+class _PackContentsColumn extends StatelessWidget {
   final StorePack pack;
+  final LanguageProvider lang;
 
-  const _PackContentsRow({required this.pack});
+  const _PackContentsColumn({required this.pack, required this.lang});
 
   @override
   Widget build(BuildContext context) {
-    final items = <Widget>[];
+    final items = <({Widget icon, int amount, String label})>[];
 
-    void add(Widget icon, int amount) {
+    void add(Widget icon, int amount, String labelKey) {
       if (amount <= 0) return;
-      items.add(Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          SizedBox(width: 2),
-          Text('+$amount',
-              style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.darkText)),
-          SizedBox(width: 7),
-        ],
-      ));
+      items.add((icon: icon, amount: amount, label: lang.translate(labelKey)));
     }
 
-    add(ResourceIcon.coin(size: 17), pack.coins);
-    add(ResourceIcon.wood(size: 17), pack.wood);
-    add(ResourceIcon.metal(size: 17), pack.metal);
-    add(ResourceIcon.gem(size: 17), pack.gems);
-    add(Image.asset('assets/images/items/book_item.png', width: 22, height: 22),
-        pack.bookPowerups);
-    add(
-        Image.asset('assets/images/items/sandwich_item.png',
-            width: 22, height: 22),
-        pack.sandwichPowerups);
-    add(
-        Image.asset('assets/images/items/hammer_item.png',
-            width: 22, height: 22),
-        pack.hammerPowerups);
-    add(
-        Image.asset('assets/images/items/glasses_item.png',
-            width: 22, height: 22),
-        pack.glassesPowerups);
+    add(ResourceIcon.coin(size: 17), pack.coins, 'coins');
+    add(ResourceIcon.wood(size: 17), pack.wood, 'wood');
+    add(ResourceIcon.metal(size: 17), pack.metal, 'metal');
+    add(ResourceIcon.gem(size: 17), pack.gems, 'gems');
+    add(Image.asset('assets/images/items/book_item.png', width: 18, height: 18), pack.bookPowerups, 'happiness_book');
+    add(Image.asset('assets/images/items/sandwich_item.png', width: 18, height: 18), pack.sandwichPowerups, 'constructor_sandwich');
+    add(Image.asset('assets/images/items/hammer_item.png', width: 18, height: 18), pack.hammerPowerups, 'constructor_hammer');
+    add(Image.asset('assets/images/items/glasses_item.png', width: 18, height: 18), pack.glassesPowerups, 'magic_glasses');
 
-    return Wrap(children: items);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items.map((item) => Padding(
+        padding: EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            item.icon,
+            SizedBox(width: 8),
+            Text(
+              '+${item.amount}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkText,
+              ),
+            ),
+            SizedBox(width: 5),
+            Text(
+              item.label,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.darkText.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+      )).toList(),
+    );
   }
 }
 
@@ -1179,8 +1428,9 @@ class _DiscountBannerState extends State<_DiscountBanner> {
     final h = d.inHours;
     final m = d.inMinutes % 60;
     final s = d.inSeconds % 60;
-    if (h > 0)
+    if (h > 0) {
       return '${h}h ${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
+    }
     return '${m.toString().padLeft(2, '0')}m ${s.toString().padLeft(2, '0')}s';
   }
 
@@ -1403,8 +1653,9 @@ class _SimulationNotice extends StatelessWidget {
 class _SpeciesTab extends StatelessWidget {
   final LanguageProvider lang;
   final StoreService storeService;
+  final Map<String, DiscountInfo> discounts;
 
-  const _SpeciesTab({required this.lang, required this.storeService});
+  const _SpeciesTab({required this.lang, required this.storeService, required this.discounts});
 
   Color _rarityColor(VillagerRarity rarity) {
     switch (rarity) {
@@ -1510,15 +1761,20 @@ class _SpeciesTab extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          ...available.map((species) => Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: _SpeciesStoreCard(
-                  species: species,
-                  lang: lang,
-                  rarityColor: _rarityColor(species.rarity),
-                  onTap: () => _purchase(context, species),
-                ),
-              )),
+          ...available.map((species) {
+                final productId = SpeciesRules.productIdForSpecies(species.id);
+                final discount = discounts[productId];
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: _SpeciesStoreCard(
+                    species: species,
+                    lang: lang,
+                    rarityColor: _rarityColor(species.rarity),
+                    onTap: () => _purchase(context, species),
+                    discount: discount,
+                  ),
+                );
+              }),
           if (!AppConstants.playStore) _SimulationNotice(lang: lang),
         ],
       ),
@@ -1542,16 +1798,23 @@ class _SpeciesStoreCard extends StatelessWidget {
   final LanguageProvider lang;
   final Color rarityColor;
   final VoidCallback onTap;
+  final DiscountInfo? discount;
 
   const _SpeciesStoreCard({
     required this.species,
     required this.lang,
     required this.rarityColor,
     required this.onTap,
+    this.discount,
   });
 
   @override
   Widget build(BuildContext context) {
+    final originalPrice = species.realPrice;
+    final finalPrice = discount != null && originalPrice != null
+        ? StoreRules.applyDiscount(originalPrice, discount!.percent)
+        : originalPrice;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1568,88 +1831,119 @@ class _SpeciesStoreCard extends StatelessWidget {
           ],
         ),
         padding: EdgeInsets.all(14),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: rarityColor.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Image.asset(
-                  'assets/images/villagers/${species.id}/${species.id}_villager.png',
-                  width: 48,
-                  height: 48,
-                  filterQuality: FilterQuality.medium,
-                  errorBuilder: (_, __, ___) => Icon(
-                    Icons.pets,
-                    size: 32,
-                    color: rarityColor,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: rarityColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
                   ),
-                ),
-              ),
-            ),
-            SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    lang.translate(species.nameKey),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkText,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: rarityColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: rarityColor, width: 1),
-                    ),
-                    child: Text(
-                      lang.translate(SpeciesRules.rarityKey(species.rarity)),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/villagers/${species.id}/${species.id}_villager.png',
+                      width: 40,
+                      height: 40,
+                      filterQuality: FilterQuality.medium,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.pets,
+                        size: 28,
                         color: rarityColor,
                       ),
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    lang.translate(species.descriptionKey),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.darkText.withValues(alpha: 0.6),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.translate(species.nameKey),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.darkText,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: rarityColor.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: rarityColor, width: 1),
+                            ),
+                            child: Text(
+                              lang.translate(SpeciesRules.rarityKey(species.rarity)),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: rarityColor,
+                              ),
+                            ),
+                          ),
+                          if (discount != null)
+                            _DiscountBadge(percent: discount!.percent),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Text(
+              lang.translate(species.descriptionKey),
+              style: TextStyle(
+                fontSize: 11.5,
+                color: AppTheme.darkText.withValues(alpha: 0.65),
+                height: 1.4,
               ),
             ),
-            SizedBox(width: 12),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: rarityColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                lang.translate('store_species_buy').replaceAll('{price}',
-                    '\$${species.realPrice?.toStringAsFixed(2) ?? '0.00'}'),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (discount != null && originalPrice != null) ...[
+                  Text(
+                    '\$${originalPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                ],
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: rarityColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    lang.translate('store_species_buy').replaceAll(
+                      '{price}',
+                      '\$${(finalPrice ?? originalPrice ?? 0.0).toStringAsFixed(2)}',
+                    ),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

@@ -247,6 +247,7 @@ Species purchases are **Non-Consumable** (bought once; owning a species is perma
 | `species_mole`           | Mole          | Extraordinary | $4.99   |
 | `species_bat`            | Bat           | Extraordinary | $4.99   |
 | `species_donkey`         | Donkey        | Extraordinary | $4.99   |
+| `species_turkey`         | Turkey        | Extraordinary | $4.99   |
 | `species_monkey`         | Monkey        | Legendary     | $9.99   |
 | `species_gorilla`        | Gorilla       | Legendary     | $9.99   |
 | `species_zebra`          | Zebra         | Legendary     | $9.99   |

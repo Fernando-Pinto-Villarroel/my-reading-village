@@ -45,6 +45,12 @@
         <receiver
             android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"/>
+        <!-- Google AdMob app ID. Use Google's test ID while googleAds=false.
+             Replace with your real AdMob App ID when googleAds=true.
+             See GOOGLE_ADS.md for instructions. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

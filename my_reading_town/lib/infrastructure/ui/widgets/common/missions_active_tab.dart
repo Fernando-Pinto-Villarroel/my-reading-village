@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
@@ -37,8 +39,16 @@ class MissionColors {
         return bookTracking;
       case MissionBranch.halloween:
         return halloween;
+      case MissionBranch.thanksgiving:
+        return const Color(0xFFE07B39);
       case MissionBranch.christmas:
         return christmas;
+      case MissionBranch.newYear:
+        return const Color(0xFF5C9BD6);
+      case MissionBranch.sanValentin:
+        return const Color(0xFFE91E8C);
+      case MissionBranch.carnival:
+        return const Color(0xFF9C5DB8);
       case MissionBranch.easter:
         return easter;
     }
@@ -58,8 +68,16 @@ class MissionColors {
         return Icons.auto_stories;
       case MissionBranch.halloween:
         return Icons.nightlight_round;
+      case MissionBranch.thanksgiving:
+        return Icons.emoji_nature;
       case MissionBranch.christmas:
         return Icons.ac_unit;
+      case MissionBranch.newYear:
+        return Icons.celebration;
+      case MissionBranch.sanValentin:
+        return Icons.favorite;
+      case MissionBranch.carnival:
+        return Icons.theater_comedy;
       case MissionBranch.easter:
         return Icons.egg_alt;
     }
@@ -454,6 +472,7 @@ class ClaimButton extends StatelessWidget {
       onTap: () async {
         final result = await village.claimMissionReward(mission.id);
         if (result.success) {
+          sl<AudioService>().playMissionCompletedSound();
           onClaimed();
           if (context.mounted) {
             if (result.speciesId != null) {

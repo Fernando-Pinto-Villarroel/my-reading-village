@@ -174,4 +174,48 @@ class SqliteVillageRepository implements VillageRepository {
 
   @override
   Future<void> markSecretCodeUsed(String code) => _db.markSecretCodeUsed(code);
+
+  @override
+  Future<
+      ({
+        int rouletteAdsToday,
+        int rouletteSpinsToday,
+        bool roulettePendingSpin,
+        String? rouletteDate,
+        int gemsAdsToday,
+        bool gemsClaimed,
+        String? gemsDate,
+      })> getAdState() => _db.getAdState();
+
+  @override
+  Future<void> saveAdState({
+    required int rouletteAdsToday,
+    required int rouletteSpinsToday,
+    required bool roulettePendingSpin,
+    required String? rouletteDate,
+    required int gemsAdsToday,
+    required bool gemsClaimed,
+    required String? gemsDate,
+  }) =>
+      _db.saveAdState(
+        rouletteAdsToday: rouletteAdsToday,
+        rouletteSpinsToday: rouletteSpinsToday,
+        roulettePendingSpin: roulettePendingSpin,
+        rouletteDate: rouletteDate,
+        gemsAdsToday: gemsAdsToday,
+        gemsClaimed: gemsClaimed,
+        gemsDate: gemsDate,
+      );
+
+  @override
+  Future<({String discountSeenKey, String gemSeenDate})> getStoreSeenData() =>
+      _db.getStoreSeenData();
+
+  @override
+  Future<void> saveStoreDiscountSeenKey(String key) =>
+      _db.saveStoreDiscountSeenKey(key);
+
+  @override
+  Future<void> saveStoreGemSeenDate(String date) =>
+      _db.saveStoreGemSeenDate(date);
 }

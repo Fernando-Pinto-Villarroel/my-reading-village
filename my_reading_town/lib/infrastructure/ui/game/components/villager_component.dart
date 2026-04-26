@@ -62,6 +62,7 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
     required this.occupancyMap,
     this.missingBuildingTypes = const [],
     this.onTapped,
+    bool spawnFromHouse = false,
   }) : super(
           position: position,
           size: Vector2(UiConstants.tilePixelSize * 0.38,
@@ -71,7 +72,7 @@ class VillagerComponent extends PositionComponent with TapCallbacks {
         ) {
     _targetPosition = position.clone();
     final id = villager.id ?? 0;
-    _waitTimer = _random.nextDouble() * 3.0 + (id % 20) * 0.15;
+    _waitTimer = spawnFromHouse ? 0.3 : _random.nextDouble() * 3.0 + (id % 20) * 0.15;
     _facingRight = _random.nextBool();
   }
 

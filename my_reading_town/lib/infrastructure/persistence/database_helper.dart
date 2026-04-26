@@ -175,7 +175,18 @@ class DatabaseHelper {
         notif_end_hour INTEGER NOT NULL DEFAULT 22,
         notif_per_day INTEGER NOT NULL DEFAULT 2,
         event_notifs_scheduled TEXT,
-        event_species_overrides TEXT NOT NULL DEFAULT '{}'
+        event_species_overrides TEXT NOT NULL DEFAULT '{}',
+        ad_roulette_pending_spin INTEGER NOT NULL DEFAULT 0,
+        ad_roulette_ads_today INTEGER NOT NULL DEFAULT 0,
+        ad_roulette_spins_today INTEGER NOT NULL DEFAULT 0,
+        ad_roulette_date TEXT,
+        ad_gems_ads_today INTEGER NOT NULL DEFAULT 0,
+        ad_gems_claimed_today INTEGER NOT NULL DEFAULT 0,
+        ad_gems_date TEXT,
+        music_volume INTEGER NOT NULL DEFAULT 3,
+        effects_volume INTEGER NOT NULL DEFAULT 3,
+        store_discount_seen_key TEXT NOT NULL DEFAULT '',
+        store_gems_seen_date TEXT NOT NULL DEFAULT ''
       )
     ''');
 
@@ -211,7 +222,8 @@ class DatabaseHelper {
         is_claimed INTEGER NOT NULL DEFAULT 0,
         activated_at TEXT,
         pages_at_activation INTEGER,
-        books_at_activation INTEGER
+        books_at_activation INTEGER,
+        building_count_at_activation INTEGER
       )
     ''');
 
