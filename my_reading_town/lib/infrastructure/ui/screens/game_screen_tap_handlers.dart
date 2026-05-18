@@ -196,7 +196,7 @@ mixin _GameTapHandlers on State<GameScreen> {
         if (remaining > Duration.zero) {
           notif.scheduleConstructionComplete(
             buildingId: placed.id!,
-            buildingName: placed.name,
+            buildingName: langProvider.translate('building_name_${placed.type}', fallback: placed.name),
             remaining: remaining,
             title: langProvider.translate('notification_construction_title'),
             body: langProvider.translate('notification_construction_body'),

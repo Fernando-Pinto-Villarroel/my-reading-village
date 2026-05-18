@@ -117,6 +117,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
         ),
         ElevatedButton(
           onPressed: _submit,
+          style: ElevatedButton.styleFrom(foregroundColor: Colors.white),
           child: Text(_isEditing ? context.t('save') : context.t('add')),
         ),
       ],

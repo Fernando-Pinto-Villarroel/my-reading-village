@@ -210,7 +210,7 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
           widget.building, village.activePowerups);
       sl<NotificationService>().scheduleConstructionComplete(
         buildingId: widget.building.id!,
-        buildingName: widget.building.name,
+        buildingName: lang.translate('building_name_${widget.building.type}', fallback: widget.building.name),
         remaining: remaining,
         title: lang.translate('notification_construction_title'),
         body: lang.translate('notification_construction_body'),

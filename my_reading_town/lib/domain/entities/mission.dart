@@ -13,6 +13,12 @@ enum MissionBranch {
   newYear,
   sanValentin,
   carnival,
+  workersDay,
+  environmentDay,
+  chocolateDay,
+  friendshipDay,
+  youthDay,
+  literacyDay,
 }
 
 enum MissionConditionType {
@@ -30,6 +36,7 @@ enum MissionConditionType {
   haveDecorationMinGemCost,
   reachSpecialTileCount,
   buySpecificDecorationSinceActivation,
+  buyTerrainSpace,
 }
 
 class MissionReward {

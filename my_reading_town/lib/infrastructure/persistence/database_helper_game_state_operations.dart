@@ -311,6 +311,17 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     await db.update('game_state', {'store_gems_seen_date': date}, where: 'id = 1');
   }
 
+  Future<int> getSpeciesManualRefreshSeed() async {
+    final state = await getGameState();
+    return state['species_manual_refresh_seed'] as int? ?? 0;
+  }
+
+  Future<void> incrementSpeciesManualRefreshSeed() async {
+    final db = await database;
+    await db.rawUpdate(
+        'UPDATE game_state SET species_manual_refresh_seed = species_manual_refresh_seed + 1 WHERE id = 1');
+  }
+
   Future<bool> isSecretCodeUsed(String code) async {
     final db = await database;
     final normalized = code.toUpperCase();

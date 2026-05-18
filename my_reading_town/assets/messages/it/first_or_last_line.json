@@ -129,6 +129,16 @@
       "line": "...perché le stirpi condannate a cento anni di solitudine non avevano una seconda opportunità sulla terra.",
       "book": "Cent'anni di solitudine",
       "is_first": false
-    }
+    },
+    { "line": "Last night I dreamt I went to Manderley again.", "book": "Rebecca", "is_first": true },
+    { "line": "Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.", "book": "The Trial", "is_first": true },
+    { "line": "It was a pleasure to burn.", "book": "Fahrenheit 451", "is_first": true },
+    { "line": "As Gregor Samsa awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.", "book": "The Metamorphosis", "is_first": true },
+    { "line": "There was no possibility of taking a walk that day.", "book": "Jane Eyre", "is_first": true },
+    { "line": "It was love at first sight.", "book": "Catch-22", "is_first": true },
+    { "line": "For a long time, I went to bed early.", "book": "In Search of Lost Time", "is_first": true },
+    { "line": "After a while I went out and left the hospital and walked back to the hotel in the rain.", "book": "A Farewell to Arms", "is_first": false },
+    { "line": "He turned out the light and went into Jem's room. He would be there all night, and he would be there when Jem waked up in the morning.", "book": "To Kill a Mockingbird", "is_first": false },
+    { "line": "All was well.", "book": "Harry Potter and the Deathly Hallows", "is_first": false }
   ]
 }

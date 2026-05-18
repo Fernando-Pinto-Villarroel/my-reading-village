@@ -44,8 +44,8 @@ class SpeciesRules {
       unlockLevel: 4, nameKey: 'species_koala', descriptionKey: 'species_desc_koala',
     ),
     VillagerSpeciesData(
-      id: 'raccoon', rarity: VillagerRarity.common, unlockType: 'level',
-      unlockLevel: 8, nameKey: 'species_raccoon', descriptionKey: 'species_desc_raccoon',
+      id: 'hamster', rarity: VillagerRarity.common, unlockType: 'level',
+      unlockLevel: 8, nameKey: 'species_hamster', descriptionKey: 'species_desc_hamster',
     ),
     VillagerSpeciesData(
       id: 'elephant', rarity: VillagerRarity.common, unlockType: 'level',
@@ -60,8 +60,8 @@ class SpeciesRules {
       unlockLevel: 20, nameKey: 'species_pig', descriptionKey: 'species_desc_pig',
     ),
     VillagerSpeciesData(
-      id: 'hamster', rarity: VillagerRarity.common, unlockType: 'level',
-      unlockLevel: 24, nameKey: 'species_hamster', descriptionKey: 'species_desc_hamster',
+      id: 'raccoon', rarity: VillagerRarity.common, unlockType: 'level',
+      unlockLevel: 24, nameKey: 'species_raccoon', descriptionKey: 'species_desc_raccoon',
     ),
     VillagerSpeciesData(
       id: 'platypus', rarity: VillagerRarity.common, unlockType: 'level',
@@ -216,7 +216,8 @@ class SpeciesRules {
   static List<VillagerSpeciesData> getSpecialSpecies() =>
       allSpecies.where((s) => s.unlockType == 'special').toList();
 
-  static List<VillagerSpeciesData> getAvailableForStore(List<String> unlockedIds) {
+  static List<VillagerSpeciesData> getAvailableForStore(
+      List<String> unlockedIds, {int manualSeed = 0}) {
     final today = DateTime.now();
     final dayseed = today.year * 10000 + today.month * 100 + today.day;
     final result = <VillagerSpeciesData>[];
@@ -230,9 +231,10 @@ class SpeciesRules {
           .where((s) => s.rarity == rarity && !unlockedIds.contains(s.id))
           .toList();
       if (pool.isEmpty) continue;
-      final rng = Random(dayseed + rarity.index);
-      pool.shuffle(rng);
-      result.add(pool.first);
+      pool.sort((a, b) => a.id.compareTo(b.id));
+      final dailyOffset = Random(dayseed + rarity.index).nextInt(pool.length);
+      final index = (dailyOffset + manualSeed) % pool.length;
+      result.add(pool[index]);
     }
     return result;
   }

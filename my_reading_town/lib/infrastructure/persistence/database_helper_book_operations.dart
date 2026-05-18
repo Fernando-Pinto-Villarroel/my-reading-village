@@ -123,6 +123,60 @@ extension DatabaseHelperBookOperations on DatabaseHelper {
     return result.first['total'] as int;
   }
 
+  Future<Map<int, int>> getPagesByDayOfWeek(DateTime monday) async {
+    final db = await database;
+    final start = '${monday.year.toString().padLeft(4, '0')}-'
+        '${monday.month.toString().padLeft(2, '0')}-'
+        '${monday.day.toString().padLeft(2, '0')}';
+    final end = monday.add(const Duration(days: 7));
+    final endStr = '${end.year.toString().padLeft(4, '0')}-'
+        '${end.month.toString().padLeft(2, '0')}-'
+        '${end.day.toString().padLeft(2, '0')}';
+    final rows = await db.rawQuery(
+      "SELECT strftime('%Y-%m-%d', date) as day, SUM(pages_read) as pages "
+      "FROM reading_sessions WHERE date >= ? AND date < ? GROUP BY day",
+      [start, endStr],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      final parsed = DateTime.tryParse(row['day'] as String);
+      if (parsed != null) result[parsed.weekday - 1] = (row['pages'] as int?) ?? 0;
+    }
+    return result;
+  }
+
+  Future<Map<int, int>> getPagesByWeekOfMonth(int year, int month) async {
+    final db = await database;
+    final monthStr = '${year.toString().padLeft(4, '0')}-'
+        '${month.toString().padLeft(2, '0')}';
+    final rows = await db.rawQuery(
+      "SELECT (CAST(strftime('%d', date) AS INTEGER) - 1) / 7 as week_idx, "
+      "SUM(pages_read) as pages FROM reading_sessions "
+      "WHERE strftime('%Y-%m', date) = ? GROUP BY week_idx",
+      [monthStr],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      result[(row['week_idx'] as int?) ?? 0] = (row['pages'] as int?) ?? 0;
+    }
+    return result;
+  }
+
+  Future<Map<int, int>> getPagesByMonthOfYear(int year) async {
+    final db = await database;
+    final rows = await db.rawQuery(
+      "SELECT CAST(strftime('%m', date) AS INTEGER) - 1 as month_idx, "
+      "SUM(pages_read) as pages FROM reading_sessions "
+      "WHERE strftime('%Y', date) = ? GROUP BY month_idx",
+      [year.toString()],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      result[(row['month_idx'] as int?) ?? 0] = (row['pages'] as int?) ?? 0;
+    }
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> getTags() async {
     final db = await database;
     return db.query('tags', orderBy: 'title ASC');

@@ -7,6 +7,9 @@ import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/popups/reward_popup.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/domain/rules/reading_rules.dart';
+import 'package:my_reading_town/infrastructure/di/service_locator.dart';
+import 'package:my_reading_town/application/services/audio_service.dart';
+import 'package:my_reading_town/app_constants.dart';
 import 'package:intl/intl.dart';
 
 void showLogPagesDialog(BuildContext context, int bookId) {
@@ -185,13 +188,44 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                 }
                 setDialogState(() => timeError = null);
 
-                const int dailyPageLimit = ReadingRules.dailyPageLimit;
                 final db = DatabaseHelper();
-                final todayPages = await db.getPagesReadForDate(selectedDate);
-                final formattedDate = DateFormat('MMM d, yyyy').format(selectedDate);
-                if (todayPages >= dailyPageLimit) {
-                  if (dialogCtx.mounted) {
-                    showDialog(
+                int pagesToLog = pages;
+                if (!AppConstants.testMode) {
+                  const int dailyPageLimit = ReadingRules.dailyPageLimit;
+                  final todayPages = await db.getPagesReadForDate(selectedDate);
+                  final formattedDate = DateFormat('MMM d, yyyy').format(selectedDate);
+                  if (todayPages >= dailyPageLimit) {
+                    if (dialogCtx.mounted) {
+                      showDialog(
+                        context: dialogCtx,
+                        builder: (ctx) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          title: Text(langProvider.translate('daily_limit_title'),
+                              textAlign: TextAlign.center),
+                          content: Text(
+                              langProvider
+                                  .translate('daily_limit_reached_message')
+                                  .replaceAll('{date}', formattedDate),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color:
+                                      AppTheme.darkText.withValues(alpha: 0.8))),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: Text(langProvider.translate('close')),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return;
+                  }
+                  final allowedPages =
+                      (dailyPageLimit - todayPages).clamp(0, pages);
+                  if (allowedPages < pages && dialogCtx.mounted) {
+                    final confirmed = await showDialog<bool>(
                       context: dialogCtx,
                       builder: (ctx) => AlertDialog(
                         shape: RoundedRectangleBorder(
@@ -200,59 +234,31 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                             textAlign: TextAlign.center),
                         content: Text(
                             langProvider
-                                .translate('daily_limit_reached_message')
-                                .replaceAll('{date}', formattedDate),
+                                .translate('daily_limit_partial_message')
+                                .replaceAll('{date}', formattedDate)
+                                .replaceAll('{allowed}', '$allowedPages')
+                                .replaceAll('{limit}', '$dailyPageLimit'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color:
-                                    AppTheme.darkText.withValues(alpha: 0.8))),
+                                color: AppTheme.darkText.withValues(alpha: 0.8))),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: Text(langProvider.translate('close')),
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(langProvider.translate('cancel')),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text(langProvider
+                                .translate('log_partial_button')
+                                .replaceAll('{pages}', '$allowedPages')),
                           ),
                         ],
                       ),
                     );
+                    if (confirmed != true) return;
                   }
-                  return;
+                  pagesToLog = allowedPages < pages ? allowedPages : pages;
                 }
-                final allowedPages =
-                    (dailyPageLimit - todayPages).clamp(0, pages);
-                if (allowedPages < pages && dialogCtx.mounted) {
-                  final confirmed = await showDialog<bool>(
-                    context: dialogCtx,
-                    builder: (ctx) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      title: Text(langProvider.translate('daily_limit_title'),
-                          textAlign: TextAlign.center),
-                      content: Text(
-                          langProvider
-                              .translate('daily_limit_partial_message')
-                              .replaceAll('{date}', formattedDate)
-                              .replaceAll('{allowed}', '$allowedPages')
-                              .replaceAll('{limit}', '$dailyPageLimit'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: AppTheme.darkText.withValues(alpha: 0.8))),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: Text(langProvider.translate('cancel')),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: Text(langProvider
-                              .translate('log_partial_button')
-                              .replaceAll('{pages}', '$allowedPages')),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (confirmed != true) return;
-                }
-                final pagesToLog = allowedPages < pages ? allowedPages : pages;
                 if (pagesToLog <= 0) return;
 
                 if (!dialogCtx.mounted) return;
@@ -285,6 +291,7 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                 }
 
                 if (context.mounted) {
+                  sl<AudioService>().playVillagerUnlockedSound();
                   _showRewardPopup(
                     context,
                     rewards['coins'] as int,

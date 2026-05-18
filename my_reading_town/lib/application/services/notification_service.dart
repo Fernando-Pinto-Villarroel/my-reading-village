@@ -98,6 +98,10 @@ class NotificationService {
     final now = DateTime.now();
     int notifId = _dailyBaseId;
 
+    final totalMinutes = range * 60;
+    final slotMinutes =
+        notificationsPerDay > 0 ? totalMinutes ~/ notificationsPerDay : totalMinutes;
+
     for (int dayOffset = 0; dayOffset < 7; dayOffset++) {
       if (notifId >= _dailyBaseId + _maxDailySlots) break;
       final targetDay = now.add(Duration(days: dayOffset));
@@ -107,8 +111,11 @@ class NotificationService {
 
       for (int n = 0; n < notificationsPerDay; n++) {
         if (notifId >= _dailyBaseId + _maxDailySlots) break;
-        final randomHour = startHour + random.nextInt(range);
-        final randomMinute = random.nextInt(60);
+        final slotOffsetMinutes = slotMinutes > 0
+            ? n * slotMinutes + random.nextInt(slotMinutes)
+            : random.nextInt(totalMinutes > 0 ? totalMinutes : 1);
+        final randomHour = startHour + slotOffsetMinutes ~/ 60;
+        final randomMinute = slotOffsetMinutes % 60;
 
         final target = DateTime(
           targetDay.year,

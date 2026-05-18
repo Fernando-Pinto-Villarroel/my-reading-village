@@ -62,6 +62,7 @@ class StorePack {
   final double basePrice;
   final int savingsPercent;
   final String colorHex;
+  final String? speciesId;
 
   const StorePack({
     required this.id,
@@ -77,6 +78,7 @@ class StorePack {
     required this.basePrice,
     required this.savingsPercent,
     required this.colorHex,
+    this.speciesId,
   });
 }
 
@@ -201,6 +203,7 @@ class StoreRules {
       basePrice: 2.99,
       savingsPercent: 30,
       colorHex: 'B5B3FF',
+      speciesId: 'capybara',
     ),
     StorePack(
       id: 'pack_town',
@@ -216,6 +219,7 @@ class StoreRules {
       basePrice: 5.99,
       savingsPercent: 35,
       colorHex: 'B3FFD9',
+      speciesId: 'otter',
     ),
     StorePack(
       id: 'pack_mega',
@@ -231,6 +235,7 @@ class StoreRules {
       basePrice: 11.99,
       savingsPercent: 40,
       colorHex: 'FFCDD2',
+      speciesId: 'kangaroo',
     ),
   ];
 

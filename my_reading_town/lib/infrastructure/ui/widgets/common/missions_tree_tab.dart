@@ -8,7 +8,6 @@ import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/missions_active_tab.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 
-
 class MissionTreeTab extends StatelessWidget {
   final int totalPagesRead;
   final int completedBooks;
@@ -150,7 +149,8 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
                         if (!isUnlocked) ...[
                           if (HolidayRules.isHolidayBranch(widget.branch))
                             Text(
-                              context.t('event_available_in_${HolidayRules.eventForBranch(widget.branch)?.id ?? ''}'),
+                              context.t(
+                                  'event_available_in_${HolidayRules.eventForBranch(widget.branch)?.id ?? ''}'),
                               style: TextStyle(
                                   fontSize: 11, color: Colors.grey.shade500),
                             )
@@ -171,7 +171,8 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
                           ),
                           if (HolidayRules.isHolidayBranch(widget.branch)) ...[
                             const SizedBox(height: 2),
-                            EventCountdownBadge(branch: widget.branch, color: color),
+                            EventCountdownBadge(
+                                branch: widget.branch, color: color),
                           ],
                         ],
                       ],
@@ -232,7 +233,7 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
           ],
           if (_expanded && !isUnlocked) ...[
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
               child: Text(
                 _lockedDescription(context, widget.branch, deps),
                 style: TextStyle(
@@ -240,6 +241,24 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
                     color: Colors.grey.shade500,
                     fontStyle: FontStyle.italic),
                 textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+              child: Column(
+                children: [
+                  for (int i = 0; i < missions.length; i++) ...[
+                    MissionTreeNode(
+                      mission: missions[i],
+                      village: widget.village,
+                      totalPagesRead: widget.totalPagesRead,
+                      completedBooks: widget.completedBooks,
+                      isLast: i == missions.length - 1,
+                      isActive: false,
+                      isLocked: true,
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
@@ -256,6 +275,7 @@ class MissionTreeNode extends StatelessWidget {
   final int completedBooks;
   final bool isLast;
   final bool isActive;
+  final bool isLocked;
 
   const MissionTreeNode({
     super.key,
@@ -265,6 +285,7 @@ class MissionTreeNode extends StatelessWidget {
     required this.completedBooks,
     required this.isLast,
     required this.isActive,
+    this.isLocked = false,
   });
 
   @override
@@ -276,7 +297,10 @@ class MissionTreeNode extends StatelessWidget {
 
     Color nodeColor;
     IconData nodeIcon;
-    if (isClaimed) {
+    if (isLocked) {
+      nodeColor = Colors.grey.shade300;
+      nodeIcon = Icons.radio_button_unchecked;
+    } else if (isClaimed) {
       nodeColor = color;
       nodeIcon = Icons.check_circle;
     } else if (isCompleted) {
@@ -290,6 +314,12 @@ class MissionTreeNode extends StatelessWidget {
       nodeIcon = Icons.radio_button_unchecked;
     }
 
+    final textColor = isLocked
+        ? Colors.grey.shade400
+        : isClaimed
+            ? AppTheme.darkText.withValues(alpha: 0.5)
+            : AppTheme.darkText;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -302,9 +332,11 @@ class MissionTreeNode extends StatelessWidget {
                 Container(
                   width: 2,
                   height: 28,
-                  color: isClaimed
-                      ? color.withValues(alpha: 0.4)
-                      : Colors.grey.shade300,
+                  color: isLocked
+                      ? Colors.grey.shade200
+                      : isClaimed
+                          ? color.withValues(alpha: 0.4)
+                          : Colors.grey.shade300,
                 ),
             ],
           ),
@@ -320,13 +352,11 @@ class MissionTreeNode extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                    color: isClaimed
-                        ? AppTheme.darkText.withValues(alpha: 0.5)
-                        : AppTheme.darkText,
+                    color: textColor,
                     decoration: isClaimed ? TextDecoration.lineThrough : null,
                   ),
                 ),
-                RewardBadges(reward: mission.reward),
+                if (!isLocked) RewardBadges(reward: mission.reward),
               ],
             ),
           ),

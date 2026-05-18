@@ -91,7 +91,68 @@ class HolidayRules {
       endMonth: 4,
       endDay: 30,
     ),
+    HolidayEvent(
+      id: 'workers_day',
+      branch: MissionBranch.workersDay,
+      startMonth: 5,
+      startDay: 1,
+      endMonth: 5,
+      endDay: 15,
+    ),
+    HolidayEvent(
+      id: 'environment_day',
+      branch: MissionBranch.environmentDay,
+      startMonth: 6,
+      startDay: 1,
+      endMonth: 6,
+      endDay: 15,
+    ),
+    HolidayEvent(
+      id: 'chocolate_day',
+      branch: MissionBranch.chocolateDay,
+      startMonth: 7,
+      startDay: 1,
+      endMonth: 7,
+      endDay: 10,
+    ),
+    HolidayEvent(
+      id: 'friendship_day',
+      branch: MissionBranch.friendshipDay,
+      startMonth: 7,
+      startDay: 20,
+      endMonth: 7,
+      endDay: 31,
+    ),
+    HolidayEvent(
+      id: 'youth_day',
+      branch: MissionBranch.youthDay,
+      startMonth: 8,
+      startDay: 1,
+      endMonth: 8,
+      endDay: 15,
+    ),
+    HolidayEvent(
+      id: 'literacy_day',
+      branch: MissionBranch.literacyDay,
+      startMonth: 9,
+      startDay: 1,
+      endMonth: 9,
+      endDay: 30,
+    ),
   ];
+
+  static List<String>? speciesChainForEvent(String eventId) {
+    switch (eventId) {
+      case 'new_year':
+        return ['lion', 'tiger'];
+      case 'thanksgiving':
+        return ['turkey', 'cow'];
+      case 'christmas':
+        return ['polar_bear', 'reindeer'];
+      default:
+        return null;
+    }
+  }
 
   static bool isHolidayBranch(MissionBranch branch) =>
       allEvents.any((e) => e.branch == branch);

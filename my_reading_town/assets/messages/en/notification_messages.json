@@ -2,7 +2,7 @@
   "messages": [
     {
       "title": "Time to read! 📚",
-      "body": "Your village is waiting! Open a book and earn resources for your town."
+      "body": "Your town is waiting! Open a book and earn resources for your town."
     },
     {
       "title": "Your villagers miss you!",
@@ -10,7 +10,7 @@
     },
     {
       "title": "Reading time! ✨",
-      "body": "Every page you read earns coins, wood and metal. Your village needs you!"
+      "body": "Every page you read earns coins, wood and metal. Your town needs you!"
     },
     {
       "title": "Bookworm alert! 🐛",
@@ -30,7 +30,7 @@
     },
     {
       "title": "Storytime! 🌟",
-      "body": "Great stories are waiting for you. Read today and watch your village flourish!"
+      "body": "Great stories are waiting for you. Read today and watch your town flourish!"
     },
     {
       "title": "Happy villagers need books!",
@@ -46,7 +46,7 @@
     },
     {
       "title": "Knowledge is power! 💪",
-      "body": "Books make you smarter and your village stronger. What are you waiting for?"
+      "body": "Books make you smarter and your town stronger. What are you waiting for?"
     }
   ]
 }

@@ -2,15 +2,15 @@
   "messages": [
     {
       "title": "L'heure de lire ! 📚",
-      "body": "Votre village vous attend ! Ouvrez un livre et gagnez des ressources pour votre ville."
+      "body": "Votre ville vous attend ! Ouvrez un livre et gagnez des ressources pour votre ville."
     },
     {
       "title": "Vos villageois vous manquent !",
-      "body": "Quelques pages par jour éloignent l'ennui. Venez lire et faites grandir votre village !"
+      "body": "Quelques pages par jour éloignent l'ennui. Venez lire et faites grandir votre ville !"
     },
     {
       "title": "Moment lecture ! ✨",
-      "body": "Chaque page lue rapporte des pièces, du bois et du métal. Votre village a besoin de vous !"
+      "body": "Chaque page lue rapporte des pièces, du bois et du métal. Votre ville a besoin de vous !"
     },
     {
       "title": "Alerte rat de bibliothèque ! 🐛",
@@ -30,7 +30,7 @@
     },
     {
       "title": "L'heure des histoires ! 🌟",
-      "body": "De grandes histoires vous attendent. Lisez aujourd'hui et regardez votre village fleurir !"
+      "body": "De grandes histoires vous attendent. Lisez aujourd'hui et regardez votre ville fleurir !"
     },
     {
       "title": "Les villageois heureux ont besoin de livres !",
@@ -46,7 +46,7 @@
     },
     {
       "title": "Le savoir c'est le pouvoir ! 💪",
-      "body": "Les livres vous rendent plus sage et votre village plus fort. Qu'attendez-vous ?"
+      "body": "Les livres vous rendent plus sage et votre ville plus forte. Qu'attendez-vous ?"
     }
   ]
 }

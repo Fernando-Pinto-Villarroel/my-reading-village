@@ -1,4 +1,4 @@
-package com.ferchostudios_dev.my_reading_town
+package com.ferchostudiodev.my_reading_town
 
 import io.flutter.embedding.android.FlutterActivity
 

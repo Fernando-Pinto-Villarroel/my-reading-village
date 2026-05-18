@@ -11,6 +11,7 @@ import 'package:my_reading_town/domain/rules/species_rules.dart';
 import 'package:my_reading_town/adapters/providers/village_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
+import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/species_bonus_popup.dart';
 
 
@@ -51,6 +52,18 @@ class MissionColors {
         return const Color(0xFF9C5DB8);
       case MissionBranch.easter:
         return easter;
+      case MissionBranch.workersDay:
+        return const Color(0xFFFF8F00);
+      case MissionBranch.environmentDay:
+        return const Color(0xFF4CAF50);
+      case MissionBranch.chocolateDay:
+        return const Color(0xFF795548);
+      case MissionBranch.friendshipDay:
+        return const Color(0xFFFF69B4);
+      case MissionBranch.youthDay:
+        return const Color(0xFF42A5F5);
+      case MissionBranch.literacyDay:
+        return const Color(0xFF7B1FA2);
     }
   }
 
@@ -80,6 +93,18 @@ class MissionColors {
         return Icons.theater_comedy;
       case MissionBranch.easter:
         return Icons.egg_alt;
+      case MissionBranch.workersDay:
+        return Icons.engineering;
+      case MissionBranch.environmentDay:
+        return Icons.park;
+      case MissionBranch.chocolateDay:
+        return Icons.cake;
+      case MissionBranch.friendshipDay:
+        return Icons.people;
+      case MissionBranch.youthDay:
+        return Icons.school;
+      case MissionBranch.literacyDay:
+        return Icons.menu_book;
     }
   }
 }
@@ -470,18 +495,48 @@ class ClaimButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        // Capture everything needed from context before any async gap.
+        // nav stays valid even after applySpeciesBonus calls notifyListeners()
+        // and unmounts this widget. rewardLabel is a plain string, always safe.
+        final nav = Navigator.of(context, rootNavigator: true);
+        final rewardLabel =
+            '${context.read<LanguageProvider>().translate('reward_claimed_prefix')} ${mission.reward}';
+
         final result = await village.claimMissionReward(mission.id);
-        if (result.success) {
-          sl<AudioService>().playMissionCompletedSound();
-          onClaimed();
-          if (context.mounted) {
-            if (result.speciesId != null) {
-              _showSpeciesRewardDialog(context, result);
-            } else {
-              showSuccessToast(context,
-                  '${context.t('reward_claimed_prefix')} ${mission.reward}');
+        if (!result.success) return;
+
+        sl<AudioService>().playMissionCompletedSound();
+
+        if (result.speciesId != null) {
+          final speciesResult =
+              await village.applySpeciesBonus(result.speciesId!);
+          // context.mounted is likely false here — notifyListeners() rebuilt the
+          // missions list and removed this widget. Use nav instead.
+          nav.pop(); // close missions modal
+          if (speciesResult != null) {
+            final speciesData =
+                SpeciesRules.findById(speciesResult.speciesId);
+            final overlay = nav.overlay;
+            if (speciesData != null && overlay != null) {
+              await showDialog(
+                // ignore: use_build_context_synchronously
+                context: overlay.context,
+                barrierDismissible: false,
+                builder: (ctx) => SpeciesBonusPopup(
+                  speciesData: speciesData,
+                  isDuplicate: speciesResult.isDuplicate,
+                ),
+              );
             }
           }
+          // Missions modal is already closed — no need to call onClaimed().
+        } else {
+          final overlay = nav.overlay;
+          if (overlay != null) {
+            // ignore: use_build_context_synchronously
+            showSuccessToast(overlay.context, rewardLabel);
+          }
+          onClaimed();
         }
       },
       child: Container(
@@ -511,27 +566,4 @@ class ClaimButton extends StatelessWidget {
     );
   }
 
-  void _showSpeciesRewardDialog(
-    BuildContext context,
-    ({
-      bool success,
-      bool isDuplicate,
-      String? speciesId,
-      String? speciesNameKey
-    }) result,
-  ) {
-    final speciesData = result.speciesId != null
-        ? SpeciesRules.findById(result.speciesId!)
-        : null;
-    if (speciesData == null) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => SpeciesBonusPopup(
-        speciesData: speciesData,
-        isDuplicate: result.isDuplicate,
-      ),
-    );
-  }
 }

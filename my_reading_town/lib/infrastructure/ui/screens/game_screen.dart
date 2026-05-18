@@ -257,7 +257,7 @@ class _GameScreenState extends State<GameScreen>
           BuildingService.effectiveRemainingTime(b, village.activePowerups);
       notif.scheduleConstructionComplete(
         buildingId: b.id!,
-        buildingName: b.name,
+        buildingName: lang.translate('building_name_${b.type}'),
         remaining: remaining,
         title: lang.translate('notification_construction_title'),
         body: lang.translate('notification_construction_body'),

@@ -97,8 +97,7 @@ class MissionService {
     final currentPages = totalPagesRead ?? 0;
     final currentBooks = completedBooks ?? 0;
     final needsPageBaseline = _isEventReadingMission(mission) &&
-        (p.pagesAtActivation == null ||
-            (p.pagesAtActivation == 0 && currentPages > 0));
+        p.pagesAtActivation == null;
 
     final needsBuildingBaseline = _isEventDecorationMission(mission) &&
         p.buildingCountAtActivation == null &&
@@ -142,10 +141,11 @@ class MissionService {
     required List<PlacedBuilding> buildings,
     required List<Villager> villagers,
     required List<ActivePowerup> activePowerups,
-    required bool bookItemUsedSinceActive,
+    required int booksUsedSinceActive,
     int? totalPagesRead,
     int? completedBooks,
     int nonGrassTileCount = 0,
+    int expansionCount = 0,
   }) async {
     for (final branch in MissionBranch.values) {
       final mission = getActiveMission(branch, progress);
@@ -160,9 +160,9 @@ class MissionService {
           buildings: buildings);
 
       final isComplete = _checkMissionCondition(mission, p, buildings, villagers,
-          activePowerups, bookItemUsedSinceActive,
+          activePowerups, booksUsedSinceActive,
           totalPagesRead: totalPagesRead, completedBooks: completedBooks,
-          nonGrassTileCount: nonGrassTileCount);
+          nonGrassTileCount: nonGrassTileCount, expansionCount: expansionCount);
       if (isComplete) {
         p.isCompleted = true;
         await _invRepo.upsertMissionProgress(mission.id, isCompleted: true);
@@ -176,10 +176,11 @@ class MissionService {
       List<PlacedBuilding> buildings,
       List<Villager> villagers,
       List<ActivePowerup> activePowerups,
-      bool bookItemUsedSinceActive,
+      int booksUsedSinceActive,
       {int? totalPagesRead,
       int? completedBooks,
-      int nonGrassTileCount = 0}) {
+      int nonGrassTileCount = 0,
+      int expansionCount = 0}) {
     if (_isEventReadingMission(mission)) {
       totalPagesRead = (totalPagesRead ?? 0) - (missionProgress.pagesAtActivation ?? 0);
       completedBooks = (completedBooks ?? 0) - (missionProgress.booksAtActivation ?? 0);
@@ -209,14 +210,17 @@ class MissionService {
         return happyCount >= (mission.targetCount ?? 1);
 
       case MissionConditionType.villagerHappinessWithBook:
-        return bookItemUsedSinceActive;
+        return booksUsedSinceActive >= (mission.targetCount ?? 1);
 
       case MissionConditionType.villagerHappinessNatural:
-        final hasAnyBookPowerup =
-            activePowerups.any((p) => p.type == 'book_happiness' && p.isActive);
-        if (hasAnyBookPowerup) return false;
-        final happyCount = villagers.where((v) => v.happiness >= 100).length;
-        return happyCount >= (mission.targetCount ?? 1);
+        final boostedIds = activePowerups
+            .where((p) => p.type == 'book_happiness' && p.isActive && p.targetVillagerId != null)
+            .map((p) => p.targetVillagerId!)
+            .toSet();
+        final naturallyHappyCount = villagers
+            .where((v) => v.happiness >= 100 && !boostedIds.contains(v.id))
+            .length;
+        return naturallyHappyCount >= (mission.targetCount ?? 1);
 
       case MissionConditionType.totalPagesRead:
         return (totalPagesRead ?? 0) >= (mission.targetCount ?? 1);
@@ -257,6 +261,9 @@ class MissionService {
             .where((b) => b.type == mission.buildingType && b.isConstructed)
             .length;
         return current - baseline >= (mission.targetCount ?? 1);
+
+      case MissionConditionType.buyTerrainSpace:
+        return expansionCount >= (mission.targetCount ?? 1);
     }
   }
 
@@ -266,10 +273,11 @@ class MissionService {
       List<PlacedBuilding> buildings,
       List<Villager> villagers,
       List<ActivePowerup> activePowerups,
-      bool bookItemUsedSinceActive,
+      int booksUsedSinceActive,
       {int? totalPagesRead,
       int? completedBooks,
-      int nonGrassTileCount = 0}) {
+      int nonGrassTileCount = 0,
+      int expansionCount = 0}) {
     if (_isEventReadingMission(mission) && missionProgress != null) {
       totalPagesRead = ((totalPagesRead ?? 0) - (missionProgress.pagesAtActivation ?? 0)).clamp(0, 999999);
       completedBooks = ((completedBooks ?? 0) - (missionProgress.booksAtActivation ?? 0)).clamp(0, 999999);
@@ -307,17 +315,17 @@ class MissionService {
         return (current: current.clamp(0, target), target: target);
 
       case MissionConditionType.villagerHappinessWithBook:
-        current = bookItemUsedSinceActive ? 1 : 0;
-        return (current: current, target: 1);
+        current = booksUsedSinceActive.clamp(0, target);
+        return (current: current, target: target);
 
       case MissionConditionType.villagerHappinessNatural:
-        final hasAnyBookPowerup =
-            activePowerups.any((p) => p.type == 'book_happiness' && p.isActive);
-        if (hasAnyBookPowerup) {
-          current = 0;
-        } else {
-          current = villagers.where((v) => v.happiness >= 100).length;
-        }
+        final boostedIds = activePowerups
+            .where((p) => p.type == 'book_happiness' && p.isActive && p.targetVillagerId != null)
+            .map((p) => p.targetVillagerId!)
+            .toSet();
+        current = villagers
+            .where((v) => v.happiness >= 100 && !boostedIds.contains(v.id))
+            .length;
         return (current: current.clamp(0, target), target: target);
 
       case MissionConditionType.totalPagesRead:
@@ -362,6 +370,10 @@ class MissionService {
             .where((b) => b.type == mission.buildingType && b.isConstructed)
             .length;
         current = (current - baseline).clamp(0, target);
+        return (current: current, target: target);
+
+      case MissionConditionType.buyTerrainSpace:
+        current = expansionCount.clamp(0, target);
         return (current: current, target: target);
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
@@ -68,11 +69,31 @@ class _MyReadingTownAppState extends State<MyReadingTownApp>
         ChangeNotifierProvider.value(value: sl<VillageProvider>()),
         ChangeNotifierProvider.value(value: sl<LanguageProvider>()),
       ],
-      child: MaterialApp(
-        title: 'My Reading Town',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.theme,
-        home: const SplashScreen(),
+      child: Consumer<LanguageProvider>(
+        builder: (_, langProvider, __) {
+          final parts = langProvider.currentLocale.split('_');
+          final locale =
+              parts.length == 2 ? Locale(parts[0], parts[1]) : Locale(parts[0]);
+          return MaterialApp(
+            title: 'My Reading Town',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.theme,
+            locale: locale,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('es'),
+              Locale('pt'),
+              Locale('fr'),
+              Locale('it'),
+            ],
+            home: const SplashScreen(),
+          );
+        },
       ),
     );
   }

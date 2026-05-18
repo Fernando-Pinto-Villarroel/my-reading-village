@@ -35,6 +35,12 @@ class MissionData {
         ..._sanValentinBranch,
         ..._carnivalBranch,
         ..._easterBranch,
+        ..._workersDayBranch,
+        ..._environmentDayBranch,
+        ..._chocolateDayBranch,
+        ..._friendshipDayBranch,
+        ..._youthDayBranch,
+        ..._literacyDayBranch,
       ];
 
   static final List<Mission> _basicConstructionBranch = [
@@ -53,7 +59,7 @@ class MissionData {
         orderInBranch: i,
       ),
 
-    // HOUSES 4
+    // HOUSES 6
     Mission(
       id: 'bc_houses_4_lv1',
       branch: MissionBranch.basicConstruction,
@@ -61,7 +67,7 @@ class MissionData {
       conditionType: MissionConditionType.reachBuildingCount,
       buildingType: 'house',
       targetLevel: 1,
-      targetCount: 4,
+      targetCount: 6,
       reward: MissionReward(
         exp: 20 + buildingTypes.length * 5,
         coins: 10,
@@ -85,7 +91,7 @@ class MissionData {
         orderInBranch: buildingTypes.length + 1 + i,
       ),
 
-    // HOUSES 8 (inicio gems)
+    // HOUSES 9
     Mission(
       id: 'bc_houses_8_lv1',
       branch: MissionBranch.basicConstruction,
@@ -93,7 +99,7 @@ class MissionData {
       conditionType: MissionConditionType.reachBuildingCount,
       buildingType: 'house',
       targetLevel: 1,
-      targetCount: 8,
+      targetCount: 9,
       reward: MissionReward(
         exp: 25 + (buildingTypes.length + allBuildingTypes.length) * 5,
         coins: 15 + allBuildingTypes.length * 5,
@@ -154,8 +160,17 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
       targetCount: 25,
-      reward: MissionReward(exp: 30),
+      reward: MissionReward(exp: 30, coins: 5),
       orderInBranch: 1,
+    ),
+    Mission(
+      id: 'dc_land_1',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.buyTerrainSpace,
+      targetCount: 1,
+      reward: MissionReward(exp: 35, coins: 8),
+      orderInBranch: 2,
     ),
     Mission(
       id: 'dc_deco_3_coin80',
@@ -165,7 +180,7 @@ class MissionData {
       targetCount: 3,
       targetMinCost: 80,
       reward: MissionReward(exp: 40, coins: 10),
-      orderInBranch: 2,
+      orderInBranch: 3,
     ),
     Mission(
       id: 'dc_tiles_40',
@@ -173,8 +188,17 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.reachSpecialTileCount,
       targetCount: 40,
-      reward: MissionReward(exp: 50, coins: 10),
-      orderInBranch: 3,
+      reward: MissionReward(exp: 50, coins: 12),
+      orderInBranch: 4,
+    ),
+    Mission(
+      id: 'dc_land_3',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.buyTerrainSpace,
+      targetCount: 3,
+      reward: MissionReward(exp: 55, coins: 15),
+      orderInBranch: 5,
     ),
     Mission(
       id: 'dc_deco_1_gem10',
@@ -183,8 +207,8 @@ class MissionData {
       conditionType: MissionConditionType.haveDecorationMinGemCost,
       targetCount: 1,
       targetMinCost: 10,
-      reward: MissionReward(exp: 60, coins: 20),
-      orderInBranch: 4,
+      reward: MissionReward(exp: 60, coins: 18),
+      orderInBranch: 6,
     ),
     Mission(
       id: 'dc_tiles_60',
@@ -193,7 +217,16 @@ class MissionData {
       conditionType: MissionConditionType.reachSpecialTileCount,
       targetCount: 60,
       reward: MissionReward(exp: 70, coins: 20),
-      orderInBranch: 5,
+      orderInBranch: 7,
+    ),
+    Mission(
+      id: 'dc_land_5',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.buyTerrainSpace,
+      targetCount: 5,
+      reward: MissionReward(exp: 75, coins: 22, gems: 2),
+      orderInBranch: 8,
     ),
     Mission(
       id: 'dc_deco_1_gem30',
@@ -203,7 +236,7 @@ class MissionData {
       targetCount: 1,
       targetMinCost: 30,
       reward: MissionReward(exp: 80, coins: 25, gems: 3),
-      orderInBranch: 6,
+      orderInBranch: 9,
     ),
     Mission(
       id: 'dc_tiles_80',
@@ -212,7 +245,16 @@ class MissionData {
       conditionType: MissionConditionType.reachSpecialTileCount,
       targetCount: 80,
       reward: MissionReward(exp: 90, coins: 25, gems: 3),
-      orderInBranch: 7,
+      orderInBranch: 10,
+    ),
+    Mission(
+      id: 'dc_land_8',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.buyTerrainSpace,
+      targetCount: 8,
+      reward: MissionReward(exp: 95, coins: 28, gems: 4),
+      orderInBranch: 11,
     ),
     Mission(
       id: 'dc_deco_5_coin100',
@@ -222,7 +264,16 @@ class MissionData {
       targetCount: 5,
       targetMinCost: 100,
       reward: MissionReward(exp: 100, coins: 30, gems: 5),
-      orderInBranch: 8,
+      orderInBranch: 12,
+    ),
+    Mission(
+      id: 'dc_land_12',
+      branch: MissionBranch.decorator,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.buyTerrainSpace,
+      targetCount: 12,
+      reward: MissionReward(exp: 110, coins: 30, gems: 5),
+      orderInBranch: 13,
     ),
   ];
 
@@ -287,7 +338,7 @@ class MissionData {
       id: 'vl_happy_1',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
-      conditionType: MissionConditionType.villagerHappiness,
+      conditionType: MissionConditionType.villagerHappinessNatural,
       targetCount: 1,
       reward: MissionReward(exp: 30, coins: 10),
       orderInBranch: 0,
@@ -302,40 +353,121 @@ class MissionData {
       orderInBranch: 1,
     ),
     Mission(
-      id: 'vl_happy_3',
+      id: 'vl_happy_4',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappiness,
-      targetCount: 3,
+      targetCount: 4,
       reward: MissionReward(exp: 60, coins: 20),
       orderInBranch: 2,
     ),
     Mission(
-      id: 'vl_happy_5',
+      id: 'vl_happy_8',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
-      conditionType: MissionConditionType.villagerHappiness,
-      targetCount: 5,
-      reward: MissionReward(exp: 80, coins: 25, gems: 3),
+      conditionType: MissionConditionType.villagerHappinessNatural,
+      targetCount: 8,
+      reward: MissionReward(exp: 80, coins: 25),
       orderInBranch: 3,
     ),
     Mission(
-      id: 'vl_happy_10',
-      branch: MissionBranch.villager,
-      checkType: MissionCheckType.am,
-      conditionType: MissionConditionType.villagerHappiness,
-      targetCount: 10,
-      reward: MissionReward(exp: 120, coins: 30, gems: 5),
-      orderInBranch: 4,
-    ),
-    Mission(
-      id: 'vl_happy_12_natural',
+      id: 'vl_happy_12',
       branch: MissionBranch.villager,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.villagerHappinessNatural,
       targetCount: 12,
-      reward: MissionReward(exp: 150, coins: 35, gems: 8),
+      reward: MissionReward(exp: 100, coins: 30, gems: 4),
+      orderInBranch: 4,
+    ),
+    Mission(
+      id: 'vl_happy_16_natural',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappinessNatural,
+      targetCount: 16,
+      reward: MissionReward(exp: 130, coins: 35, gems: 4),
       orderInBranch: 5,
+    ),
+    Mission(
+      id: 'vl_happy_20_natural',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappinessNatural,
+      targetCount: 20,
+      reward: MissionReward(exp: 160, coins: 40, gems: 5),
+      orderInBranch: 6,
+    ),
+    Mission(
+      id: 'vl_books_3',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappinessWithBook,
+      targetCount: 3,
+      reward: MissionReward(exp: 180, coins: 45, gems: 5),
+      orderInBranch: 7,
+    ),
+    Mission(
+      id: 'vl_happy_25',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 25,
+      reward: MissionReward(exp: 200, coins: 50, gems: 6),
+      orderInBranch: 8,
+    ),
+    Mission(
+      id: 'vl_happy_30',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 30,
+      reward: MissionReward(exp: 230, coins: 55, gems: 6),
+      orderInBranch: 9,
+    ),
+    Mission(
+      id: 'vl_happy_35',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 35,
+      reward: MissionReward(exp: 260, coins: 60, gems: 7),
+      orderInBranch: 10,
+    ),
+    Mission(
+      id: 'vl_books_5',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappinessWithBook,
+      targetCount: 5,
+      reward: MissionReward(exp: 290, coins: 65, gems: 7),
+      orderInBranch: 11,
+    ),
+    Mission(
+      id: 'vl_happy_40',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 40,
+      reward: MissionReward(exp: 320, coins: 70, gems: 8),
+      orderInBranch: 12,
+    ),
+    Mission(
+      id: 'vl_happy_45',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 45,
+      reward: MissionReward(exp: 360, coins: 75, gems: 8),
+      orderInBranch: 13,
+    ),
+    Mission(
+      id: 'vl_happy_50',
+      branch: MissionBranch.villager,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.villagerHappiness,
+      targetCount: 50,
+      reward: MissionReward(exp: 400, coins: 80, gems: 9),
+      orderInBranch: 14,
     ),
   ];
 
@@ -456,7 +588,7 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
       targetCount: 500,
-      reward: MissionReward(exp: 40, gems: 3),
+      reward: MissionReward(exp: 40, gems: 5),
       orderInBranch: 1,
     ),
     Mission(
@@ -486,7 +618,7 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
       targetCount: 500,
-      reward: MissionReward(exp: 40, gems: 3),
+      reward: MissionReward(exp: 40, gems: 5),
       orderInBranch: 1,
     ),
     Mission(
@@ -520,11 +652,11 @@ class MissionData {
       orderInBranch: 1,
     ),
     Mission(
-      id: 'xmas_buy_wishing_well',
+      id: 'xmas_buy_christmas_tree',
       branch: MissionBranch.christmas,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
-      buildingType: 'wishing_well',
+      buildingType: 'christmas_tree',
       targetCount: 1,
       reward: MissionReward(exp: 80, speciesId: 'polar_bear'),
       orderInBranch: 2,
@@ -550,13 +682,13 @@ class MissionData {
       orderInBranch: 1,
     ),
     Mission(
-      id: 'ny_buy_monument',
+      id: 'ny_buy_celebration_arch',
       branch: MissionBranch.newYear,
       checkType: MissionCheckType.am,
       conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
-      buildingType: 'book_stack_monument',
+      buildingType: 'celebration_arch',
       targetCount: 1,
-      reward: MissionReward(exp: 70, speciesId: 'tiger'),
+      reward: MissionReward(exp: 70, speciesId: 'lion'),
       orderInBranch: 2,
     ),
   ];
@@ -606,7 +738,7 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
       targetCount: 500,
-      reward: MissionReward(exp: 40, gems: 3),
+      reward: MissionReward(exp: 40, gems: 5),
       orderInBranch: 1,
     ),
     Mission(
@@ -636,7 +768,7 @@ class MissionData {
       checkType: MissionCheckType.bm,
       conditionType: MissionConditionType.totalPagesRead,
       targetCount: 400,
-      reward: MissionReward(exp: 40, gems: 3),
+      reward: MissionReward(exp: 40, gems: 5),
       orderInBranch: 1,
     ),
     Mission(
@@ -651,9 +783,189 @@ class MissionData {
     ),
   ];
 
+  static const List<Mission> _workersDayBranch = [
+    Mission(
+      id: 'wd_enter',
+      branch: MissionBranch.workersDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'wd_pages_250',
+      branch: MissionBranch.workersDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 250,
+      reward: MissionReward(exp: 40, gems: 3),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'wd_buy_gear_monument',
+      branch: MissionBranch.workersDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'gear_monument',
+      targetCount: 1,
+      reward: MissionReward(exp: 70, speciesId: 'bull'),
+      orderInBranch: 2,
+    ),
+  ];
+
+  static const List<Mission> _environmentDayBranch = [
+    Mission(
+      id: 'env_enter',
+      branch: MissionBranch.environmentDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'env_pages_250',
+      branch: MissionBranch.environmentDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 250,
+      reward: MissionReward(exp: 40, gems: 3),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'env_buy_flower_garden',
+      branch: MissionBranch.environmentDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'flower_garden',
+      targetCount: 1,
+      reward: MissionReward(exp: 75, speciesId: 'red_panda'),
+      orderInBranch: 2,
+    ),
+  ];
+
+  static const List<Mission> _chocolateDayBranch = [
+    Mission(
+      id: 'choc_enter',
+      branch: MissionBranch.chocolateDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'choc_pages_150',
+      branch: MissionBranch.chocolateDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 150,
+      reward: MissionReward(exp: 30, gems: 2),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'choc_buy_chocolate_fountain',
+      branch: MissionBranch.chocolateDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'chocolate_fountain',
+      targetCount: 1,
+      reward: MissionReward(exp: 60, speciesId: 'capybara'),
+      orderInBranch: 2,
+    ),
+  ];
+
+  static const List<Mission> _friendshipDayBranch = [
+    Mission(
+      id: 'fri_enter',
+      branch: MissionBranch.friendshipDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'fri_pages_200',
+      branch: MissionBranch.friendshipDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 200,
+      reward: MissionReward(exp: 40, gems: 3),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'fri_buy_friendship_arch',
+      branch: MissionBranch.friendshipDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'friendship_arch',
+      targetCount: 1,
+      reward: MissionReward(exp: 70, speciesId: 'horse'),
+      orderInBranch: 2,
+    ),
+  ];
+
+  static const List<Mission> _youthDayBranch = [
+    Mission(
+      id: 'yd_enter',
+      branch: MissionBranch.youthDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'yd_pages_250',
+      branch: MissionBranch.youthDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 250,
+      reward: MissionReward(exp: 40, gems: 3),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'yd_buy_wishing_well',
+      branch: MissionBranch.youthDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'wishing_well',
+      targetCount: 1,
+      reward: MissionReward(exp: 70, speciesId: 'kangaroo'),
+      orderInBranch: 2,
+    ),
+  ];
+
+  static const List<Mission> _literacyDayBranch = [
+    Mission(
+      id: 'ld_enter',
+      branch: MissionBranch.literacyDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.enterAppDuringEvent,
+      reward: MissionReward(exp: 20, coins: 20),
+      orderInBranch: 0,
+    ),
+    Mission(
+      id: 'ld_pages_500',
+      branch: MissionBranch.literacyDay,
+      checkType: MissionCheckType.bm,
+      conditionType: MissionConditionType.totalPagesRead,
+      targetCount: 500,
+      reward: MissionReward(exp: 50, gems: 5),
+      orderInBranch: 1,
+    ),
+    Mission(
+      id: 'ld_buy_book_stack_monument',
+      branch: MissionBranch.literacyDay,
+      checkType: MissionCheckType.am,
+      conditionType: MissionConditionType.buySpecificDecorationSinceActivation,
+      buildingType: 'book_stack_monument',
+      targetCount: 1,
+      reward: MissionReward(exp: 90, speciesId: 'fox'),
+      orderInBranch: 2,
+    ),
+  ];
+
   static int _advCount(String type, int level) {
     if (type == 'house') {
-      return level == 1 ? 16 : 3;
+      return level == 1 ? 16 : 5;
     }
     return 3;
   }

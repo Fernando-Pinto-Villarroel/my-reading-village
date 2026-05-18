@@ -67,4 +67,6 @@ abstract class VillageRepository {
   Future<({String discountSeenKey, String gemSeenDate})> getStoreSeenData();
   Future<void> saveStoreDiscountSeenKey(String key);
   Future<void> saveStoreGemSeenDate(String date);
+  Future<int> getSpeciesManualRefreshSeed();
+  Future<void> incrementSpeciesManualRefreshSeed();
 }

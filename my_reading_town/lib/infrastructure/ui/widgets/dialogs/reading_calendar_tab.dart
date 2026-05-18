@@ -28,7 +28,7 @@ class ReadingCalendarTab extends StatefulWidget {
 class _ReadingCalendarTabState extends State<ReadingCalendarTab> {
   int _year = DateTime.now().year;
   int _month = DateTime.now().month;
-  _CalendarViewMode _viewMode = _CalendarViewMode.annual;
+  _CalendarViewMode _viewMode = _CalendarViewMode.monthly;
 
   static const _kFireActive = Color(0xFFFF6B35);
   static const _kFireBgActive = Color(0x1FFF6B35);

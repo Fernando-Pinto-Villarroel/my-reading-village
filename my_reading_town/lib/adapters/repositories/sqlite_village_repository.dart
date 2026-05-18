@@ -218,4 +218,12 @@ class SqliteVillageRepository implements VillageRepository {
   @override
   Future<void> saveStoreGemSeenDate(String date) =>
       _db.saveStoreGemSeenDate(date);
+
+  @override
+  Future<int> getSpeciesManualRefreshSeed() =>
+      _db.getSpeciesManualRefreshSeed();
+
+  @override
+  Future<void> incrementSpeciesManualRefreshSeed() =>
+      _db.incrementSpeciesManualRefreshSeed();
 }

@@ -282,6 +282,7 @@ class _TagManagerDialogState extends State<TagManagerDialog> {
                 }
                 if (ctx.mounted) Navigator.pop(ctx);
               },
+              style: ElevatedButton.styleFrom(foregroundColor: Colors.white),
               child: Text(existing == null
                   ? langProvider.translate('create')
                   : langProvider.translate('save')),

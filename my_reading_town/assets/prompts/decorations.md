@@ -158,6 +158,105 @@ no sparkle effects
 only the main image asset, nothing else
 ```
 
+### chocolate_fountain.png
+
+```
+cute kawaii chocolate fountain decoration for a village game
+a round tiered chocolate fountain with smooth flowing dark chocolate cascading gently from tier to tier
+round basin at the bottom catching the chocolate
+glossy rich brown chocolate with cream/white highlights, light gray/cream stone base
+kawaii style, pastel color palette, soft pastel colors
+clean simple outlines, simple shapes
+2D flat design with slight depth
+front view, centered in frame
+192x192px
+white background
+no shadows anywhere in the design
+no text inside the image
+no sparkle effects
+only the main image asset, nothing else
+```
+
+### friendship_arch.png
+
+```
+cute kawaii friendship arch decoration for a village game
+a rounded pastel wooden arch with intertwined vines and colorful small flowers decorating the top
+two upright wooden posts supporting the arch with small heart-shaped cutouts
+pastel pink, lavender and mint green color tones throughout
+soft rounded kawaii style
+kawaii style, pastel color palette, soft pastel colors
+clean simple outlines, simple shapes
+2D flat design with slight depth
+front view, centered in frame
+192x192px
+white background
+no shadows anywhere in the design
+no text inside the image
+no sparkle effects
+only the main image asset, nothing else
+```
+
+### christmas_tree.png
+
+```
+cute kawaii christmas tree decoration for a village game
+a chubby rounded evergreen christmas tree with three tiers of fluffy soft branches
+adorned with small pastel-colored round ornament balls (pink, lavender, sky blue, peach) and a tiny gold star on top
+a small light brown wooden pot or stand at the base
+soft green branches with subtle depth, white snow tips on the branches
+kawaii style, pastel color palette, soft pastel colors
+clean simple outlines, simple shapes
+2D flat design with slight depth
+front view, centered in frame
+192x192px
+white background
+no shadows anywhere in the design
+no text inside the image
+no sparkle effects
+only the main image asset, nothing else
+```
+
+### gear_monument.png
+
+```
+cute kawaii gear monument decoration for a village game
+a tall stone pedestal monument with a large decorative gear/cog on top
+the gear has rounded teeth and a cute happy face on its center (dot eyes and tiny smile)
+light gray stone pedestal with subtle brick texture, metallic silver gear
+small engravings or details on the pedestal
+kawaii style, pastel color palette, soft and rounded industrial aesthetic
+clean simple outlines, simple shapes
+2D flat design with slight depth
+front view, centered in frame
+192x192px
+white background
+no shadows anywhere in the design
+no text inside the image
+no sparkle effects
+only the main image asset, nothing else
+```
+
+### celebration_arch.png
+
+```
+cute kawaii celebration arch decoration for a village game
+a grand rounded ceremonial arch made of light stone/cream colored bricks
+decorated with colorful hanging paper lanterns in pastel colors (pink, lavender, mint, peach) hanging from the arch top
+small star-shaped bunting flags strung along the arch opening
+two sturdy stone columns supporting the arch
+kawaii style, pastel color palette, festive and celebratory feel
+clean simple outlines, simple shapes
+2D flat design with slight depth
+front view, centered in frame
+192x192px
+white background
+no shadows anywhere in the design
+no text inside the image
+no sparkle effects
+only the main image asset, nothing else
+```
+
 ### expansion_sign.png
 
 ```

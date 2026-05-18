@@ -56,7 +56,7 @@ class VillageProvider extends ChangeNotifier {
   List<MinigameCooldown> _minigameCooldowns = [];
 
   Map<String, MissionProgress> _missionProgress = {};
-  bool _bookItemUsedSinceActive = false;
+  int _booksUsedSinceActive = 0;
   int? _pendingLevelUp;
   String _language = 'en';
   bool _tutorialCompleted = false;
@@ -85,6 +85,7 @@ class VillageProvider extends ChangeNotifier {
 
   String _storeDiscountSeenKey = '';
   String _storeGemSeenDate = '';
+  int _speciesManualRefreshSeed = 0;
 
   List<PlacedBuilding> get placedBuildings => _placedBuildings;
   List<Villager> get villagers => _villagers;
@@ -327,10 +328,11 @@ class VillageProvider extends ChangeNotifier {
       _placedBuildings,
       _villagers,
       _activePowerups,
-      _bookItemUsedSinceActive,
+      _booksUsedSinceActive,
       totalPagesRead: totalPagesRead,
       completedBooks: completedBooks,
       nonGrassTileCount: _roadTiles.length + _specialTiles.length,
+      expansionCount: _expansionCount,
     );
   }
 
@@ -427,6 +429,7 @@ class VillageProvider extends ChangeNotifier {
     final storeSeenData = await _repo.getStoreSeenData();
     _storeDiscountSeenKey = storeSeenData.discountSeenKey;
     _storeGemSeenDate = storeSeenData.gemSeenDate;
+    _speciesManualRefreshSeed = await _repo.getSpeciesManualRefreshSeed();
 
     final choiceMaps = await _repo.getPendingVillagerChoices();
     _pendingVillagerChoices =
@@ -543,7 +546,18 @@ class VillageProvider extends ChangeNotifier {
   }
 
   List<VillagerSpeciesData> get storeSpeciesAvailable =>
-      SpeciesRules.getAvailableForStore(_unlockedSpeciesIds);
+      SpeciesRules.getAvailableForStore(_unlockedSpeciesIds,
+          manualSeed: _speciesManualRefreshSeed);
+
+  static const int speciesManualRefreshCost = 20;
+
+  Future<void> refreshSpeciesForGems() async {
+    await _repo.subtractResources(gems: speciesManualRefreshCost);
+    _gems -= speciesManualRefreshCost;
+    await _repo.incrementSpeciesManualRefreshSeed();
+    _speciesManualRefreshSeed++;
+    notifyListeners();
+  }
 
   Future<void> addResources(
       {int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
@@ -1005,10 +1019,11 @@ class VillageProvider extends ChangeNotifier {
       buildings: _placedBuildings,
       villagers: _villagers,
       activePowerups: _activePowerups,
-      bookItemUsedSinceActive: _bookItemUsedSinceActive,
+      booksUsedSinceActive: _booksUsedSinceActive,
       totalPagesRead: _lastTotalPagesRead,
       completedBooks: _lastCompletedBooks,
       nonGrassTileCount: _roadTiles.length + _specialTiles.length,
+      expansionCount: _expansionCount,
     );
     notifyListeners();
   }
@@ -1031,15 +1046,28 @@ class VillageProvider extends ChangeNotifier {
       if (target == null) continue;
       final originalId = target.reward.speciesId!;
       String resolvedId;
-      if (!_unlockedSpeciesIds.contains(originalId)) {
-        resolvedId = originalId;
-      } else if (event.branch == MissionBranch.christmas &&
-          !_unlockedSpeciesIds.contains('reindeer')) {
-        resolvedId = 'reindeer';
+      final chain = HolidayRules.speciesChainForEvent(event.id);
+      if (chain != null && chain.isNotEmpty) {
+        String? nextInChain;
+        for (final speciesId in chain) {
+          if (!_unlockedSpeciesIds.contains(speciesId)) {
+            nextInChain = speciesId;
+            break;
+          }
+        }
+        resolvedId = nextInChain ??
+            (SpeciesRules.pickRandomSpeciesReward(_unlockedSpeciesIds, Random())
+                    ?.id ??
+                chain.first);
       } else {
-        final replacement =
-            SpeciesRules.pickRandomSpeciesReward(_unlockedSpeciesIds, Random());
-        resolvedId = replacement?.id ?? originalId;
+        if (!_unlockedSpeciesIds.contains(originalId)) {
+          resolvedId = originalId;
+        } else {
+          resolvedId =
+              SpeciesRules.pickRandomSpeciesReward(_unlockedSpeciesIds, Random())
+                      ?.id ??
+                  originalId;
+        }
       }
       _eventSpeciesOverrides[key] = resolvedId;
       changed = true;
@@ -1082,23 +1110,24 @@ class VillageProvider extends ChangeNotifier {
     if (reward.coins > 0) _coins += reward.coins;
     if (reward.gems > 0) _gems += reward.gems;
 
-    if (missionId == 'vl_book_happy') _bookItemUsedSinceActive = false;
+    if (mission.conditionType == MissionConditionType.villagerHappinessWithBook) {
+      _booksUsedSinceActive = 0;
+    }
 
     if (reward.speciesId != null) {
-      String speciesId = reward.speciesId!;
+      String resolvedSpeciesId = reward.speciesId!;
       final event = HolidayRules.eventForBranch(mission.branch);
       if (event != null) {
         final key = '${event.id}_${DateTime.now().year}';
         final override = _eventSpeciesOverrides[key];
-        if (override != null) speciesId = override;
+        if (override != null) resolvedSpeciesId = override;
       }
-      final speciesResult = await applySpeciesBonus(speciesId);
       notifyListeners();
       return (
         success: true,
-        isDuplicate: speciesResult?.isDuplicate ?? false,
-        speciesId: speciesResult?.speciesId,
-        speciesNameKey: speciesResult?.speciesNameKey,
+        isDuplicate: false,
+        speciesId: resolvedSpeciesId,
+        speciesNameKey: null,
       );
     }
 
@@ -1116,7 +1145,7 @@ class VillageProvider extends ChangeNotifier {
     if (activeMission != null &&
         activeMission.conditionType ==
             MissionConditionType.villagerHappinessWithBook) {
-      _bookItemUsedSinceActive = true;
+      _booksUsedSinceActive++;
     }
   }
 

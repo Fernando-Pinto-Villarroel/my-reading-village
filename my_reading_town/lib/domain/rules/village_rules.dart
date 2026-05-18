@@ -341,6 +341,28 @@ class VillageRules {
       'exp': 12
     },
     {
+      'type': 'chocolate_fountain',
+      'name': 'Chocolate Fountain',
+      'coinCost': 130,
+      'gemCost': 0,
+      'woodCost': 0,
+      'metalCost': 60,
+      'happinessBonus': 0,
+      'constructionMinutes': 25,
+      'exp': 13
+    },
+    {
+      'type': 'friendship_arch',
+      'name': 'Friendship Arch',
+      'coinCost': 140,
+      'gemCost': 0,
+      'woodCost': 70,
+      'metalCost': 0,
+      'happinessBonus': 0,
+      'constructionMinutes': 28,
+      'exp': 14
+    },
+    {
       'type': 'water_font',
       'name': 'Water Font',
       'coinCost': 150,
@@ -350,6 +372,28 @@ class VillageRules {
       'happinessBonus': 0,
       'constructionMinutes': 30,
       'exp': 15
+    },
+    {
+      'type': 'christmas_tree',
+      'name': 'Christmas Tree',
+      'coinCost': 160,
+      'gemCost': 5,
+      'woodCost': 60,
+      'metalCost': 0,
+      'happinessBonus': 0,
+      'constructionMinutes': 30,
+      'exp': 16
+    },
+    {
+      'type': 'gear_monument',
+      'name': 'Gear Monument',
+      'coinCost': 180,
+      'gemCost': 0,
+      'woodCost': 0,
+      'metalCost': 90,
+      'happinessBonus': 0,
+      'constructionMinutes': 35,
+      'exp': 18
     },
     {
       'type': 'wishing_well',
@@ -372,6 +416,17 @@ class VillageRules {
       'happinessBonus': 0,
       'constructionMinutes': 60,
       'exp': 25
+    },
+    {
+      'type': 'celebration_arch',
+      'name': 'Celebration Arch',
+      'coinCost': 280,
+      'gemCost': 15,
+      'woodCost': 50,
+      'metalCost': 50,
+      'happinessBonus': 0,
+      'constructionMinutes': 55,
+      'exp': 28
     },
     {
       'type': 'book_stack_monument',
@@ -438,6 +493,11 @@ class VillageRules {
     'reading_bench',
     'book_stack_monument',
     'wishing_well',
+    'chocolate_fountain',
+    'friendship_arch',
+    'christmas_tree',
+    'gear_monument',
+    'celebration_arch',
   };
   static const Set<String> tileTypes = {'grass', 'road', 'sea', 'sand', 'rock'};
   static const Set<String> specialTileTypes = {'sea', 'sand', 'rock'};

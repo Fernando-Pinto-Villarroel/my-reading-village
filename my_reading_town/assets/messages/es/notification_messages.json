@@ -2,7 +2,7 @@
   "messages": [
     {
       "title": "¡Hora de leer! 📚",
-      "body": "¡Tu villa te espera! Abre un libro y gana recursos para tu pueblo."
+      "body": "¡Tu pueblo te espera! Abre un libro y gana recursos para tu pueblo."
     },
     {
       "title": "¡Tus aldeanos te extrañan!",
@@ -10,7 +10,7 @@
     },
     {
       "title": "¡Momento de lectura! ✨",
-      "body": "Cada página que lees gana monedas, madera y metal. ¡Tu villa te necesita!"
+      "body": "Cada página que lees gana monedas, madera y metal. ¡Tu pueblo te necesita!"
     },
     {
       "title": "¡Alerta de ratón de biblioteca! 🐛",
@@ -30,7 +30,7 @@
     },
     {
       "title": "¡Hora de cuentos! 🌟",
-      "body": "Grandes historias te esperan. ¡Lee hoy y observa cómo florece tu villa!"
+      "body": "Grandes historias te esperan. ¡Lee hoy y observa cómo florece tu pueblo!"
     },
     {
       "title": "¡Los aldeanos felices necesitan libros!",
@@ -46,7 +46,7 @@
     },
     {
       "title": "¡El conocimiento es poder! 💪",
-      "body": "Los libros te hacen más sabio y a tu villa más fuerte. ¿A qué esperas?"
+      "body": "Los libros te hacen más sabio y a tu pueblo más fuerte. ¿A qué esperas?"
     }
   ]
 }

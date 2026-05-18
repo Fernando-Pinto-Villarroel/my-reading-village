@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:my_reading_town/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/domain/rules/reading_rules.dart';
+import 'package:my_reading_town/adapters/providers/village_provider.dart';
 
 void showReadingCalculatorDialog(BuildContext context) {
   showModalBottomSheet(
@@ -16,6 +18,8 @@ void showReadingCalculatorDialog(BuildContext context) {
 
 enum _ResourceType { coins, gems, wood, metal }
 
+enum _CalcMode { net, goal }
+
 class _ReadingCalculatorContent extends StatefulWidget {
   const _ReadingCalculatorContent();
 
@@ -25,18 +29,40 @@ class _ReadingCalculatorContent extends StatefulWidget {
 }
 
 class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
+  _CalcMode _calcMode = _CalcMode.net;
   _ResourceType _selectedResource = _ResourceType.coins;
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _goalController = TextEditingController();
   _CalculationResult? _result;
   String? _error;
+  bool _goalRangeError = false;
 
   @override
   void dispose() {
     _amountController.dispose();
+    _goalController.dispose();
     super.dispose();
   }
 
+  int _getCurrentAmount() {
+    final village = Provider.of<VillageProvider>(context, listen: false);
+    switch (_selectedResource) {
+      case _ResourceType.coins: return village.coins;
+      case _ResourceType.gems: return village.gems;
+      case _ResourceType.wood: return village.wood;
+      case _ResourceType.metal: return village.metal;
+    }
+  }
+
   void _calculate() {
+    if (_calcMode == _CalcMode.net) {
+      _calculateNet();
+    } else {
+      _calculateGoal();
+    }
+  }
+
+  void _calculateNet() {
     final text = _amountController.text.trim();
     if (text.isEmpty) {
       setState(() {
@@ -56,6 +82,42 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
     setState(() {
       _error = null;
       _result = _computeResult(_selectedResource, amount);
+    });
+  }
+
+  void _calculateGoal() {
+    final current = _getCurrentAmount();
+    final goalText = _goalController.text.trim();
+    if (goalText.isEmpty) {
+      setState(() {
+        _error = context.t('calculator_enter_amount');
+        _result = null;
+        _goalRangeError = false;
+      });
+      return;
+    }
+    final goal = int.tryParse(goalText);
+    if (goal == null || goal <= 0) {
+      setState(() {
+        _error = context.t('calculator_invalid_amount');
+        _result = null;
+        _goalRangeError = false;
+      });
+      return;
+    }
+    if (goal <= current) {
+      setState(() {
+        _error = null;
+        _result = null;
+        _goalRangeError = true;
+      });
+      return;
+    }
+    final needed = goal - current;
+    setState(() {
+      _error = null;
+      _result = _computeResult(_selectedResource, needed);
+      _goalRangeError = false;
     });
   }
 
@@ -165,6 +227,19 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                _CalcModeSelector(
+                  mode: _calcMode,
+                  onChanged: (m) => setState(() {
+                    _calcMode = m;
+                    _result = null;
+                    _error = null;
+                    _goalRangeError = false;
+                    if (m == _CalcMode.goal) {
+                      _goalController.text = '${_getCurrentAmount()}';
+                    }
+                  }),
+                ),
+                const SizedBox(height: 16),
                 Text(
                   context.t('calculator_resource_type'),
                   style: const TextStyle(
@@ -180,83 +255,77 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
                     _selectedResource = r;
                     _result = null;
                     _error = null;
+                    _goalRangeError = false;
+                    if (_calcMode == _CalcMode.goal) {
+                      _goalController.text = '${_getCurrentAmount()}';
+                    } else {
+                      _goalController.clear();
+                    }
                   }),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  context.t('calculator_target_amount'),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.darkText,
+                if (_calcMode == _CalcMode.net) ...[
+                  Text(
+                    context.t('calculator_target_amount'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkText,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _amountController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        decoration: InputDecoration(
-                          hintText: context.t('calculator_amount_hint'),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppTheme.lavender.withValues(alpha: 0.4),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppTheme.lavender.withValues(alpha: 0.4),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: AppTheme.lavender,
-                              width: 2,
-                            ),
-                          ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _amountController,
+                          hint: context.t('calculator_amount_hint'),
                           errorText: _error,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
                         ),
-                        onSubmitted: (_) => _calculate(),
                       ),
+                      const SizedBox(width: 12),
+                      _buildCalcButton(),
+                    ],
+                  ),
+                ] else ...[
+                  Text(
+                    context.t('calculator_current_amount'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkText,
                     ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: _calculate,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.lavender,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        context.t('calculator_calculate'),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.darkText,
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildCurrentAmountDisplay(),
+                  const SizedBox(height: 12),
+                  Text(
+                    context.t('calculator_goal_amount'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.darkText,
                     ),
-                  ],
-                ),
-                if (_result != null) ...[
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _goalController,
+                          hint: context.t('calculator_goal_hint'),
+                          errorText: _error,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildCalcButton(),
+                    ],
+                  ),
+                ],
+                if (_goalRangeError) ...[
+                  const SizedBox(height: 16),
+                  _GoalRangeErrorCard(message: context.t('calculator_goal_invalid')),
+                ] else if (_result != null) ...[
                   const SizedBox(height: 16),
                   _ResultCard(result: _result!),
                 ],
@@ -293,6 +362,138 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    String? errorText,
+    void Function(String)? onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppTheme.lavender.withValues(alpha: 0.4)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppTheme.lavender.withValues(alpha: 0.4)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.lavender, width: 2),
+        ),
+        errorText: errorText,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      onSubmitted: (_) => _calculate(),
+    );
+  }
+
+  Widget _buildCurrentAmountDisplay() {
+    final amount = _getCurrentAmount();
+    Widget icon;
+    switch (_selectedResource) {
+      case _ResourceType.coins: icon = ResourceIcon.coin(size: 20);
+      case _ResourceType.gems: icon = ResourceIcon.gem(size: 20);
+      case _ResourceType.wood: icon = ResourceIcon.wood(size: 20);
+      case _ResourceType.metal: icon = ResourceIcon.metal(size: 20);
+    }
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.lavender.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.lavender.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          icon,
+          const SizedBox(width: 10),
+          Text(
+            '$amount',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkLavender,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalcButton() {
+    return ElevatedButton(
+      onPressed: _calculate,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.lavender,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: Text(
+        context.t('calculator_calculate'),
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class _CalcModeSelector extends StatelessWidget {
+  final _CalcMode mode;
+  final ValueChanged<_CalcMode> onChanged;
+
+  const _CalcModeSelector({required this.mode, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: AppTheme.darkText.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: _CalcMode.values.map((m) {
+          final selected = m == mode;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(m),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: selected ? AppTheme.lavender : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  m == _CalcMode.net
+                      ? context.t('calculator_tab_net')
+                      : context.t('calculator_tab_goal'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: selected
+                        ? Colors.white
+                        : AppTheme.darkText.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -553,6 +754,41 @@ class _ResultRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _GoalRangeErrorCard extends StatelessWidget {
+  final String message;
+
+  const _GoalRangeErrorCard({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.pink.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.pink.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline_rounded, size: 20, color: AppTheme.darkPink),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.darkPink,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

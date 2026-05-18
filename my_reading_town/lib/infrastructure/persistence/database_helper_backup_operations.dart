@@ -22,13 +22,17 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     'used_secret_codes',
   ];
 
-  Future<Map<String, dynamic>> exportAllTables() async {
+  Future<Map<String, dynamic>> exportAllTables({Set<String>? only}) async {
     final db = await database;
     final result = <String, dynamic>{
       'version': 3,
       'exported_at': DateTime.now().toIso8601String(),
     };
+    if (only != null && only.length < _allTables.length) {
+      result['partial'] = true;
+    }
     for (final table in _allTables) {
+      if (only != null && !only.contains(table)) continue;
       final rows = await db.query(table);
       if (table == 'books') {
         result[table] = await Future.wait(rows.map((row) async {
@@ -57,11 +61,13 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     final coverDir = Directory(p.join(dir.path, 'book_covers'));
     if (!coverDir.existsSync()) coverDir.createSync(recursive: true);
 
+    final tablesToRestore = _allTables.where((t) => data.containsKey(t)).toList();
+
     await db.transaction((txn) async {
-      for (final table in _allTables.reversed) {
+      for (final table in tablesToRestore.reversed) {
         await txn.delete(table);
       }
-      for (final table in _allTables) {
+      for (final table in tablesToRestore) {
         final rows = data[table] as List<dynamic>?;
         if (rows == null) continue;
         for (final row in rows) {

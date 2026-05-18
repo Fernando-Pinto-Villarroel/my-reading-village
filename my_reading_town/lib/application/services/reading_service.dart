@@ -4,6 +4,7 @@ import 'package:my_reading_town/domain/entities/reading_session.dart';
 import 'package:my_reading_town/domain/entities/tag.dart';
 import 'package:my_reading_town/domain/ports/book_repository.dart';
 import 'package:my_reading_town/domain/rules/reading_rules.dart';
+import 'package:my_reading_town/app_constants.dart';
 
 class ReadingService {
   final BookRepository _repo;
@@ -217,12 +218,14 @@ class ReadingService {
       targetDate,
       excludingSessionId: sessionId,
     );
-    final available = ReadingRules.dailyPageLimit - pagesOnTargetDate;
-    if (available <= 0) {
-      throw Exception('daily_limit_full:${ReadingRules.dailyPageLimit}');
-    }
-    if (newPages > available) {
-      throw Exception('daily_limit_partial:$available:${ReadingRules.dailyPageLimit}');
+    if (!AppConstants.testMode) {
+      final available = ReadingRules.dailyPageLimit - pagesOnTargetDate;
+      if (available <= 0) {
+        throw Exception('daily_limit_full:${ReadingRules.dailyPageLimit}');
+      }
+      if (newPages > available) {
+        throw Exception('daily_limit_partial:$available:${ReadingRules.dailyPageLimit}');
+      }
     }
 
     await _repo.updateReadingSession(sessionId, {

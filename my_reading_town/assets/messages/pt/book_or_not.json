@@ -134,6 +134,16 @@
     {
       "title": "O Jardim de Cerâmica",
       "is_real": false
-    }
+    },
+    { "title": "Beloved", "is_real": true, "author": "Toni Morrison" },
+    { "title": "The God of Small Things", "is_real": true, "author": "Arundhati Roy" },
+    { "title": "The Kite Runner", "is_real": true, "author": "Khaled Hosseini" },
+    { "title": "The Road", "is_real": true, "author": "Cormac McCarthy" },
+    { "title": "Norwegian Wood", "is_real": true, "author": "Haruki Murakami" },
+    { "title": "The Emerald Tower Chronicles", "is_real": false },
+    { "title": "Songs of the Forgotten Monastery", "is_real": false },
+    { "title": "Whispers at the Edge of Dawn", "is_real": false },
+    { "title": "The Velvet Cartographer", "is_real": false },
+    { "title": "Tales from the Stone Bridge", "is_real": false }
   ]
 }

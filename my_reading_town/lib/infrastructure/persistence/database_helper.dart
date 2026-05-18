@@ -186,7 +186,8 @@ class DatabaseHelper {
         music_volume INTEGER NOT NULL DEFAULT 3,
         effects_volume INTEGER NOT NULL DEFAULT 3,
         store_discount_seen_key TEXT NOT NULL DEFAULT '',
-        store_gems_seen_date TEXT NOT NULL DEFAULT ''
+        store_gems_seen_date TEXT NOT NULL DEFAULT '',
+        species_manual_refresh_seed INTEGER NOT NULL DEFAULT 0
       )
     ''');
 

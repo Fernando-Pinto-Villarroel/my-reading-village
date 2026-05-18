@@ -12,6 +12,7 @@ import 'package:my_reading_town/infrastructure/di/service_locator.dart';
 import 'package:my_reading_town/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_town/infrastructure/ui/widgets/common/app_toast.dart';
+import 'package:my_reading_town/infrastructure/ui/widgets/common/species_bonus_popup.dart';
 
 void showStoreDialog(BuildContext context) {
   showDialog(
@@ -110,7 +111,10 @@ class _StoreDialogState extends State<_StoreDialog>
                       lang: lang,
                       discounts: _discounts,
                       storeService: _storeService),
-                  _SpeciesTab(lang: lang, storeService: _storeService, discounts: _discounts),
+                  _SpeciesTab(
+                      lang: lang,
+                      storeService: _storeService,
+                      discounts: _discounts),
                 ],
               ),
             ),
@@ -739,14 +743,12 @@ class _GemsTabState extends State<_GemsTab> {
     if (village.adCooldownRemainingFor('gems') != null) return;
     village.recordAdCooldown('gems');
     setState(() => _watchingAdForGems = true);
-    final earned =
-        await sl<AdService>().showRewardedAd(context, widget.lang);
+    final earned = await sl<AdService>().showRewardedAd(context, widget.lang);
     if (!mounted) return;
     if (earned) {
       final claimed = await village.watchAdForGems();
       if (mounted && claimed) {
-        showSuccessToast(
-            context, widget.lang.translate('ad_gems_received'));
+        showSuccessToast(context, widget.lang.translate('ad_gems_received'));
       }
     }
     if (mounted) {
@@ -855,9 +857,7 @@ class _AdForGemsSection extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: claimed
-            ? Colors.grey.withValues(alpha: 0.08)
-            : bgColor,
+        color: claimed ? Colors.grey.withValues(alpha: 0.08) : bgColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: claimed
@@ -872,8 +872,7 @@ class _AdForGemsSection extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.play_circle_outline,
-                  size: 16,
-                  color: claimed ? Colors.grey : sectionColor),
+                  size: 16, color: claimed ? Colors.grey : sectionColor),
               SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -897,9 +896,7 @@ class _AdForGemsSection extends StatelessWidget {
           if (claimed) ...[
             Text(
               lang.translate('ad_gems_claimed_today'),
-              style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
             ),
           ] else ...[
             Row(
@@ -916,8 +913,7 @@ class _AdForGemsSection extends StatelessWidget {
                             child: Text(
                               lang.translate('ad_gems_section_subtitle'),
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppTheme.darkText),
+                                  fontSize: 12, color: AppTheme.darkText),
                             ),
                           ),
                         ],
@@ -936,8 +932,7 @@ class _AdForGemsSection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: adsToday / 3.0,
-                          backgroundColor:
-                              sectionColor.withValues(alpha: 0.15),
+                          backgroundColor: sectionColor.withValues(alpha: 0.15),
                           valueColor:
                               AlwaysStoppedAnimation<Color>(sectionColor),
                           minHeight: 6,
@@ -950,7 +945,8 @@ class _AdForGemsSection extends StatelessWidget {
                 SizedBox(
                   height: 36,
                   child: ElevatedButton.icon(
-                    onPressed: (isWatching || cooldown != null) ? null : onWatchAd,
+                    onPressed:
+                        (isWatching || cooldown != null) ? null : onWatchAd,
                     icon: isWatching
                         ? SizedBox(
                             width: 14,
@@ -963,8 +959,8 @@ class _AdForGemsSection extends StatelessWidget {
                       cooldown != null
                           ? '${lang.translate('ad_gems_watch_btn')} (${cooldown!.inSeconds}s)'
                           : lang.translate('ad_gems_watch_btn'),
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: sectionColor,
@@ -1045,6 +1041,9 @@ class _PacksTab extends StatelessWidget {
               .replaceAll('{pack}', lang.translate('store_pack_${pack.id}')),
         );
       }
+      if (pack.speciesId != null && context.mounted) {
+        await _applyAndShowSpeciesBonus(context, village, pack.speciesId!);
+      }
       return;
     }
 
@@ -1053,7 +1052,30 @@ class _PacksTab extends StatelessWidget {
 
     if (result.state == StorePurchaseState.error) {
       _showError(context, lang, result.errorMessage);
+      return;
     }
+
+    if (result.state == StorePurchaseState.success &&
+        pack.speciesId != null &&
+        context.mounted) {
+      await _applyAndShowSpeciesBonus(context, village, pack.speciesId!);
+    }
+  }
+
+  Future<void> _applyAndShowSpeciesBonus(
+      BuildContext context, VillageProvider village, String speciesId) async {
+    final speciesResult = await village.applySpeciesBonus(speciesId);
+    if (!context.mounted || speciesResult == null) return;
+    final speciesData = SpeciesRules.findById(speciesResult.speciesId);
+    if (speciesData == null) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => SpeciesBonusPopup(
+        speciesData: speciesData,
+        isDuplicate: speciesResult.isDuplicate,
+      ),
+    );
   }
 
   Future<void> _applyPackContents(
@@ -1214,15 +1236,18 @@ class _PackCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.1)],
+            colors: [
+              color.withValues(alpha: 0.08),
+              color.withValues(alpha: 0.02)
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: color, width: 2),
+          border: Border.all(color: color.withValues(alpha: 0.65), width: 2),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.3),
+              color: color.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: Offset(0, 3),
             ),
@@ -1233,7 +1258,7 @@ class _PackCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Column(
@@ -1249,16 +1274,21 @@ class _PackCard extends StatelessWidget {
                       ),
                       SizedBox(height: 5),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: color.withValues(alpha: 0.28),
                           borderRadius: BorderRadius.circular(7),
+                          border: Border.all(
+                              color: color.withValues(alpha: 0.7), width: 1),
                         ),
                         child: Text(
-                          lang.translate('store_save').replaceAll('{pct}', '${pack.savingsPercent}'),
+                          lang
+                              .translate('store_save')
+                              .replaceAll('{pct}', '${pack.savingsPercent}'),
                           style: TextStyle(
                             fontSize: 10,
-                            color: Colors.white,
+                            color: AppTheme.darkText.withValues(alpha: 0.85),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -1269,24 +1299,32 @@ class _PackCard extends StatelessWidget {
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (discount != null) ...[
-                      _DiscountBadge(percent: discount!.percent),
-                      SizedBox(height: 4),
-                      Text(
-                        '\$${pack.basePrice.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                          decoration: TextDecoration.lineThrough,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '\$${pack.basePrice.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade500,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          _DiscountBadge(percent: discount!.percent),
+                        ],
                       ),
-                      SizedBox(height: 2),
+                      SizedBox(height: 6),
                     ],
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        color: color,
+                        color: Color.alphaBlend(
+                            const Color(0x18000000), color),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -1302,8 +1340,9 @@ class _PackCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Divider(height: 1, color: color.withValues(alpha: 0.4)),
+            SizedBox(height: 12),
+            Divider(
+                height: 1, thickness: 1, color: color.withValues(alpha: 0.9)),
             SizedBox(height: 10),
             _PackContentsColumn(pack: pack, lang: lang),
           ],
@@ -1332,38 +1371,107 @@ class _PackContentsColumn extends StatelessWidget {
     add(ResourceIcon.wood(size: 17), pack.wood, 'wood');
     add(ResourceIcon.metal(size: 17), pack.metal, 'metal');
     add(ResourceIcon.gem(size: 17), pack.gems, 'gems');
-    add(Image.asset('assets/images/items/book_item.png', width: 18, height: 18), pack.bookPowerups, 'happiness_book');
-    add(Image.asset('assets/images/items/sandwich_item.png', width: 18, height: 18), pack.sandwichPowerups, 'constructor_sandwich');
-    add(Image.asset('assets/images/items/hammer_item.png', width: 18, height: 18), pack.hammerPowerups, 'constructor_hammer');
-    add(Image.asset('assets/images/items/glasses_item.png', width: 18, height: 18), pack.glassesPowerups, 'magic_glasses');
+    add(Image.asset('assets/images/items/book_item.png', width: 18, height: 18),
+        pack.bookPowerups, 'happiness_book');
+    add(
+        Image.asset('assets/images/items/sandwich_item.png',
+            width: 18, height: 18),
+        pack.sandwichPowerups,
+        'constructor_sandwich');
+    add(
+        Image.asset('assets/images/items/hammer_item.png',
+            width: 18, height: 18),
+        pack.hammerPowerups,
+        'constructor_hammer');
+    add(
+        Image.asset('assets/images/items/glasses_item.png',
+            width: 18, height: 18),
+        pack.glassesPowerups,
+        'magic_glasses');
+
+    Widget? speciesRow;
+    if (pack.speciesId != null) {
+      final speciesData = SpeciesRules.findById(pack.speciesId!);
+      if (speciesData != null) {
+        final Color rarityTextColor;
+        switch (speciesData.rarity) {
+          case VillagerRarity.common:
+            rarityTextColor = const Color(0xFF424242);
+          case VillagerRarity.rare:
+            rarityTextColor = const Color(0xFF0D47A1);
+          case VillagerRarity.extraordinary:
+            rarityTextColor = const Color(0xFF4A148C);
+          case VillagerRarity.legendary:
+            rarityTextColor = const Color(0xFFE65100);
+          case VillagerRarity.godly:
+            rarityTextColor = const Color(0xFFB71C1C);
+        }
+        speciesRow = Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/images/villagers/${pack.speciesId}/${pack.speciesId}_villager.png',
+                width: 20,
+                height: 20,
+                errorBuilder: (_, __, ___) =>
+                    Icon(Icons.pets, size: 18, color: rarityTextColor),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '+1',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: rarityTextColor,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                lang.translate(speciesData.nameKey),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: rarityTextColor,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: items.map((item) => Padding(
-        padding: EdgeInsets.symmetric(vertical: 3),
-        child: Row(
-          children: [
-            item.icon,
-            SizedBox(width: 8),
-            Text(
-              '+${item.amount}',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkText,
-              ),
-            ),
-            SizedBox(width: 5),
-            Text(
-              item.label,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.darkText.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
-        ),
-      )).toList(),
+      children: [
+        ...items
+          .map((item) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    item.icon,
+                    SizedBox(width: 8),
+                    Text(
+                      '+${item.amount}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.darkText,
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.darkText.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        if (speciesRow != null) speciesRow,
+      ],
     );
   }
 }
@@ -1655,7 +1763,10 @@ class _SpeciesTab extends StatelessWidget {
   final StoreService storeService;
   final Map<String, DiscountInfo> discounts;
 
-  const _SpeciesTab({required this.lang, required this.storeService, required this.discounts});
+  const _SpeciesTab(
+      {required this.lang,
+      required this.storeService,
+      required this.discounts});
 
   Color _rarityColor(VillagerRarity rarity) {
     switch (rarity) {
@@ -1672,20 +1783,45 @@ class _SpeciesTab extends StatelessWidget {
     }
   }
 
+  Color _rarityTextColor(VillagerRarity rarity) {
+    switch (rarity) {
+      case VillagerRarity.common:
+        return const Color(0xFF424242);
+      case VillagerRarity.rare:
+        return const Color(0xFF0D47A1);
+      case VillagerRarity.extraordinary:
+        return const Color(0xFF4A148C);
+      case VillagerRarity.legendary:
+        return const Color(0xFFE65100);
+      case VillagerRarity.godly:
+        return const Color(0xFFB71C1C);
+    }
+  }
+
   Future<void> _purchase(
       BuildContext context, VillagerSpeciesData species) async {
     final village = context.read<VillageProvider>();
     if (village.isSpeciesUnlocked(species.id)) return;
 
     if (!AppConstants.playStore) {
-      await village.unlockSpeciesFromStore(species.id);
-      if (context.mounted) {
-        _showSimulatedPurchase(
-          context,
-          lang,
-          lang.translate('store_species_unlock_success'),
-        );
-      }
+      _showSimulatedPurchase(
+        context,
+        lang,
+        lang.translate('store_species_unlock_success'),
+      );
+      if (!context.mounted) return;
+      final bonus = await village.applySpeciesBonus(species.id);
+      if (!context.mounted || bonus == null) return;
+      final speciesData = SpeciesRules.findById(bonus.speciesId);
+      if (speciesData == null || !context.mounted) return;
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => SpeciesBonusPopup(
+          speciesData: speciesData,
+          isDuplicate: bonus.isDuplicate,
+        ),
+      );
       return;
     }
 
@@ -1693,11 +1829,18 @@ class _SpeciesTab extends StatelessWidget {
     final result = await storeService.purchaseSpecies(productId);
     if (!context.mounted) return;
     if (result.state == StorePurchaseState.success) {
-      await village.unlockSpeciesFromStore(species.id);
-      if (context.mounted) {
-        showSuccessToast(
-            context, lang.translate('store_species_unlock_success'));
-      }
+      final bonus = await village.applySpeciesBonus(species.id);
+      if (!context.mounted || bonus == null) return;
+      final speciesData = SpeciesRules.findById(bonus.speciesId);
+      if (speciesData == null || !context.mounted) return;
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => SpeciesBonusPopup(
+          speciesData: speciesData,
+          isDuplicate: bonus.isDuplicate,
+        ),
+      );
     } else if (result.state == StorePurchaseState.error) {
       _showError(context, lang, result.errorMessage);
     }
@@ -1737,44 +1880,55 @@ class _SpeciesTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppTheme.lavender.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppTheme.lavender),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.refresh, size: 16, color: AppTheme.darkLavender),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    _nextRefreshText(),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.darkLavender,
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lavender.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppTheme.lavender),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.schedule, size: 16, color: AppTheme.darkLavender),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          _nextRefreshText(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.darkLavender,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(width: 8),
+              _ManualRefreshButton(lang: lang),
+            ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 12),
+          _DiscountBanner(discounts: discounts, lang: lang),
+          SizedBox(height: 12),
           ...available.map((species) {
-                final productId = SpeciesRules.productIdForSpecies(species.id);
-                final discount = discounts[productId];
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: _SpeciesStoreCard(
-                    species: species,
-                    lang: lang,
-                    rarityColor: _rarityColor(species.rarity),
-                    onTap: () => _purchase(context, species),
-                    discount: discount,
-                  ),
-                );
-              }),
+            final productId = SpeciesRules.productIdForSpecies(species.id);
+            final discount = discounts[productId];
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: _SpeciesStoreCard(
+                species: species,
+                lang: lang,
+                rarityColor: _rarityColor(species.rarity),
+                rarityTextColor: _rarityTextColor(species.rarity),
+                onTap: () => _purchase(context, species),
+                discount: discount,
+              ),
+            );
+          }),
           if (!AppConstants.playStore) _SimulationNotice(lang: lang),
         ],
       ),
@@ -1797,6 +1951,7 @@ class _SpeciesStoreCard extends StatelessWidget {
   final VillagerSpeciesData species;
   final LanguageProvider lang;
   final Color rarityColor;
+  final Color rarityTextColor;
   final VoidCallback onTap;
   final DiscountInfo? discount;
 
@@ -1804,6 +1959,7 @@ class _SpeciesStoreCard extends StatelessWidget {
     required this.species,
     required this.lang,
     required this.rarityColor,
+    required this.rarityTextColor,
     required this.onTap,
     this.discount,
   });
@@ -1877,18 +2033,20 @@ class _SpeciesStoreCard extends StatelessWidget {
                         runSpacing: 4,
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: rarityColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: rarityColor, width: 1),
                             ),
                             child: Text(
-                              lang.translate(SpeciesRules.rarityKey(species.rarity)),
+                              lang.translate(
+                                  SpeciesRules.rarityKey(species.rarity)),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: rarityColor,
+                                color: rarityTextColor,
                               ),
                             ),
                           ),
@@ -1933,9 +2091,9 @@ class _SpeciesStoreCard extends StatelessWidget {
                   ),
                   child: Text(
                     lang.translate('store_species_buy').replaceAll(
-                      '{price}',
-                      '\$${(finalPrice ?? originalPrice ?? 0.0).toStringAsFixed(2)}',
-                    ),
+                          '{price}',
+                          '\$${(finalPrice ?? originalPrice ?? 0.0).toStringAsFixed(2)}',
+                        ),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -2053,3 +2211,53 @@ void _showSimulatedPurchase(
 
 void _showError(BuildContext context, LanguageProvider lang, String? message) =>
     showErrorToast(context, message ?? lang.translate('store_purchase_error'));
+
+class _ManualRefreshButton extends StatelessWidget {
+  final LanguageProvider lang;
+
+  const _ManualRefreshButton({required this.lang});
+
+  Future<void> _onTap(BuildContext context) async {
+    final village = context.read<VillageProvider>();
+    if (village.gems < VillageProvider.speciesManualRefreshCost) {
+      _showNotEnoughGems(context, lang);
+      return;
+    }
+    final confirmed = await _showGemConfirmDialog(
+        context, lang, VillageProvider.speciesManualRefreshCost);
+    if (!confirmed || !context.mounted) return;
+    await village.refreshSpeciesForGems();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _onTap(context),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.gemPurple.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppTheme.gemPurple),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.refresh, size: 14, color: AppTheme.gemPurple),
+            SizedBox(width: 4),
+            Text(
+              '${VillageProvider.speciesManualRefreshCost}',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gemPurple,
+              ),
+            ),
+            SizedBox(width: 2),
+            ResourceIcon.gem(size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+}

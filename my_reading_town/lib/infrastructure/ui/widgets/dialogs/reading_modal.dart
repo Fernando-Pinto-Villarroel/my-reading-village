@@ -288,6 +288,7 @@ void _showAddBookDialog(BuildContext context) {
               label: Text(langProvider.translate('search_online')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.lavender,
+                foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(vertical: 12),
               ),
             ),

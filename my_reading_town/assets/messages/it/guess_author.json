@@ -289,6 +289,16 @@
         "F. Scott Fitzgerald",
         "William Faulkner"
       ]
-    }
+    },
+    { "book": "Invisible Cities", "correct_author": "Italo Calvino", "wrong_authors": ["Umberto Eco", "Paulo Coelho", "Jorge Luis Borges"] },
+    { "book": "The God of Small Things", "correct_author": "Arundhati Roy", "wrong_authors": ["Salman Rushdie", "Jhumpa Lahiri", "Kazuo Ishiguro"] },
+    { "book": "Beloved", "correct_author": "Toni Morrison", "wrong_authors": ["Maya Angelou", "Alice Walker", "Zora Neale Hurston"] },
+    { "book": "The Kite Runner", "correct_author": "Khaled Hosseini", "wrong_authors": ["Rumi", "Naguib Mahfouz", "Orhan Pamuk"] },
+    { "book": "Norwegian Wood", "correct_author": "Haruki Murakami", "wrong_authors": ["Yasunari Kawabata", "Kenzaburo Oe", "Junichiro Tanizaki"] },
+    { "book": "The Name of the Rose", "correct_author": "Umberto Eco", "wrong_authors": ["Italo Calvino", "Leonardo Sciascia", "Andrea Camilleri"] },
+    { "book": "My Brilliant Friend", "correct_author": "Elena Ferrante", "wrong_authors": ["Natalia Ginzburg", "Elsa Morante", "Dacia Maraini"] },
+    { "book": "If This Is a Man", "correct_author": "Primo Levi", "wrong_authors": ["Giorgio Bassani", "Carlo Levi", "Natalia Ginzburg"] },
+    { "book": "The Shape of Water", "correct_author": "Andrea Camilleri", "wrong_authors": ["Leonardo Sciascia", "Massimo Carlotto", "Carlo Lucarelli"] },
+    { "book": "The Tartar Steppe", "correct_author": "Dino Buzzati", "wrong_authors": ["Italo Calvino", "Cesare Pavese", "Vasco Pratolini"] }
   ]
 }

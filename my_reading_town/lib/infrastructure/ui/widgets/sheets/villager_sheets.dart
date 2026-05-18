@@ -174,6 +174,14 @@ Widget _dragHandle() {
   );
 }
 
+String _happinessStateKey(int happiness) {
+  if (happiness >= 100) return 'happiness_state_happy';
+  if (happiness >= 75) return 'happiness_state_almost_happy';
+  if (happiness >= 50) return 'happiness_state_neutral';
+  if (happiness >= 25) return 'happiness_state_sad';
+  return 'happiness_state_very_sad';
+}
+
 Widget _happinessChip(Villager villager, LanguageProvider langProvider) {
   final color = villager.happiness >= 100
       ? Color(0xFF2E7D32)
@@ -193,6 +201,7 @@ Widget _happinessChip(Villager villager, LanguageProvider langProvider) {
               : villager.happiness >= 25
                   ? Icons.sentiment_dissatisfied
                   : Icons.sentiment_very_dissatisfied;
+  final label = langProvider.translate(_happinessStateKey(villager.happiness));
 
   return Container(
     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -205,7 +214,7 @@ Widget _happinessChip(Villager villager, LanguageProvider langProvider) {
       children: [
         Icon(icon, size: 22, color: color),
         SizedBox(width: 8),
-        Text('${langProvider.translate('happiness')}: ${villager.happiness}%',
+        Text('$label: ${villager.happiness}%',
             style: TextStyle(
                 fontSize: 15, fontWeight: FontWeight.bold, color: color)),
       ],

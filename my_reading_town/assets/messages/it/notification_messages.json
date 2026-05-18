@@ -2,15 +2,15 @@
   "messages": [
     {
       "title": "È ora di leggere! 📚",
-      "body": "Il tuo villaggio ti aspetta! Apri un libro e guadagna risorse per la tua città."
+      "body": "La tua città ti aspetta! Apri un libro e guadagna risorse per la tua città."
     },
     {
       "title": "I tuoi abitanti ti mancano!",
-      "body": "Poche pagine al giorno tengono lontana la noia. Vieni a leggere e fai crescere il tuo paese!"
+      "body": "Poche pagine al giorno tengono lontana la noia. Vieni a leggere e fai crescere la tua città!"
     },
     {
       "title": "Momento di lettura! ✨",
-      "body": "Ogni pagina che leggi guadagna monete, legno e metallo. Il tuo villaggio ha bisogno di te!"
+      "body": "Ogni pagina che leggi guadagna monete, legno e metallo. La tua città ha bisogno di te!"
     },
     {
       "title": "Allarme topo di biblioteca! 🐛",
@@ -30,7 +30,7 @@
     },
     {
       "title": "L'ora delle storie! 🌟",
-      "body": "Grandi storie ti aspettano. Leggi oggi e guarda il tuo villaggio fiorire!"
+      "body": "Grandi storie ti aspettano. Leggi oggi e guarda la tua città fiorire!"
     },
     {
       "title": "Gli abitanti felici hanno bisogno di libri!",
@@ -46,7 +46,7 @@
     },
     {
       "title": "La conoscenza è potere! 💪",
-      "body": "I libri ti rendono più saggio e il tuo villaggio più forte. Cosa stai aspettando?"
+      "body": "I libri ti rendono più saggio e la tua città più forte. Cosa stai aspettando?"
     }
   ]
 }

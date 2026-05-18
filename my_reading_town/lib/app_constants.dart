@@ -1,8 +1,9 @@
 class AppConstants {
-  static const bool testMode = false;
+  static const bool testMode = true;
   static const bool isNightTime = false;
   static const bool playStore = false;
   static const bool googleAds = false;
+  static const String appVersion = '1.0.0';
 
   // Ad cooldown duration (NO_REWARDED_AD_RELOAD_PERIOD_SECONDS)
   // In production: 30-60 seconds minimum between rewarded ads per building (AdMob policy)
