@@ -167,7 +167,7 @@ def process_batch(
 
     image_files = sorted(
         f for f in input_dir.iterdir()
-        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+        if f.is_file() and f.name != ".gitkeep" and f.suffix.lower() in SUPPORTED_EXTENSIONS
     )
 
     if not image_files:

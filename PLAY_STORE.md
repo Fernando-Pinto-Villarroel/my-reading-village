@@ -38,7 +38,7 @@ Edit `my_reading_town/pubspec.yaml`:
 
 ```yaml
 name: my_reading_town
-version: 1.0.0+1   # format: version_name+version_code
+version: 1.0.0+1 # format: version_name+version_code
 ```
 
 - `version_name` (e.g., `1.0.0`) is shown to users.
@@ -49,7 +49,7 @@ Edit `my_reading_town/android/app/build.gradle` and set:
 ```gradle
 android {
     defaultConfig {
-        applicationId "com.ferchostudios_dev.my_reading_town"   // CHANGE THIS — must be unique on the Play Store
+        applicationId "com.ferchostudiodev.my_reading_town"   // CHANGE THIS — must be unique on the Play Store
         minSdkVersion 21
         targetSdkVersion 34
         versionCode 1
@@ -58,7 +58,7 @@ android {
 }
 ```
 
-**Important:** `applicationId` must be globally unique. Reverse-domain notation is standard (e.g., `com.fernandopinto.myreadingtown`).
+**Important:** `applicationId` must be globally unique. Reverse-domain notation is standard (e.g., `com.ferchostudiodev.my_reading_town`).
 
 ### Step 2.2 — Generate a Signing Key
 
@@ -170,6 +170,7 @@ Go to **Policy > App content > Target audience and content**:
 ### Step 3.5 — Privacy Policy
 
 You need a Privacy Policy URL. You can:
+
 1. Create a simple one at https://app-privacy-policy-generator.firebaseapp.com/
 2. Host it on GitHub Pages or any simple web server.
 3. Paste the URL in **Policy > App content > Privacy policy**.
@@ -185,6 +186,7 @@ This is critical for the store to work. All products sold with real money must b
 Go to **Monetize > Products > In-app products**.
 
 If this section is greyed out, you may need to:
+
 1. Upload at least one APK/AAB to a testing track first (see Part 5).
 2. Have a valid payment profile linked to your Play Console account.
 
@@ -194,16 +196,17 @@ To set up a payment profile: click your account name > **Payments profile** and 
 
 For each gem pack, click **"Create product"**:
 
-| Product ID     | Name                | Description            | Price    |
-|---------------|---------------------|------------------------|----------|
-| `gems_50`     | 50 Gems             | 50 gems for your town  | $0.99    |
-| `gems_100`    | 100 Gems            | 100 gems for your town | $1.99    |
-| `gems_200`    | 200 Gems            | 200 gems for your town | $3.99    |
-| `gems_500`    | 500 Gems            | 500 gems for your town | $8.99    |
-| `gems_1000`   | 1000 Gems           | 1000 gems for your town| $16.99   |
-| `gems_2000`   | 2000 Gems           | 2000 gems for your town| $29.99   |
+| Product ID  | Name      | Description             | Price  |
+| ----------- | --------- | ----------------------- | ------ |
+| `gems_50`   | 50 Gems   | 50 gems for your town   | $0.99  |
+| `gems_100`  | 100 Gems  | 100 gems for your town  | $1.99  |
+| `gems_200`  | 200 Gems  | 200 gems for your town  | $3.99  |
+| `gems_500`  | 500 Gems  | 500 gems for your town  | $8.99  |
+| `gems_1000` | 1000 Gems | 1000 gems for your town | $16.99 |
+| `gems_2000` | 2000 Gems | 2000 gems for your town | $29.99 |
 
 For each product:
+
 1. Set **Product ID** exactly as shown (must match the `productId` in `store_rules.dart`).
 2. Set **Type** to **"Consumable"** (gems can be bought multiple times).
 3. Set **Status** to **Active**.
@@ -212,13 +215,13 @@ For each product:
 
 ### Step 4.3 — Register Pack Products (Consumable)
 
-| Product ID      | Name          | Description                             | Price    |
-|----------------|---------------|-----------------------------------------|----------|
-| `pack_starter` | Starter Pack  | 50 coins + 30 wood + 10 metal + 1 sandwich | $1.49 |
-| `pack_builder` | Builder Pack  | 100 coins + 100 wood + 50 metal + 2 hammers | $2.99 |
-| `pack_reader`  | Reader Pack   | 200 coins + 50 gems + 3 books + 3 glasses | $4.99  |
-| `pack_town`    | Town Pack     | 500 coins + 200 wood + 100 metal + 100 gems + powerups | $9.99 |
-| `pack_mega`    | Mega Pack     | 1000 coins + 500 wood + 200 metal + 200 gems + 10 of each powerup | $19.99 |
+| Product ID     | Name         | Description                                                       | Price  |
+| -------------- | ------------ | ----------------------------------------------------------------- | ------ |
+| `pack_starter` | Starter Pack | 50 coins + 30 wood + 10 metal + 1 sandwich                        | $1.49  |
+| `pack_builder` | Builder Pack | 100 coins + 100 wood + 50 metal + 2 hammers                       | $2.99  |
+| `pack_reader`  | Reader Pack  | 200 coins + 50 gems + 3 books + 3 glasses                         | $4.99  |
+| `pack_town`    | Town Pack    | 500 coins + 200 wood + 100 metal + 100 gems + powerups            | $9.99  |
+| `pack_mega`    | Mega Pack    | 1000 coins + 500 wood + 200 metal + 200 gems + 10 of each powerup | $19.99 |
 
 All packs are **Consumable** (can be repurchased).
 
@@ -228,41 +231,42 @@ All packs are **Consumable** (can be repurchased).
 
 Species purchases are **Non-Consumable** (bought once; owning a species is permanent).
 
-| Product ID               | Name          | Rarity        | Price   |
-|--------------------------|---------------|---------------|---------|
-| `species_grizzly_bear`   | Grizzly Bear  | Rare          | $1.99   |
-| `species_polar_bear`     | Polar Bear    | Rare          | $1.99   |
-| `species_panda_bear`     | Panda Bear    | Rare          | $1.99   |
-| `species_red_panda`      | Red Panda     | Rare          | $1.99   |
-| `species_sloth`          | Sloth         | Rare          | $1.99   |
-| `species_hedgehog`       | Hedgehog      | Rare          | $1.99   |
-| `species_capybara`       | Capybara      | Rare          | $1.99   |
-| `species_cow`            | Cow           | Rare          | $1.99   |
-| `species_sheep`          | Sheep         | Rare          | $1.99   |
-| `species_bull`           | Bull          | Extraordinary | $4.99   |
-| `species_otter`          | Otter         | Extraordinary | $4.99   |
-| `species_kangaroo`       | Kangaroo      | Extraordinary | $4.99   |
-| `species_reindeer`       | Reindeer      | Extraordinary | $4.99   |
-| `species_ferret`         | Ferret        | Extraordinary | $4.99   |
-| `species_mole`           | Mole          | Extraordinary | $4.99   |
-| `species_bat`            | Bat           | Extraordinary | $4.99   |
-| `species_donkey`         | Donkey        | Extraordinary | $4.99   |
-| `species_turkey`         | Turkey        | Extraordinary | $4.99   |
-| `species_monkey`         | Monkey        | Legendary     | $9.99   |
-| `species_gorilla`        | Gorilla       | Legendary     | $9.99   |
-| `species_zebra`          | Zebra         | Legendary     | $9.99   |
-| `species_horse`          | Horse         | Legendary     | $9.99   |
-| `species_skunk`          | Skunk         | Legendary     | $9.99   |
-| `species_hyena`          | Hyena         | Legendary     | $9.99   |
-| `species_mouse`          | Mouse         | Legendary     | $9.99   |
-| `species_lion`           | Lion          | Godly         | $19.99  |
-| `species_armadillo`      | Armadillo     | Godly         | $19.99  |
-| `species_beaver`         | Beaver        | Godly         | $19.99  |
-| `species_fox`            | Fox           | Godly         | $19.99  |
-| `species_tiger`          | Tiger         | Godly         | $19.99  |
-| `species_leopard`        | Leopard       | Godly         | $19.99  |
+| Product ID             | Name         | Rarity        | Price  |
+| ---------------------- | ------------ | ------------- | ------ |
+| `species_grizzly_bear` | Grizzly Bear | Rare          | $1.99  |
+| `species_polar_bear`   | Polar Bear   | Rare          | $1.99  |
+| `species_panda_bear`   | Panda Bear   | Rare          | $1.99  |
+| `species_red_panda`    | Red Panda    | Rare          | $1.99  |
+| `species_sloth`        | Sloth        | Rare          | $1.99  |
+| `species_hedgehog`     | Hedgehog     | Rare          | $1.99  |
+| `species_capybara`     | Capybara     | Rare          | $1.99  |
+| `species_cow`          | Cow          | Rare          | $1.99  |
+| `species_sheep`        | Sheep        | Rare          | $1.99  |
+| `species_bull`         | Bull         | Extraordinary | $4.99  |
+| `species_otter`        | Otter        | Extraordinary | $4.99  |
+| `species_kangaroo`     | Kangaroo     | Extraordinary | $4.99  |
+| `species_reindeer`     | Reindeer     | Extraordinary | $4.99  |
+| `species_ferret`       | Ferret       | Extraordinary | $4.99  |
+| `species_mole`         | Mole         | Extraordinary | $4.99  |
+| `species_bat`          | Bat          | Extraordinary | $4.99  |
+| `species_donkey`       | Donkey       | Extraordinary | $4.99  |
+| `species_turkey`       | Turkey       | Extraordinary | $4.99  |
+| `species_monkey`       | Monkey       | Legendary     | $9.99  |
+| `species_gorilla`      | Gorilla      | Legendary     | $9.99  |
+| `species_zebra`        | Zebra        | Legendary     | $9.99  |
+| `species_horse`        | Horse        | Legendary     | $9.99  |
+| `species_skunk`        | Skunk        | Legendary     | $9.99  |
+| `species_hyena`        | Hyena        | Legendary     | $9.99  |
+| `species_mouse`        | Mouse        | Legendary     | $9.99  |
+| `species_lion`         | Lion         | Godly         | $19.99 |
+| `species_armadillo`    | Armadillo    | Godly         | $19.99 |
+| `species_beaver`       | Beaver       | Godly         | $19.99 |
+| `species_fox`          | Fox          | Godly         | $19.99 |
+| `species_tiger`        | Tiger        | Godly         | $19.99 |
+| `species_leopard`      | Leopard      | Godly         | $19.99 |
 
 For each product:
+
 1. Set **Product ID** exactly as shown (must match the `id` field in `SpeciesRules.allSpecies` in `lib/domain/rules/species_rules.dart`).
 2. Set **Type** to **"Non-consumable"** (species cannot be bought twice — the app hides already-owned species from the store tab).
 3. Set **Status** to **Active**.
@@ -284,6 +288,7 @@ static const bool playStore = false;  // simulation mode
 ```
 
 When `playStore = false`:
+
 - Tapping buy buttons in the Gems and Packs tabs instantly grants the items.
 - A dialog shows "Simulated Purchase — no real money charged".
 - No Google account or Play Console needed.
@@ -326,6 +331,7 @@ To test purchases without spending real money:
 ### Step 5.5 — Closed/Open Testing
 
 After internal testing:
+
 1. **Closed Testing (Alpha)**: Small group of real users.
 2. **Open Testing (Beta)**: Anyone can join.
 3. Move through these stages before production.
@@ -358,6 +364,7 @@ This is optional for a small indie app but recommended to prevent cheating.
 ### Step 7.2 — Rollout Percentage
 
 You can start with a partial rollout (e.g., 10% of users) to catch issues before full release:
+
 - Start at 10% → 25% → 50% → 100% as you gain confidence.
 
 ### Step 7.3 — Review Time
@@ -377,6 +384,7 @@ Google typically reviews new apps in **1–3 days**. After approval, your app go
 ### Updating the App
 
 Every update requires:
+
 1. Incrementing `versionCode` (e.g., `+2`, `+3`) in `pubspec.yaml`.
 2. Building a new AAB.
 3. Uploading to Play Console.

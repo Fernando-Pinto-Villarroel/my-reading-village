@@ -97,7 +97,7 @@ def process_batch(input_dir: Path, output_dir: Path, target_color: tuple[int, in
 
     image_files = sorted(
         f for f in input_dir.iterdir()
-        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+        if f.is_file() and f.name != ".gitkeep" and f.suffix.lower() in SUPPORTED_EXTENSIONS
     )
 
     if not image_files:

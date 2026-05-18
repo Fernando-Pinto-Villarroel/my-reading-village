@@ -1,0 +1,46 @@
+ries-lean-startup:
+    type: Book
+    title: The Lean Startup
+    author: Ries, Eric
+    publisher: Crown Business
+    date: 2011
+    isbn: "978-0307887894"
+
+freddy-vega-reading:
+    type: Web
+    title: "Por qué dejamos de leer"
+    author: Vega, Freddy
+    url: https://www.youtube.com/watch?v=5X26m52lMwU
+    date: 2020
+
+eyal-hooked:
+    type: Book
+    title: "Hooked: How to Build Habit-Forming Products"
+    author: Eyal, Nir
+    publisher: Portfolio/Penguin
+    date: 2014
+    isbn: "978-1591847786"
+
+duhigg-habit:
+    type: Book
+    title: The Power of Habit
+    author: Duhigg, Charles
+    publisher: Random House
+    date: 2012
+    isbn: "978-0812981605"
+
+kapp-gamification:
+    type: Book
+    title: "The Gamification of Learning and Instruction: Game-based Methods and Strategies for Training and Education"
+    author: Kapp, Karl M.
+    publisher: Pfeiffer
+    date: 2012
+    isbn: "978-1118096345"
+
+nea-reading:
+    type: Report
+    title: "To Read or Not to Read: A Question of National Consequence"
+    author: "National Endowment for the Arts"
+    publisher: National Endowment for the Arts
+    date: 2007
+    url: https://www.arts.gov/sites/default/files/ToRead.pdf
