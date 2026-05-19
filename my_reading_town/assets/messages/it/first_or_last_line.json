@@ -130,15 +130,15 @@
       "book": "Cent'anni di solitudine",
       "is_first": false
     },
-    { "line": "Last night I dreamt I went to Manderley again.", "book": "Rebecca", "is_first": true },
-    { "line": "Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.", "book": "The Trial", "is_first": true },
-    { "line": "It was a pleasure to burn.", "book": "Fahrenheit 451", "is_first": true },
-    { "line": "As Gregor Samsa awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.", "book": "The Metamorphosis", "is_first": true },
-    { "line": "There was no possibility of taking a walk that day.", "book": "Jane Eyre", "is_first": true },
-    { "line": "It was love at first sight.", "book": "Catch-22", "is_first": true },
-    { "line": "For a long time, I went to bed early.", "book": "In Search of Lost Time", "is_first": true },
-    { "line": "After a while I went out and left the hospital and walked back to the hotel in the rain.", "book": "A Farewell to Arms", "is_first": false },
-    { "line": "He turned out the light and went into Jem's room. He would be there all night, and he would be there when Jem waked up in the morning.", "book": "To Kill a Mockingbird", "is_first": false },
-    { "line": "All was well.", "book": "Harry Potter and the Deathly Hallows", "is_first": false }
+    { "line": "Stanotte ho sognato di essere tornata a Manderley.", "book": "Rebecca", "is_first": true },
+    { "line": "Qualcuno doveva aver calunniato Josef K., perché una mattina, senza che avesse fatto nulla di male, fu arrestato.", "book": "Il Processo", "is_first": true },
+    { "line": "Che piacere bruciare.", "book": "Fahrenheit 451", "is_first": true },
+    { "line": "Quando Gregor Samsa si svegliò un mattino da sogni agitati, si trovò trasformato nel suo letto in un enorme insetto.", "book": "La Metamorfosi", "is_first": true },
+    { "line": "Quel giorno non era possibile fare una passeggiata.", "book": "Jane Eyre", "is_first": true },
+    { "line": "Fu amore a prima vista.", "book": "Comma 22", "is_first": true },
+    { "line": "Per molto tempo sono andato a letto presto.", "book": "Alla ricerca del tempo perduto", "is_first": true },
+    { "line": "Dopo un po' uscii e lasciai l'ospedale e tornai all'hotel sotto la pioggia.", "book": "Addio alle armi", "is_first": false },
+    { "line": "Spense la luce e andò nella stanza di Jem. Sarebbe stato lì tutta la notte, e sarebbe stato lì quando Jem si fosse svegliato al mattino.", "book": "Il buio oltre la siepe", "is_first": false },
+    { "line": "Era tutto a posto.", "book": "Harry Potter e i Doni della Morte", "is_first": false }
   ]
 }

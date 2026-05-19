@@ -130,15 +130,55 @@
       "book": "Cent ans de solitude",
       "is_first": false
     },
-    { "line": "Last night I dreamt I went to Manderley again.", "book": "Rebecca", "is_first": true },
-    { "line": "Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.", "book": "The Trial", "is_first": true },
-    { "line": "It was a pleasure to burn.", "book": "Fahrenheit 451", "is_first": true },
-    { "line": "As Gregor Samsa awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.", "book": "The Metamorphosis", "is_first": true },
-    { "line": "There was no possibility of taking a walk that day.", "book": "Jane Eyre", "is_first": true },
-    { "line": "It was love at first sight.", "book": "Catch-22", "is_first": true },
-    { "line": "For a long time, I went to bed early.", "book": "In Search of Lost Time", "is_first": true },
-    { "line": "After a while I went out and left the hospital and walked back to the hotel in the rain.", "book": "A Farewell to Arms", "is_first": false },
-    { "line": "He turned out the light and went into Jem's room. He would be there all night, and he would be there when Jem waked up in the morning.", "book": "To Kill a Mockingbird", "is_first": false },
-    { "line": "All was well.", "book": "Harry Potter and the Deathly Hallows", "is_first": false }
+    {
+      "line": "La nuit dernière, j'ai rêvé que je retournais à Manderley.",
+      "book": "Rebecca",
+      "is_first": true
+    },
+    {
+      "line": "Quelqu'un avait dû calomnier Josef K., car un matin, sans avoir rien fait de mal, il fut arrêté.",
+      "book": "Le Procès",
+      "is_first": true
+    },
+    {
+      "line": "C'était un plaisir de brûler.",
+      "book": "Fahrenheit 451",
+      "is_first": true
+    },
+    {
+      "line": "Comme Gregor Samsa s'éveillait un matin au sortir de rêves agités, il se retrouva dans son lit transformé en un monstrueux insecte.",
+      "book": "La Métamorphose",
+      "is_first": true
+    },
+    {
+      "line": "Ce jour-là, il était impossible de se promener.",
+      "book": "Jane Eyre",
+      "is_first": true
+    },
+    {
+      "line": "Ce fut le coup de foudre.",
+      "book": "Catch-22",
+      "is_first": true
+    },
+    {
+      "line": "Longtemps, je me suis couché de bonne heure.",
+      "book": "À la recherche du temps perdu",
+      "is_first": true
+    },
+    {
+      "line": "Au bout d'un moment, je sortis, quittai l'hôpital et rentrai à l'hôtel sous la pluie.",
+      "book": "L'Adieu aux armes",
+      "is_first": false
+    },
+    {
+      "line": "Il éteignit la lumière et alla dans la chambre de Jem. Il serait là toute la nuit, et il serait là quand Jem se réveillerait le matin.",
+      "book": "Ne tirez pas sur l'oiseau moqueur",
+      "is_first": false
+    },
+    {
+      "line": "Tout allait bien.",
+      "book": "Harry Potter et les Reliques de la Mort",
+      "is_first": false
+    }
   ]
 }

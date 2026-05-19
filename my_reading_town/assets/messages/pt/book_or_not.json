@@ -135,15 +135,27 @@
       "title": "O Jardim de Cerâmica",
       "is_real": false
     },
-    { "title": "Beloved", "is_real": true, "author": "Toni Morrison" },
-    { "title": "The God of Small Things", "is_real": true, "author": "Arundhati Roy" },
-    { "title": "The Kite Runner", "is_real": true, "author": "Khaled Hosseini" },
-    { "title": "The Road", "is_real": true, "author": "Cormac McCarthy" },
-    { "title": "Norwegian Wood", "is_real": true, "author": "Haruki Murakami" },
-    { "title": "The Emerald Tower Chronicles", "is_real": false },
-    { "title": "Songs of the Forgotten Monastery", "is_real": false },
-    { "title": "Whispers at the Edge of Dawn", "is_real": false },
-    { "title": "The Velvet Cartographer", "is_real": false },
-    { "title": "Tales from the Stone Bridge", "is_real": false }
+    { "title": "Amada", "is_real": true, "author": "Toni Morrison" },
+    {
+      "title": "O Deus das Pequenas Coisas",
+      "is_real": true,
+      "author": "Arundhati Roy"
+    },
+    {
+      "title": "O Caçador de Pipas",
+      "is_real": true,
+      "author": "Khaled Hosseini"
+    },
+    { "title": "A Estrada", "is_real": true, "author": "Cormac McCarthy" },
+    {
+      "title": "Bosque Norueguês",
+      "is_real": true,
+      "author": "Haruki Murakami"
+    },
+    { "title": "As Crônicas da Torre Esmeralda", "is_real": false },
+    { "title": "Canções do Mosteiro Esquecido", "is_real": false },
+    { "title": "Sussurros à Beira do Amanhecer", "is_real": false },
+    { "title": "O Cartógrafo de Veludo", "is_real": false },
+    { "title": "Contos da Ponte de Pedra", "is_real": false }
   ]
 }

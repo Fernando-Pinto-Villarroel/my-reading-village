@@ -567,6 +567,7 @@
   "store_species_title": "Espécies Disponíveis Hoje",
   "store_species_refresh_in": "Atualiza em {time}",
   "store_species_all_unlocked": "Você desbloqueou todas as espécies disponíveis!",
+  "store_species_manual_refresh": "Atualizar agora",
   "store_species_buy": "Comprar por {price}",
   "store_species_refresh": "Atualiza em {time}",
   "store_species_no_available": "Você desbloqueou todas as espécies!",

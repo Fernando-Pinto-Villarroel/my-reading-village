@@ -130,15 +130,15 @@
       "book": "Cien años de soledad",
       "is_first": false
     },
-    { "line": "Last night I dreamt I went to Manderley again.", "book": "Rebecca", "is_first": true },
-    { "line": "Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.", "book": "The Trial", "is_first": true },
-    { "line": "It was a pleasure to burn.", "book": "Fahrenheit 451", "is_first": true },
-    { "line": "As Gregor Samsa awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.", "book": "The Metamorphosis", "is_first": true },
-    { "line": "There was no possibility of taking a walk that day.", "book": "Jane Eyre", "is_first": true },
-    { "line": "It was love at first sight.", "book": "Catch-22", "is_first": true },
-    { "line": "For a long time, I went to bed early.", "book": "In Search of Lost Time", "is_first": true },
-    { "line": "After a while I went out and left the hospital and walked back to the hotel in the rain.", "book": "A Farewell to Arms", "is_first": false },
-    { "line": "He turned out the light and went into Jem's room. He would be there all night, and he would be there when Jem waked up in the morning.", "book": "To Kill a Mockingbird", "is_first": false },
-    { "line": "All was well.", "book": "Harry Potter and the Deathly Hallows", "is_first": false }
+    { "line": "Anoche soñé que volvía a Manderley.", "book": "Rebecca", "is_first": true },
+    { "line": "Alguien debió de haber calumniado a Josef K., porque una mañana fue detenido sin haber hecho nada malo.", "book": "El Proceso", "is_first": true },
+    { "line": "Qué placer era encender el fuego.", "book": "Fahrenheit 451", "is_first": true },
+    { "line": "Al despertar Gregorio Samsa una mañana, tras un sueño intranquilo, se encontró en su cama convertido en un monstruoso insecto.", "book": "La Metamorfosis", "is_first": true },
+    { "line": "Aquel día no había posibilidad de dar un paseo.", "book": "Jane Eyre", "is_first": true },
+    { "line": "Fue amor a primera vista.", "book": "Trampa 22", "is_first": true },
+    { "line": "Durante mucho tiempo me acosté temprano.", "book": "En busca del tiempo perdido", "is_first": true },
+    { "line": "Al cabo de un rato salí y abandoné el hospital y regresé caminando al hotel bajo la lluvia.", "book": "Adiós a las armas", "is_first": false },
+    { "line": "Apagó la luz y entró en el cuarto de Jem. Estaría allí toda la noche, y seguiría allí cuando Jem se despertara por la mañana.", "book": "Matar a un ruiseñor", "is_first": false },
+    { "line": "Todo estaba bien.", "book": "Harry Potter y las Reliquias de la Muerte", "is_first": false }
   ]
 }

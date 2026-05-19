@@ -136,14 +136,26 @@
       "is_real": false
     },
     { "title": "Beloved", "is_real": true, "author": "Toni Morrison" },
-    { "title": "The God of Small Things", "is_real": true, "author": "Arundhati Roy" },
-    { "title": "The Kite Runner", "is_real": true, "author": "Khaled Hosseini" },
-    { "title": "The Road", "is_real": true, "author": "Cormac McCarthy" },
-    { "title": "Norwegian Wood", "is_real": true, "author": "Haruki Murakami" },
-    { "title": "The Emerald Tower Chronicles", "is_real": false },
-    { "title": "Songs of the Forgotten Monastery", "is_real": false },
-    { "title": "Whispers at the Edge of Dawn", "is_real": false },
-    { "title": "The Velvet Cartographer", "is_real": false },
-    { "title": "Tales from the Stone Bridge", "is_real": false }
+    {
+      "title": "Le Dieu des Petits Riens",
+      "is_real": true,
+      "author": "Arundhati Roy"
+    },
+    {
+      "title": "Les Cerfs-volants de Kaboul",
+      "is_real": true,
+      "author": "Khaled Hosseini"
+    },
+    { "title": "La Route", "is_real": true, "author": "Cormac McCarthy" },
+    {
+      "title": "La Ballade de l'impossible",
+      "is_real": true,
+      "author": "Haruki Murakami"
+    },
+    { "title": "Les Chroniques de la Tour d'Émeraude", "is_real": false },
+    { "title": "Chansons du Monastère Oublié", "is_real": false },
+    { "title": "Murmures au Bord de l'Aube", "is_real": false },
+    { "title": "Le Cartographe de Velours", "is_real": false },
+    { "title": "Contes du Pont de Pierre", "is_real": false }
   ]
 }

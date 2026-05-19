@@ -200,15 +200,15 @@
       "correct_role": "Arquero Elfo",
       "wrong_roles": ["Mago", "Rey", "Hobbit"]
     },
-    { "character": "Quasimodo", "correct_role": "Cathedral Bell-Ringer", "wrong_roles": ["Prisoner", "Monk", "Soldier"] },
-    { "character": "Cyrano de Bergerac", "correct_role": "Poetic Swordsman", "wrong_roles": ["Knight", "General", "Playwright"] },
-    { "character": "Robinson Crusoe", "correct_role": "Shipwrecked Castaway", "wrong_roles": ["Pirate", "Explorer", "Sailor"] },
-    { "character": "Gulliver", "correct_role": "Surgeon Turned Traveler", "wrong_roles": ["Pirate", "Adventurer", "Spy"] },
-    { "character": "The Count of Monte Cristo", "correct_role": "Wrongfully Imprisoned Nobleman", "wrong_roles": ["King", "Pirate", "Spy"] },
-    { "character": "The Phantom of the Opera", "correct_role": "Masked Musician", "wrong_roles": ["Ghost", "Wizard", "Spy"] },
-    { "character": "Hamlet", "correct_role": "Brooding Danish Prince", "wrong_roles": ["King", "Knight", "Scholar"] },
-    { "character": "Macbeth", "correct_role": "Ambitious Scottish General", "wrong_roles": ["King", "Wizard", "Spy"] },
-    { "character": "Jo March", "correct_role": "Aspiring Young Writer", "wrong_roles": ["Princess", "Teacher", "Governess"] },
-    { "character": "Hercule Poirot", "correct_role": "Eccentric Belgian Detective", "wrong_roles": ["Inspector", "Spy", "Judge"] }
+    { "character": "Quasimodo", "correct_role": "Campanero de la Catedral", "wrong_roles": ["Prisionero", "Monje", "Soldado"] },
+    { "character": "Cyrano de Bergerac", "correct_role": "Espadachín Poético", "wrong_roles": ["Caballero", "General", "Dramaturgo"] },
+    { "character": "Robinson Crusoe", "correct_role": "Náufrago Varado", "wrong_roles": ["Pirata", "Explorador", "Marinero"] },
+    { "character": "Gulliver", "correct_role": "Cirujano Convertido en Viajero", "wrong_roles": ["Pirata", "Aventurero", "Espía"] },
+    { "character": "El Conde de Montecristo", "correct_role": "Noble Encarcelado Injustamente", "wrong_roles": ["Rey", "Pirata", "Espía"] },
+    { "character": "El Fantasma de la Ópera", "correct_role": "Músico Enmascarado", "wrong_roles": ["Fantasma", "Mago", "Espía"] },
+    { "character": "Hamlet", "correct_role": "Sombrío Príncipe Danés", "wrong_roles": ["Rey", "Caballero", "Erudito"] },
+    { "character": "Macbeth", "correct_role": "Ambicioso General Escocés", "wrong_roles": ["Rey", "Mago", "Espía"] },
+    { "character": "Jo March", "correct_role": "Joven Escritora Aspirante", "wrong_roles": ["Princesa", "Maestra", "Institutriz"] },
+    { "character": "Hercule Poirot", "correct_role": "Excéntrico Detective Belga", "wrong_roles": ["Inspector", "Espía", "Juez"] }
   ]
 }

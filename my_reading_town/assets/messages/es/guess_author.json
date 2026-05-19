@@ -290,15 +290,15 @@
         "William Faulkner"
       ]
     },
-    { "book": "Invisible Cities", "correct_author": "Italo Calvino", "wrong_authors": ["Umberto Eco", "Paulo Coelho", "Jorge Luis Borges"] },
-    { "book": "The God of Small Things", "correct_author": "Arundhati Roy", "wrong_authors": ["Salman Rushdie", "Jhumpa Lahiri", "Kazuo Ishiguro"] },
-    { "book": "Beloved", "correct_author": "Toni Morrison", "wrong_authors": ["Maya Angelou", "Alice Walker", "Zora Neale Hurston"] },
-    { "book": "The Kite Runner", "correct_author": "Khaled Hosseini", "wrong_authors": ["Rumi", "Naguib Mahfouz", "Orhan Pamuk"] },
-    { "book": "Norwegian Wood", "correct_author": "Haruki Murakami", "wrong_authors": ["Yasunari Kawabata", "Kenzaburo Oe", "Junichiro Tanizaki"] },
+    { "book": "Las Ciudades Invisibles", "correct_author": "Italo Calvino", "wrong_authors": ["Umberto Eco", "Paulo Coelho", "Jorge Luis Borges"] },
+    { "book": "El Dios de las Pequeñas Cosas", "correct_author": "Arundhati Roy", "wrong_authors": ["Salman Rushdie", "Jhumpa Lahiri", "Kazuo Ishiguro"] },
+    { "book": "Amada", "correct_author": "Toni Morrison", "wrong_authors": ["Maya Angelou", "Alice Walker", "Zora Neale Hurston"] },
+    { "book": "Cometas en el Cielo", "correct_author": "Khaled Hosseini", "wrong_authors": ["Rumi", "Naguib Mahfouz", "Orhan Pamuk"] },
+    { "book": "Tokio Blues", "correct_author": "Haruki Murakami", "wrong_authors": ["Yasunari Kawabata", "Kenzaburo Oe", "Junichiro Tanizaki"] },
     { "book": "Rayuela", "correct_author": "Julio Cortázar", "wrong_authors": ["Jorge Luis Borges", "Mario Vargas Llosa", "Carlos Fuentes"] },
     { "book": "Pedro Páramo", "correct_author": "Juan Rulfo", "wrong_authors": ["Agustín Yáñez", "Mariano Azuela", "Carlos Fuentes"] },
-    { "book": "Captain Alatriste", "correct_author": "Arturo Pérez-Reverte", "wrong_authors": ["Carlos Ruiz Zafón", "Juan Marsé", "Javier Cercas"] },
-    { "book": "The House of the Spirits", "correct_author": "Isabel Allende", "wrong_authors": ["Gabriel García Márquez", "Laura Esquivel", "Clarice Lispector"] },
+    { "book": "El Capitán Alatriste", "correct_author": "Arturo Pérez-Reverte", "wrong_authors": ["Carlos Ruiz Zafón", "Juan Marsé", "Javier Cercas"] },
+    { "book": "La Casa de los Espíritus", "correct_author": "Isabel Allende", "wrong_authors": ["Gabriel García Márquez", "Laura Esquivel", "Clarice Lispector"] },
     { "book": "El Señor Presidente", "correct_author": "Miguel Ángel Asturias", "wrong_authors": ["Alejo Carpentier", "Rómulo Gallegos", "Carlos Fuentes"] }
   ]
 }

@@ -135,15 +135,15 @@
       "title": "Il Giardino di Ceramica",
       "is_real": false
     },
-    { "title": "Beloved", "is_real": true, "author": "Toni Morrison" },
-    { "title": "The God of Small Things", "is_real": true, "author": "Arundhati Roy" },
-    { "title": "The Kite Runner", "is_real": true, "author": "Khaled Hosseini" },
-    { "title": "The Road", "is_real": true, "author": "Cormac McCarthy" },
-    { "title": "Norwegian Wood", "is_real": true, "author": "Haruki Murakami" },
-    { "title": "The Emerald Tower Chronicles", "is_real": false },
-    { "title": "Songs of the Forgotten Monastery", "is_real": false },
-    { "title": "Whispers at the Edge of Dawn", "is_real": false },
-    { "title": "The Velvet Cartographer", "is_real": false },
-    { "title": "Tales from the Stone Bridge", "is_real": false }
+    { "title": "Amatissima", "is_real": true, "author": "Toni Morrison" },
+    { "title": "Il Dio delle Piccole Cose", "is_real": true, "author": "Arundhati Roy" },
+    { "title": "Il Cacciatore di Aquiloni", "is_real": true, "author": "Khaled Hosseini" },
+    { "title": "La Strada", "is_real": true, "author": "Cormac McCarthy" },
+    { "title": "Norwegian Wood (Tokyo Blues)", "is_real": true, "author": "Haruki Murakami" },
+    { "title": "Le Cronache della Torre Smeraldo", "is_real": false },
+    { "title": "Canzoni del Monastero Dimenticato", "is_real": false },
+    { "title": "Sussurri all'Orizzonte dell'Alba", "is_real": false },
+    { "title": "Il Cartografo di Velluto", "is_real": false },
+    { "title": "Racconti dal Ponte di Pietra", "is_real": false }
   ]
 }

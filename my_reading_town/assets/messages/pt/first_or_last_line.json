@@ -130,15 +130,15 @@
       "book": "Cem anos de solidão",
       "is_first": false
     },
-    { "line": "Last night I dreamt I went to Manderley again.", "book": "Rebecca", "is_first": true },
-    { "line": "Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.", "book": "The Trial", "is_first": true },
-    { "line": "It was a pleasure to burn.", "book": "Fahrenheit 451", "is_first": true },
-    { "line": "As Gregor Samsa awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.", "book": "The Metamorphosis", "is_first": true },
-    { "line": "There was no possibility of taking a walk that day.", "book": "Jane Eyre", "is_first": true },
-    { "line": "It was love at first sight.", "book": "Catch-22", "is_first": true },
-    { "line": "For a long time, I went to bed early.", "book": "In Search of Lost Time", "is_first": true },
-    { "line": "After a while I went out and left the hospital and walked back to the hotel in the rain.", "book": "A Farewell to Arms", "is_first": false },
-    { "line": "He turned out the light and went into Jem's room. He would be there all night, and he would be there when Jem waked up in the morning.", "book": "To Kill a Mockingbird", "is_first": false },
-    { "line": "All was well.", "book": "Harry Potter and the Deathly Hallows", "is_first": false }
+    { "line": "Na noite passada, sonhei que voltava a Manderley.", "book": "Rebecca", "is_first": true },
+    { "line": "Alguém devia ter caluniado Josef K., pois uma manhã ele foi detido sem ter feito nada de errado.", "book": "O Processo", "is_first": true },
+    { "line": "Era um prazer queimar.", "book": "Fahrenheit 451", "is_first": true },
+    { "line": "Quando Gregor Samsa acordou uma manhã de sonhos perturbados, encontrou-se em sua cama transformado num enorme inseto.", "book": "A Metamorfose", "is_first": true },
+    { "line": "Naquele dia não havia possibilidade de dar um passeio.", "book": "Jane Eyre", "is_first": true },
+    { "line": "Foi amor à primeira vista.", "book": "Ardil-22", "is_first": true },
+    { "line": "Por muito tempo fui me deitar cedo.", "book": "Em Busca do Tempo Perdido", "is_first": true },
+    { "line": "Depois de um tempo, saí e deixei o hospital e voltei caminhando ao hotel sob a chuva.", "book": "Adeus às Armas", "is_first": false },
+    { "line": "Apagou a luz e foi para o quarto de Jem. Estaria lá a noite toda, e estaria lá quando Jem acordasse de manhã.", "book": "O Sol é para Todos", "is_first": false },
+    { "line": "Tudo estava bem.", "book": "Harry Potter e as Relíquias da Morte", "is_first": false }
   ]
 }
