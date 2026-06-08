@@ -1,320 +1,558 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Reading Town — Proyección de ROI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --lavender:   #c9b8f5; --lavender-l: #ede7fc; --lavender-d: #7b5ea7;
-      --mint:       #a8e6cf; --mint-l:     #dff5ec; --mint-d:     #3d9970;
-      --peach:      #ffd3a5; --peach-l:    #fff0da; --peach-d:    #c77c2a;
-      --rose:       #ffb3c6; --rose-l:     #ffe4ec; --rose-d:     #b5385a;
-      --sky:        #a8d8f0; --sky-l:      #dff1fb; --sky-d:      #2e7ea8;
-      --cream: #fdfaf5; --sand: #f5efe0;
-      --text-dark: #2d2a3e; --text-mid: #5a5475; --text-soft: #9490a8;
-      --white: #ffffff;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reading Village — Proyección de ROI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --lavender: #c9b8f5;
+        --lavender-l: #ede7fc;
+        --lavender-d: #7b5ea7;
+        --mint: #a8e6cf;
+        --mint-l: #dff5ec;
+        --mint-d: #3d9970;
+        --peach: #ffd3a5;
+        --peach-l: #fff0da;
+        --peach-d: #c77c2a;
+        --rose: #ffb3c6;
+        --rose-l: #ffe4ec;
+        --rose-d: #b5385a;
+        --sky: #a8d8f0;
+        --sky-l: #dff1fb;
+        --sky-d: #2e7ea8;
+        --cream: #fdfaf5;
+        --sand: #f5efe0;
+        --text-dark: #2d2a3e;
+        --text-mid: #5a5475;
+        --text-soft: #9490a8;
+        --white: #ffffff;
+      }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    body {
-      font-family: "Nunito Sans", sans-serif;
-      background: var(--cream);
-      color: var(--text-dark);
-      min-height: 100vh;
-      padding: 40px 24px;
-      position: relative;
-      overflow-x: hidden;
-    }
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        background: var(--cream);
+        color: var(--text-dark);
+        min-height: 100vh;
+        padding: 40px 24px;
+        position: relative;
+        overflow-x: hidden;
+      }
 
-    body::before {
-      content: "";
-      position: fixed; inset: 0;
-      background-image: radial-gradient(circle, #c9b8f530 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events: none; z-index: 0;
-    }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          #c9b8f530 1px,
+          transparent 1px
+        );
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+      }
 
-    .page { max-width: 1140px; margin: 0 auto; position: relative; z-index: 1; }
+      .page {
+        max-width: 1140px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
 
-    /* ── Header ────────────────────────────────────────────── */
-    .header { text-align: center; margin-bottom: 32px; }
+      /* ── Header ────────────────────────────────────────────── */
+      .header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
 
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--mint-l); color: var(--mint-d);
-      border: 1.5px solid var(--mint); border-radius: 99px;
-      font-family: "Nunito", sans-serif; font-size: 12px; font-weight: 700;
-      letter-spacing: 0.5px; text-transform: uppercase;
-      padding: 5px 16px; margin-bottom: 18px;
-    }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--mint-l);
+        color: var(--mint-d);
+        border: 1.5px solid var(--mint);
+        border-radius: 99px;
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 5px 16px;
+        margin-bottom: 18px;
+      }
 
-    h1 {
-      font-family: "Nunito", sans-serif;
-      font-size: clamp(24px, 4vw, 36px);
-      font-weight: 900; line-height: 1.15;
-      color: var(--text-dark); margin-bottom: 12px;
-    }
+      h1 {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 900;
+        line-height: 1.15;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+      }
 
-    h1 span { color: var(--mint-d); position: relative; }
-    h1 span::after {
-      content: ""; position: absolute; bottom: 2px; left: 0; right: 0;
-      height: 6px; background: var(--mint); border-radius: 99px; z-index: -1; opacity: 0.6;
-    }
+      h1 span {
+        color: var(--mint-d);
+        position: relative;
+      }
+      h1 span::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: var(--mint);
+        border-radius: 99px;
+        z-index: -1;
+        opacity: 0.6;
+      }
 
-    .header-sub {
-      font-size: 14.5px; color: var(--text-mid);
-      max-width: 580px; margin: 0 auto; line-height: 1.6;
-    }
+      .header-sub {
+        font-size: 14.5px;
+        color: var(--text-mid);
+        max-width: 580px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
 
-    /* ── Chart card ─────────────────────────────────────────── */
-    .chart-card {
-      background: var(--white);
-      border-radius: 24px; border: 1.5px solid var(--sand);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.05);
-      overflow: hidden;
-    }
+      /* ── Chart card ─────────────────────────────────────────── */
+      .chart-card {
+        background: var(--white);
+        border-radius: 24px;
+        border: 1.5px solid var(--sand);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
 
-    .chart-head {
-      display: flex; flex-wrap: wrap;
-      justify-content: space-between; align-items: flex-end; gap: 16px;
-      padding: 22px 28px 16px;
-      border-bottom: 2px dashed var(--sand);
-    }
+      .chart-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        padding: 22px 28px 16px;
+        border-bottom: 2px dashed var(--sand);
+      }
 
-    .chart-title {
-      font-family: "Nunito", sans-serif; font-size: 17px;
-      font-weight: 900; color: var(--text-dark);
-    }
+      .chart-title {
+        font-family: "Nunito", sans-serif;
+        font-size: 17px;
+        font-weight: 900;
+        color: var(--text-dark);
+      }
 
-    .chart-sub { font-size: 12px; color: var(--text-mid); margin-top: 4px; }
+      .chart-sub {
+        font-size: 12px;
+        color: var(--text-mid);
+        margin-top: 4px;
+      }
 
-    .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+      .chart-legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-    .lg-item {
-      display: flex; align-items: center; gap: 6px;
-      font-family: "Nunito", sans-serif; font-size: 11.5px; font-weight: 700;
-      color: var(--text-mid);
-    }
+      .lg-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Nunito", sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--text-mid);
+      }
 
-    .lg-swatch { width: 20px; height: 3px; border-radius: 99px; flex-shrink: 0; }
-    .lg-swatch.dashed {
-      background-image: linear-gradient(to right, currentColor 55%, transparent 55%);
-      background-size: 7px 2px; background-repeat: repeat-x;
-      background-position: center; background-color: transparent !important;
-    }
+      .lg-swatch {
+        width: 20px;
+        height: 3px;
+        border-radius: 99px;
+        flex-shrink: 0;
+      }
+      .lg-swatch.dashed {
+        background-image: linear-gradient(
+          to right,
+          currentColor 55%,
+          transparent 55%
+        );
+        background-size: 7px 2px;
+        background-repeat: repeat-x;
+        background-position: center;
+        background-color: transparent !important;
+      }
 
-    /* ── Chart body: SVG + right panel ─────────────────────── */
-    .chart-layout { display: flex; align-items: stretch; }
+      /* ── Chart body: SVG + right panel ─────────────────────── */
+      .chart-layout {
+        display: flex;
+        align-items: stretch;
+      }
 
-    .chart-svg-wrap {
-      flex: 1; min-width: 0; overflow-x: auto;
-      padding: 18px 0 14px 18px;
-    }
+      .chart-svg-wrap {
+        flex: 1;
+        min-width: 0;
+        overflow-x: auto;
+        padding: 18px 0 14px 18px;
+      }
 
-    .chart-svg { width: 100%; min-width: 580px; height: auto; display: block; }
+      .chart-svg {
+        width: 100%;
+        min-width: 580px;
+        height: auto;
+        display: block;
+      }
 
-    /* ── Right panel ────────────────────────────────────────── */
-    .right-panel {
-      width: 290px; flex-shrink: 0;
-      border-left: 1.5px solid var(--sand);
-      display: flex; flex-direction: column;
-    }
+      /* ── Right panel ────────────────────────────────────────── */
+      .right-panel {
+        width: 290px;
+        flex-shrink: 0;
+        border-left: 1.5px solid var(--sand);
+        display: flex;
+        flex-direction: column;
+      }
 
-    .panel-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 48fr 52fr;
-      flex: 1;
-    }
+      .panel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 48fr 52fr;
+        flex: 1;
+      }
 
-    .panel-cell {
-      padding: 16px 14px 12px;
-      display: flex; flex-direction: column; gap: 6px;
-    }
+      .panel-cell {
+        padding: 16px 14px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
 
-    .panel-cell:nth-child(1),
-    .panel-cell:nth-child(3) { border-right: 1px solid var(--sand); }
+      .panel-cell:nth-child(1),
+      .panel-cell:nth-child(3) {
+        border-right: 1px solid var(--sand);
+      }
 
-    .panel-cell:nth-child(1),
-    .panel-cell:nth-child(2) { border-bottom: 1px solid var(--sand); }
+      .panel-cell:nth-child(1),
+      .panel-cell:nth-child(2) {
+        border-bottom: 1px solid var(--sand);
+      }
 
-    .cell-header { display: flex; align-items: center; gap: 7px; }
+      .cell-header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
 
-    .cell-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+      .cell-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
 
-    .cell-name {
-      font-family: "Nunito", sans-serif; font-size: 11px; font-weight: 800;
-      color: var(--text-dark); line-height: 1.2;
-    }
+      .cell-name {
+        font-family: "Nunito", sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text-dark);
+        line-height: 1.2;
+      }
 
-    .cell-rows { display: flex; flex-direction: column; gap: 4px; }
+      .cell-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-    .cell-row {
-      display: flex; justify-content: center;
-      align-items: baseline; gap: 8px;
-    }
+      .cell-row {
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: 8px;
+      }
 
-    .cell-m {
-      font-family: "Nunito Sans", sans-serif; font-size: 9px; font-weight: 600;
-      color: var(--text-soft); min-width: 26px; text-align: right;
-    }
+      .cell-m {
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--text-soft);
+        min-width: 26px;
+        text-align: right;
+      }
 
-    .cell-v {
-      font-family: "Nunito", sans-serif; font-size: 9.5px; font-weight: 800;
-      min-width: 34px; text-align: left;
-    }
+      .cell-v {
+        font-family: "Nunito", sans-serif;
+        font-size: 9.5px;
+        font-weight: 800;
+        min-width: 34px;
+        text-align: left;
+      }
 
-    /* ── SVG helpers ────────────────────────────────────────── */
-    .axis-label {
-      font-family: "Nunito", sans-serif; font-size: 11px;
-      font-weight: 700; fill: var(--text-soft);
-    }
-    .axis-tick {
-      font-family: "Nunito Sans", sans-serif; font-size: 10.5px;
-      font-weight: 600; fill: var(--text-soft);
-    }
-    .q-label {
-      font-family: "Nunito", sans-serif; font-size: 9.5px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.5px; text-anchor: middle;
-    }
-    .grid-line  { stroke: var(--sand); stroke-width: 1; stroke-dasharray: 3 4; }
-    .baseline   { stroke: var(--text-soft); stroke-width: 1.5; }
+      /* ── SVG helpers ────────────────────────────────────────── */
+      .axis-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        fill: var(--text-soft);
+      }
+      .axis-tick {
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 10.5px;
+        font-weight: 600;
+        fill: var(--text-soft);
+      }
+      .q-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 9.5px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-anchor: middle;
+      }
+      .grid-line {
+        stroke: var(--sand);
+        stroke-width: 1;
+        stroke-dasharray: 3 4;
+      }
+      .baseline {
+        stroke: var(--text-soft);
+        stroke-width: 1.5;
+      }
 
-    .data-line {
-      fill: none; stroke-width: 2.5;
-      stroke-linecap: round; stroke-linejoin: round;
-    }
-    .data-line.revenue { stroke: var(--mint-d); }
-    .data-line.cost    { stroke: var(--rose-d); }
-    .data-line.cumrev  { stroke: var(--lavender-d); stroke-dasharray: 8 5; }
-    .data-line.cumcost { stroke: var(--peach-d);    stroke-dasharray: 3 4; }
+      .data-line {
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .data-line.revenue {
+        stroke: var(--mint-d);
+      }
+      .data-line.cost {
+        stroke: var(--rose-d);
+      }
+      .data-line.cumrev {
+        stroke: var(--lavender-d);
+        stroke-dasharray: 8 5;
+      }
+      .data-line.cumcost {
+        stroke: var(--peach-d);
+        stroke-dasharray: 3 4;
+      }
 
-    .data-point { stroke: var(--white); stroke-width: 2; }
+      .data-point {
+        stroke: var(--white);
+        stroke-width: 2;
+      }
 
-    .val-label {
-      font-family: "Nunito", sans-serif; font-size: 10px;
-      font-weight: 800; text-anchor: middle;
-    }
-    .be-text {
-      font-family: "Nunito", sans-serif; font-size: 11px;
-      font-weight: 800; text-anchor: middle;
-    }
-    .be-sub {
-      font-family: "Nunito Sans", sans-serif; font-size: 10px;
-      font-weight: 700; text-anchor: middle;
-    }
+      .val-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-anchor: middle;
+      }
+      .be-text {
+        font-family: "Nunito", sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        text-anchor: middle;
+      }
+      .be-sub {
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        text-anchor: middle;
+      }
 
-    /* ── KPI cards ──────────────────────────────────────────── */
-    .kpis {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 14px; margin-top: 20px;
-    }
-    @media (max-width: 820px)  { .kpis { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 480px)  { .kpis { grid-template-columns: 1fr; } }
+      /* ── KPI cards ──────────────────────────────────────────── */
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 20px;
+      }
+      @media (max-width: 820px) {
+        .kpis {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 480px) {
+        .kpis {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .kpi {
-      background: var(--white); border-radius: 18px;
-      padding: 18px 16px; border: 1.5px solid var(--sand);
-    }
-    .kpi.mint  { border-color: var(--mint);     background: linear-gradient(150deg, var(--white), var(--mint-l)); }
-    .kpi.rose  { border-color: var(--rose);     background: linear-gradient(150deg, var(--white), var(--rose-l)); }
-    .kpi.lav   { border-color: var(--lavender); background: linear-gradient(150deg, var(--white), var(--lavender-l)); }
-    .kpi.peach { border-color: var(--peach);    background: linear-gradient(150deg, var(--white), var(--peach-l)); }
-    .kpi.sky   { border-color: var(--sky);      background: linear-gradient(150deg, var(--white), var(--sky-l)); }
+      .kpi {
+        background: var(--white);
+        border-radius: 18px;
+        padding: 18px 16px;
+        border: 1.5px solid var(--sand);
+      }
+      .kpi.mint {
+        border-color: var(--mint);
+        background: linear-gradient(150deg, var(--white), var(--mint-l));
+      }
+      .kpi.rose {
+        border-color: var(--rose);
+        background: linear-gradient(150deg, var(--white), var(--rose-l));
+      }
+      .kpi.lav {
+        border-color: var(--lavender);
+        background: linear-gradient(150deg, var(--white), var(--lavender-l));
+      }
+      .kpi.peach {
+        border-color: var(--peach);
+        background: linear-gradient(150deg, var(--white), var(--peach-l));
+      }
+      .kpi.sky {
+        border-color: var(--sky);
+        background: linear-gradient(150deg, var(--white), var(--sky-l));
+      }
 
-    .kpi-label {
-      font-family: "Nunito", sans-serif; font-size: 10px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.6px;
-      color: var(--text-soft); margin-bottom: 8px;
-    }
-    .kpi-val {
-      font-family: "Nunito", sans-serif; font-size: 24px;
-      font-weight: 900; color: var(--text-dark); line-height: 1.1;
-    }
-    .kpi-sub { font-size: 11.5px; color: var(--text-mid); margin-top: 5px; line-height: 1.4; }
+      .kpi-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+      }
+      .kpi-val {
+        font-family: "Nunito", sans-serif;
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--text-dark);
+        line-height: 1.1;
+      }
+      .kpi-sub {
+        font-size: 11.5px;
+        color: var(--text-mid);
+        margin-top: 5px;
+        line-height: 1.4;
+      }
 
-    /* ── Insight ────────────────────────────────────────────── */
-    .insight {
-      background: var(--lavender-l); border: 1.5px solid var(--lavender);
-      border-radius: 14px; padding: 14px 18px; margin-top: 18px;
-      display: flex; gap: 12px; align-items: flex-start;
-    }
-    .insight-icon { font-size: 22px; flex-shrink: 0; }
-    .insight-text { font-size: 13px; color: var(--lavender-d); line-height: 1.55; font-weight: 600; }
-    .insight-text strong { font-weight: 900; }
+      /* ── Insight ────────────────────────────────────────────── */
+      .insight {
+        background: var(--lavender-l);
+        border: 1.5px solid var(--lavender);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin-top: 18px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .insight-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .insight-text {
+        font-size: 13px;
+        color: var(--lavender-d);
+        line-height: 1.55;
+        font-weight: 600;
+      }
+      .insight-text strong {
+        font-weight: 900;
+      }
 
-    /* ── Footer ─────────────────────────────────────────────── */
-    .footer {
-      margin-top: 28px; text-align: center; font-size: 12px;
-      color: var(--text-soft); padding-top: 16px;
-      border-top: 1px dashed var(--sand);
-    }
-    .footer strong { color: var(--text-mid); }
+      /* ── Footer ─────────────────────────────────────────────── */
+      .footer {
+        margin-top: 28px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-soft);
+        padding-top: 16px;
+        border-top: 1px dashed var(--sand);
+      }
+      .footer strong {
+        color: var(--text-mid);
+      }
 
-    /* ── Responsive ─────────────────────────────────────────── */
-    @media (max-width: 920px) {
-      .chart-layout { flex-direction: column; }
-      .right-panel  { width: 100%; border-left: none; border-top: 1.5px solid var(--sand); }
-      .panel-grid   { grid-template-rows: auto auto; }
-    }
-  </style>
-</head>
-<body>
-<div class="page">
-
-  <!-- Header -->
-  <div class="header">
-    <div class="badge">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-        <path d="M3 17l6-6 4 4 8-8v4h2V3h-7v2h4l-7 7-4-4-7 7 1 1z"/>
-      </svg>
-      Proyección de ROI — 24 meses
-    </div>
-    <h1>Cuándo se vuelve <span>rentable</span> el proyecto</h1>
-    <p class="header-sub">
-      Comparación mensual de ingresos, costos e ingresos acumulados con dos puntos de equilibrio.
-      El break-even operativo mensual se alcanza en el <strong>mes 15</strong>;
-      el acumulado en el <strong>mes 20</strong>.
-    </p>
-  </div>
-
-  <!-- Chart card -->
-  <div class="chart-card">
-
-    <!-- Head: title + legend -->
-    <div class="chart-head">
-      <div>
-        <div class="chart-title">Ingresos vs. Costos — mensual + acumulado</div>
-        <div class="chart-sub">Escenario base · 1K MAU mes 12</div>
+      /* ── Responsive ─────────────────────────────────────────── */
+      @media (max-width: 920px) {
+        .chart-layout {
+          flex-direction: column;
+        }
+        .right-panel {
+          width: 100%;
+          border-left: none;
+          border-top: 1.5px solid var(--sand);
+        }
+        .panel-grid {
+          grid-template-rows: auto auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header -->
+      <div class="header">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <path d="M3 17l6-6 4 4 8-8v4h2V3h-7v2h4l-7 7-4-4-7 7 1 1z" />
+          </svg>
+          Proyección de ROI — 24 meses
+        </div>
+        <h1>Cuándo se vuelve <span>rentable</span> el proyecto</h1>
+        <p class="header-sub">
+          Comparación mensual de ingresos, costos e ingresos acumulados con dos
+          puntos de equilibrio. El break-even operativo mensual se alcanza en el
+          <strong>mes 15</strong>; el acumulado en el <strong>mes 20</strong>.
+        </p>
       </div>
-      <div class="chart-legend">
-        <div class="lg-item" style="color:var(--mint-d)">
-          <div class="lg-swatch" style="background:var(--mint-d)"></div>
-          Ingreso mensual
-        </div>
-        <div class="lg-item" style="color:var(--rose-d)">
-          <div class="lg-swatch" style="background:var(--rose-d)"></div>
-          Costo mensual
-        </div>
-        <div class="lg-item" style="color:var(--lavender-d)">
-          <div class="lg-swatch dashed" style="color:var(--lavender-d)"></div>
-          Ingreso acumulado
-        </div>
-        <div class="lg-item" style="color:var(--peach-d)">
-          <div class="lg-swatch dashed" style="color:var(--peach-d)"></div>
-          Costo acumulado
-        </div>
-      </div>
-    </div>
 
-    <!-- Body: SVG + right panel -->
-    <div class="chart-layout">
+      <!-- Chart card -->
+      <div class="chart-card">
+        <!-- Head: title + legend -->
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">
+              Ingresos vs. Costos — mensual + acumulado
+            </div>
+            <div class="chart-sub">Escenario base · 1K MAU mes 12</div>
+          </div>
+          <div class="chart-legend">
+            <div class="lg-item" style="color: var(--mint-d)">
+              <div class="lg-swatch" style="background: var(--mint-d)"></div>
+              Ingreso mensual
+            </div>
+            <div class="lg-item" style="color: var(--rose-d)">
+              <div class="lg-swatch" style="background: var(--rose-d)"></div>
+              Costo mensual
+            </div>
+            <div class="lg-item" style="color: var(--lavender-d)">
+              <div
+                class="lg-swatch dashed"
+                style="color: var(--lavender-d)"
+              ></div>
+              Ingreso acumulado
+            </div>
+            <div class="lg-item" style="color: var(--peach-d)">
+              <div class="lg-swatch dashed" style="color: var(--peach-d)"></div>
+              Costo acumulado
+            </div>
+          </div>
+        </div>
 
-      <!-- SVG chart -->
-      <!--
+        <!-- Body: SVG + right panel -->
+        <div class="chart-layout">
+          <!-- SVG chart -->
+          <!--
         viewBox 0 0 900 440
         Chart area: x=55..855 (800px / 24mo = 33.33px/mo), y=20..380 (360px / $12000 = 0.03px/$)
         xs(m) = 55 + m*33.333   ys(v) = 380 - min(v,12000)*0.03
@@ -327,300 +565,608 @@
         Key dots: m6(255), m12(455), m18(655), m24(855)
         Break-even monthly: xs(15)=555  cumulative: xs(20)=722
       -->
-      <div class="chart-svg-wrap">
-        <svg class="chart-svg" viewBox="0 0 900 440" xmlns="http://www.w3.org/2000/svg">
+          <div class="chart-svg-wrap">
+            <svg
+              class="chart-svg"
+              viewBox="0 0 900 440"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <!-- Quarter bands (100px each, y=20..380) -->
+              <rect
+                x="55"
+                y="20"
+                width="100"
+                height="360"
+                fill="#ede7fc"
+                opacity="0.45"
+              />
+              <rect
+                x="155"
+                y="20"
+                width="100"
+                height="360"
+                fill="#dff5ec"
+                opacity="0.45"
+              />
+              <rect
+                x="255"
+                y="20"
+                width="100"
+                height="360"
+                fill="#fff0da"
+                opacity="0.45"
+              />
+              <rect
+                x="355"
+                y="20"
+                width="100"
+                height="360"
+                fill="#ffe4ec"
+                opacity="0.45"
+              />
+              <rect
+                x="455"
+                y="20"
+                width="100"
+                height="360"
+                fill="#ede7fc"
+                opacity="0.45"
+              />
+              <rect
+                x="555"
+                y="20"
+                width="100"
+                height="360"
+                fill="#dff5ec"
+                opacity="0.45"
+              />
+              <rect
+                x="655"
+                y="20"
+                width="100"
+                height="360"
+                fill="#fff0da"
+                opacity="0.45"
+              />
+              <rect
+                x="755"
+                y="20"
+                width="100"
+                height="360"
+                fill="#ffe4ec"
+                opacity="0.45"
+              />
 
-          <!-- Quarter bands (100px each, y=20..380) -->
-          <rect x="55"  y="20" width="100" height="360" fill="#ede7fc" opacity="0.45"/>
-          <rect x="155" y="20" width="100" height="360" fill="#dff5ec" opacity="0.45"/>
-          <rect x="255" y="20" width="100" height="360" fill="#fff0da" opacity="0.45"/>
-          <rect x="355" y="20" width="100" height="360" fill="#ffe4ec" opacity="0.45"/>
-          <rect x="455" y="20" width="100" height="360" fill="#ede7fc" opacity="0.45"/>
-          <rect x="555" y="20" width="100" height="360" fill="#dff5ec" opacity="0.45"/>
-          <rect x="655" y="20" width="100" height="360" fill="#fff0da" opacity="0.45"/>
-          <rect x="755" y="20" width="100" height="360" fill="#ffe4ec" opacity="0.45"/>
+              <!-- Quarter labels -->
+              <text class="q-label" x="105" y="13" fill="#7b5ea7">Q1</text>
+              <text class="q-label" x="205" y="13" fill="#3d9970">Q2</text>
+              <text class="q-label" x="305" y="13" fill="#c77c2a">Q3</text>
+              <text class="q-label" x="405" y="13" fill="#b5385a">Q4</text>
+              <text class="q-label" x="505" y="13" fill="#7b5ea7">Q5</text>
+              <text class="q-label" x="605" y="13" fill="#3d9970">Q6</text>
+              <text class="q-label" x="705" y="13" fill="#c77c2a">Q7</text>
+              <text class="q-label" x="805" y="13" fill="#b5385a">Q8</text>
 
-          <!-- Quarter labels -->
-          <text class="q-label" x="105" y="13" fill="#7b5ea7">Q1</text>
-          <text class="q-label" x="205" y="13" fill="#3d9970">Q2</text>
-          <text class="q-label" x="305" y="13" fill="#c77c2a">Q3</text>
-          <text class="q-label" x="405" y="13" fill="#b5385a">Q4</text>
-          <text class="q-label" x="505" y="13" fill="#7b5ea7">Q5</text>
-          <text class="q-label" x="605" y="13" fill="#3d9970">Q6</text>
-          <text class="q-label" x="705" y="13" fill="#c77c2a">Q7</text>
-          <text class="q-label" x="805" y="13" fill="#b5385a">Q8</text>
+              <!-- Y gridlines & labels -->
+              <line class="baseline" x1="55" y1="380" x2="855" y2="380" />
+              <text class="axis-tick" x="48" y="384" text-anchor="end">$0</text>
 
-          <!-- Y gridlines & labels -->
-          <line class="baseline"  x1="55" y1="380" x2="855" y2="380"/>
-          <text class="axis-tick" x="48"  y="384"  text-anchor="end">$0</text>
+              <line class="grid-line" x1="55" y1="290" x2="855" y2="290" />
+              <text class="axis-tick" x="48" y="294" text-anchor="end">
+                $3K
+              </text>
 
-          <line class="grid-line" x1="55" y1="290" x2="855" y2="290"/>
-          <text class="axis-tick" x="48"  y="294"  text-anchor="end">$3K</text>
+              <line class="grid-line" x1="55" y1="200" x2="855" y2="200" />
+              <text class="axis-tick" x="48" y="204" text-anchor="end">
+                $6K
+              </text>
 
-          <line class="grid-line" x1="55" y1="200" x2="855" y2="200"/>
-          <text class="axis-tick" x="48"  y="204"  text-anchor="end">$6K</text>
+              <line class="grid-line" x1="55" y1="110" x2="855" y2="110" />
+              <text class="axis-tick" x="48" y="114" text-anchor="end">
+                $9K
+              </text>
 
-          <line class="grid-line" x1="55" y1="110" x2="855" y2="110"/>
-          <text class="axis-tick" x="48"  y="114"  text-anchor="end">$9K</text>
+              <line class="grid-line" x1="55" y1="20" x2="855" y2="20" />
+              <text class="axis-tick" x="48" y="24" text-anchor="end">
+                $12K
+              </text>
 
-          <line class="grid-line" x1="55" y1="20"  x2="855" y2="20"/>
-          <text class="axis-tick" x="48"  y="24"   text-anchor="end">$12K</text>
+              <!-- Y axis -->
+              <line class="baseline" x1="55" y1="20" x2="55" y2="380" />
+              <text
+                class="axis-label"
+                x="14"
+                y="200"
+                transform="rotate(-90,14,200)"
+                text-anchor="middle"
+              >
+                USD / mes
+              </text>
 
-          <!-- Y axis -->
-          <line class="baseline" x1="55" y1="20" x2="55" y2="380"/>
-          <text class="axis-label" x="14" y="200" transform="rotate(-90,14,200)" text-anchor="middle">USD / mes</text>
+              <!-- X ticks -->
+              <text class="axis-tick" x="55" y="398" text-anchor="middle">
+                Mes 0
+              </text>
+              <text class="axis-tick" x="255" y="398" text-anchor="middle">
+                6
+              </text>
+              <text class="axis-tick" x="455" y="398" text-anchor="middle">
+                Mes 12
+              </text>
+              <text class="axis-tick" x="655" y="398" text-anchor="middle">
+                18
+              </text>
+              <text class="axis-tick" x="855" y="398" text-anchor="middle">
+                Mes 24
+              </text>
+              <text class="axis-label" x="455" y="425" text-anchor="middle">
+                Meses desde el lanzamiento
+              </text>
 
-          <!-- X ticks -->
-          <text class="axis-tick" x="55"  y="398" text-anchor="middle">Mes 0</text>
-          <text class="axis-tick" x="255" y="398" text-anchor="middle">6</text>
-          <text class="axis-tick" x="455" y="398" text-anchor="middle">Mes 12</text>
-          <text class="axis-tick" x="655" y="398" text-anchor="middle">18</text>
-          <text class="axis-tick" x="855" y="398" text-anchor="middle">Mes 24</text>
-          <text class="axis-label" x="455" y="425" text-anchor="middle">Meses desde el lanzamiento</text>
+              <!-- Green fill under revenue -->
+              <path
+                fill="#a8e6cf"
+                opacity="0.18"
+                d="M 55 380 L 155 379.4 L 255 377.6 L 355 375.8 L 455 374.0 L 555 367.4 L 655 356.0 L 755 338.0 L 855 314.0 L 855 380 Z"
+              />
 
-          <!-- Green fill under revenue -->
-          <path fill="#a8e6cf" opacity="0.18"
-            d="M 55 380 L 155 379.4 L 255 377.6 L 355 375.8 L 455 374.0 L 555 367.4 L 655 356.0 L 755 338.0 L 855 314.0 L 855 380 Z"/>
+              <!-- Lines (drawn back-to-front so revenue is on top) -->
+              <path
+                class="data-line cumrev"
+                d="M 55 380 L 155 378.2 L 255 371.0 L 355 358.4 L 455 340.4 L 555 302.6 L 655 230.6 L 755 104.6 L 855 20"
+              />
 
-          <!-- Lines (drawn back-to-front so revenue is on top) -->
-          <path class="data-line cumrev"
-            d="M 55 380 L 155 378.2 L 255 371.0 L 355 358.4 L 455 340.4 L 555 302.6 L 655 230.6 L 755 104.6 L 855 20"/>
+              <path
+                class="data-line cumcost"
+                d="M 55 367.4 L 155 333.2 L 255 300.8 L 355 269.3 L 455 238.7 L 555 204.5 L 655 166.7 L 755 125.3 L 855 80.3"
+              />
 
-          <path class="data-line cumcost"
-            d="M 55 367.4 L 155 333.2 L 255 300.8 L 355 269.3 L 455 238.7 L 555 204.5 L 655 166.7 L 755 125.3 L 855 80.3"/>
+              <path
+                class="data-line cost"
+                d="M 55 367.4 L 155 368.6 L 255 369.2 L 355 369.5 L 455 369.8 L 555 368.6 L 655 367.4 L 755 366.2 L 855 365.0"
+              />
 
-          <path class="data-line cost"
-            d="M 55 367.4 L 155 368.6 L 255 369.2 L 355 369.5 L 455 369.8 L 555 368.6 L 655 367.4 L 755 366.2 L 855 365.0"/>
+              <path
+                class="data-line revenue"
+                d="M 55 380 L 155 379.4 L 255 377.6 L 355 375.8 L 455 374.0 L 555 367.4 L 655 356.0 L 755 338.0 L 855 314.0"
+              />
 
-          <path class="data-line revenue"
-            d="M 55 380 L 155 379.4 L 255 377.6 L 355 375.8 L 455 374.0 L 555 367.4 L 655 356.0 L 755 338.0 L 855 314.0"/>
+              <!-- Break-even monthly (m15, x=555) -->
+              <line
+                x1="555"
+                y1="20"
+                x2="555"
+                y2="380"
+                stroke="#c77c2a"
+                stroke-width="1.2"
+                stroke-dasharray="4 3"
+              />
+              <rect
+                x="514"
+                y="22"
+                width="82"
+                height="52"
+                rx="6"
+                fill="#fff0da"
+                stroke="#c77c2a"
+                stroke-width="1.2"
+              />
+              <text class="be-text" x="555" y="39" fill="#c77c2a">
+                Break-even
+              </text>
+              <text class="be-text" x="555" y="53" fill="#c77c2a">mensual</text>
+              <text class="be-sub" x="555" y="67" fill="#5a5475">Mes 15</text>
 
-          <!-- Break-even monthly (m15, x=555) -->
-          <line x1="555" y1="20" x2="555" y2="380" stroke="#c77c2a" stroke-width="1.2" stroke-dasharray="4 3"/>
-          <rect x="514" y="22" width="82" height="52" rx="6" fill="#fff0da" stroke="#c77c2a" stroke-width="1.2"/>
-          <text class="be-text" x="555" y="39" fill="#c77c2a">Break-even</text>
-          <text class="be-text" x="555" y="53" fill="#c77c2a">mensual</text>
-          <text class="be-sub"  x="555" y="67" fill="#5a5475">Mes 15</text>
+              <!-- Break-even cumulative (m20, x=722) -->
+              <line
+                x1="722"
+                y1="20"
+                x2="722"
+                y2="380"
+                stroke="#2e7ea8"
+                stroke-width="1.2"
+                stroke-dasharray="4 3"
+              />
+              <rect
+                x="681"
+                y="115"
+                width="82"
+                height="52"
+                rx="6"
+                fill="#dff1fb"
+                stroke="#2e7ea8"
+                stroke-width="1.2"
+              />
+              <text class="be-text" x="722" y="132" fill="#2e7ea8">
+                Break-even
+              </text>
+              <text class="be-text" x="722" y="146" fill="#2e7ea8">
+                acumulado
+              </text>
+              <text class="be-sub" x="722" y="160" fill="#5a5475">Mes 20</text>
 
-          <!-- Break-even cumulative (m20, x=722) -->
-          <line x1="722" y1="20" x2="722" y2="380" stroke="#2e7ea8" stroke-width="1.2" stroke-dasharray="4 3"/>
-          <rect x="681" y="115" width="82" height="52" rx="6" fill="#dff1fb" stroke="#2e7ea8" stroke-width="1.2"/>
-          <text class="be-text" x="722" y="132" fill="#2e7ea8">Break-even</text>
-          <text class="be-text" x="722" y="146" fill="#2e7ea8">acumulado</text>
-          <text class="be-sub"  x="722" y="160" fill="#5a5475">Mes 20</text>
+              <!-- Dots — cumrev: m6, m12, m18, m24 -->
+              <circle
+                class="data-point"
+                cx="255"
+                cy="371.0"
+                r="5.5"
+                fill="#7b5ea7"
+              />
+              <circle
+                class="data-point"
+                cx="455"
+                cy="340.4"
+                r="5.5"
+                fill="#7b5ea7"
+              />
+              <circle
+                class="data-point"
+                cx="655"
+                cy="230.6"
+                r="5.5"
+                fill="#7b5ea7"
+              />
+              <circle
+                class="data-point"
+                cx="855"
+                cy="20"
+                r="5.5"
+                fill="#7b5ea7"
+              />
 
-          <!-- Dots — cumrev: m6, m12, m18, m24 -->
-          <circle class="data-point" cx="255" cy="371.0" r="5.5" fill="#7b5ea7"/>
-          <circle class="data-point" cx="455" cy="340.4" r="5.5" fill="#7b5ea7"/>
-          <circle class="data-point" cx="655" cy="230.6" r="5.5" fill="#7b5ea7"/>
-          <circle class="data-point" cx="855" cy="20"    r="5.5" fill="#7b5ea7"/>
+              <!-- Dots — cumcost: m6, m12, m18, m24 -->
+              <circle
+                class="data-point"
+                cx="255"
+                cy="300.8"
+                r="5.5"
+                fill="#c77c2a"
+              />
+              <circle
+                class="data-point"
+                cx="455"
+                cy="238.7"
+                r="5.5"
+                fill="#c77c2a"
+              />
+              <circle
+                class="data-point"
+                cx="655"
+                cy="166.7"
+                r="5.5"
+                fill="#c77c2a"
+              />
+              <circle
+                class="data-point"
+                cx="855"
+                cy="80.3"
+                r="5.5"
+                fill="#c77c2a"
+              />
 
-          <!-- Dots — cumcost: m6, m12, m18, m24 -->
-          <circle class="data-point" cx="255" cy="300.8" r="5.5" fill="#c77c2a"/>
-          <circle class="data-point" cx="455" cy="238.7" r="5.5" fill="#c77c2a"/>
-          <circle class="data-point" cx="655" cy="166.7" r="5.5" fill="#c77c2a"/>
-          <circle class="data-point" cx="855" cy="80.3"  r="5.5" fill="#c77c2a"/>
+              <!-- Dots — cost: m6, m12, m18, m24 -->
+              <circle
+                class="data-point"
+                cx="255"
+                cy="369.2"
+                r="5.5"
+                fill="#b5385a"
+              />
+              <circle
+                class="data-point"
+                cx="455"
+                cy="369.8"
+                r="5.5"
+                fill="#b5385a"
+              />
+              <circle
+                class="data-point"
+                cx="655"
+                cy="367.4"
+                r="5.5"
+                fill="#b5385a"
+              />
+              <circle
+                class="data-point"
+                cx="855"
+                cy="365.0"
+                r="5.5"
+                fill="#b5385a"
+              />
 
-          <!-- Dots — cost: m6, m12, m18, m24 -->
-          <circle class="data-point" cx="255" cy="369.2" r="5.5" fill="#b5385a"/>
-          <circle class="data-point" cx="455" cy="369.8" r="5.5" fill="#b5385a"/>
-          <circle class="data-point" cx="655" cy="367.4" r="5.5" fill="#b5385a"/>
-          <circle class="data-point" cx="855" cy="365.0" r="5.5" fill="#b5385a"/>
+              <!-- Dots — revenue: m6, m12, m18, m24 -->
+              <circle
+                class="data-point"
+                cx="255"
+                cy="377.6"
+                r="5.5"
+                fill="#3d9970"
+              />
+              <circle
+                class="data-point"
+                cx="455"
+                cy="374.0"
+                r="5.5"
+                fill="#3d9970"
+              />
+              <circle
+                class="data-point"
+                cx="655"
+                cy="356.0"
+                r="5.5"
+                fill="#3d9970"
+              />
+              <circle
+                class="data-point"
+                cx="855"
+                cy="314.0"
+                r="5.5"
+                fill="#3d9970"
+              />
 
-          <!-- Dots — revenue: m6, m12, m18, m24 -->
-          <circle class="data-point" cx="255" cy="377.6" r="5.5" fill="#3d9970"/>
-          <circle class="data-point" cx="455" cy="374.0" r="5.5" fill="#3d9970"/>
-          <circle class="data-point" cx="655" cy="356.0" r="5.5" fill="#3d9970"/>
-          <circle class="data-point" cx="855" cy="314.0" r="5.5" fill="#3d9970"/>
+              <!-- Mes 0 annotation -->
+              <text
+                x="66"
+                y="378"
+                fill="#b5385a"
+                font-family="Nunito, sans-serif"
+                font-size="9"
+                font-weight="700"
+                transform="rotate(-90,66,378)"
+                text-anchor="start"
+                opacity="0.85"
+              >
+                Mes 0 · $0 ingresos
+              </text>
 
-          <!-- Mes 0 annotation -->
-          <text x="66" y="378" fill="#b5385a"
-                font-family="Nunito, sans-serif" font-size="9" font-weight="700"
-                transform="rotate(-90,66,378)" text-anchor="start"
-                opacity="0.85">Mes 0 · $0 ingresos</text>
+              <!-- Key value labels -->
+              <text class="val-label" x="855" y="305" fill="#3d9970">
+                $2,200
+              </text>
+              <text class="val-label" x="855" y="356" fill="#b5385a">$500</text>
+              <text class="val-label" x="855" y="35" fill="#7b5ea7">
+                $15,780
+              </text>
+              <text class="val-label" x="855" y="71" fill="#c77c2a">
+                $9,990
+              </text>
+              <text class="val-label" x="655" y="221" fill="#7b5ea7">
+                $4,980
+              </text>
+              <text class="val-label" x="655" y="157" fill="#c77c2a">
+                $7,110
+              </text>
+              <text class="val-label" x="455" y="229" fill="#c77c2a">
+                $4,710
+              </text>
+              <text class="val-label" x="255" y="292" fill="#c77c2a">
+                $2,640
+              </text>
+              <text class="val-label" x="55" y="358" fill="#b5385a">$420</text>
+            </svg>
+          </div>
 
-          <!-- Key value labels -->
-          <text class="val-label" x="855" y="305" fill="#3d9970">$2,200</text>
-          <text class="val-label" x="855" y="356" fill="#b5385a">$500</text>
-          <text class="val-label" x="855" y="35"  fill="#7b5ea7">$15,780</text>
-          <text class="val-label" x="855" y="71"  fill="#c77c2a">$9,990</text>
-          <text class="val-label" x="655" y="221" fill="#7b5ea7">$4,980</text>
-          <text class="val-label" x="655" y="157" fill="#c77c2a">$7,110</text>
-          <text class="val-label" x="455" y="229" fill="#c77c2a">$4,710</text>
-          <text class="val-label" x="255" y="292" fill="#c77c2a">$2,640</text>
-          <text class="val-label" x="55"  y="358" fill="#b5385a">$420</text>
+          <!-- Right panel: 2×2 data grid -->
+          <div class="right-panel">
+            <div class="panel-grid">
+              <!-- Cell 1: Ingreso mensual (mint) -->
+              <div class="panel-cell">
+                <div class="cell-header">
+                  <span
+                    class="cell-dot"
+                    style="background: var(--mint-d)"
+                  ></span>
+                  <span class="cell-name">Ingreso mensual</span>
+                </div>
+                <div class="cell-rows">
+                  <div class="cell-row">
+                    <span class="cell-m">m0</span>
+                    <span class="cell-v" style="color: var(--mint-d)">$0</span>
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m6</span>
+                    <span class="cell-v" style="color: var(--mint-d)">$80</span>
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m12</span>
+                    <span class="cell-v" style="color: var(--mint-d)"
+                      >$200</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m18</span>
+                    <span class="cell-v" style="color: var(--mint-d)"
+                      >$800</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m24</span>
+                    <span class="cell-v" style="color: var(--mint-d)"
+                      >$2,200</span
+                    >
+                  </div>
+                </div>
+              </div>
 
-        </svg>
+              <!-- Cell 2: Ingreso acumulado (lavender) -->
+              <div class="panel-cell">
+                <div class="cell-header">
+                  <span
+                    class="cell-dot"
+                    style="background: var(--lavender-d)"
+                  ></span>
+                  <span class="cell-name">Ingreso acumulado</span>
+                </div>
+                <div class="cell-rows">
+                  <div class="cell-row">
+                    <span class="cell-m">m0</span>
+                    <span class="cell-v" style="color: var(--lavender-d)"
+                      >$0</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m6</span>
+                    <span class="cell-v" style="color: var(--lavender-d)"
+                      >$300</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m12</span>
+                    <span class="cell-v" style="color: var(--lavender-d)"
+                      >$1,320</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m18</span>
+                    <span class="cell-v" style="color: var(--lavender-d)"
+                      >$4,980</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m24</span>
+                    <span class="cell-v" style="color: var(--lavender-d)"
+                      >$15,780</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cell 3: Costo mensual (rose) -->
+              <div class="panel-cell">
+                <div class="cell-header">
+                  <span
+                    class="cell-dot"
+                    style="background: var(--rose-d)"
+                  ></span>
+                  <span class="cell-name">Costo mensual</span>
+                </div>
+                <div class="cell-rows">
+                  <div class="cell-row">
+                    <span class="cell-m">m0</span>
+                    <span class="cell-v" style="color: var(--rose-d)"
+                      >$420</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m6</span>
+                    <span class="cell-v" style="color: var(--rose-d)"
+                      >$360</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m12</span>
+                    <span class="cell-v" style="color: var(--rose-d)"
+                      >$340</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m18</span>
+                    <span class="cell-v" style="color: var(--rose-d)"
+                      >$420</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m24</span>
+                    <span class="cell-v" style="color: var(--rose-d)"
+                      >$500</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cell 4: Costo acumulado (peach) -->
+              <div class="panel-cell">
+                <div class="cell-header">
+                  <span
+                    class="cell-dot"
+                    style="background: var(--peach-d)"
+                  ></span>
+                  <span class="cell-name">Costo acumulado</span>
+                </div>
+                <div class="cell-rows">
+                  <div class="cell-row">
+                    <span class="cell-m">m0</span>
+                    <span class="cell-v" style="color: var(--peach-d)"
+                      >$420</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m6</span>
+                    <span class="cell-v" style="color: var(--peach-d)"
+                      >$2,640</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m12</span>
+                    <span class="cell-v" style="color: var(--peach-d)"
+                      >$4,710</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m18</span>
+                    <span class="cell-v" style="color: var(--peach-d)"
+                      >$7,110</span
+                    >
+                  </div>
+                  <div class="cell-row">
+                    <span class="cell-m">m24</span>
+                    <span class="cell-v" style="color: var(--peach-d)"
+                      >$9,990</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- .chart-layout -->
       </div>
+      <!-- .chart-card -->
 
-      <!-- Right panel: 2×2 data grid -->
-      <div class="right-panel">
-        <div class="panel-grid">
-
-          <!-- Cell 1: Ingreso mensual (mint) -->
-          <div class="panel-cell">
-            <div class="cell-header">
-              <span class="cell-dot" style="background:var(--mint-d)"></span>
-              <span class="cell-name">Ingreso mensual</span>
-            </div>
-            <div class="cell-rows">
-              <div class="cell-row">
-                <span class="cell-m">m0</span>
-                <span class="cell-v" style="color:var(--mint-d)">$0</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m6</span>
-                <span class="cell-v" style="color:var(--mint-d)">$80</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m12</span>
-                <span class="cell-v" style="color:var(--mint-d)">$200</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m18</span>
-                <span class="cell-v" style="color:var(--mint-d)">$800</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m24</span>
-                <span class="cell-v" style="color:var(--mint-d)">$2,200</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cell 2: Ingreso acumulado (lavender) -->
-          <div class="panel-cell">
-            <div class="cell-header">
-              <span class="cell-dot" style="background:var(--lavender-d)"></span>
-              <span class="cell-name">Ingreso acumulado</span>
-            </div>
-            <div class="cell-rows">
-              <div class="cell-row">
-                <span class="cell-m">m0</span>
-                <span class="cell-v" style="color:var(--lavender-d)">$0</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m6</span>
-                <span class="cell-v" style="color:var(--lavender-d)">$300</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m12</span>
-                <span class="cell-v" style="color:var(--lavender-d)">$1,320</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m18</span>
-                <span class="cell-v" style="color:var(--lavender-d)">$4,980</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m24</span>
-                <span class="cell-v" style="color:var(--lavender-d)">$15,780</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cell 3: Costo mensual (rose) -->
-          <div class="panel-cell">
-            <div class="cell-header">
-              <span class="cell-dot" style="background:var(--rose-d)"></span>
-              <span class="cell-name">Costo mensual</span>
-            </div>
-            <div class="cell-rows">
-              <div class="cell-row">
-                <span class="cell-m">m0</span>
-                <span class="cell-v" style="color:var(--rose-d)">$420</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m6</span>
-                <span class="cell-v" style="color:var(--rose-d)">$360</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m12</span>
-                <span class="cell-v" style="color:var(--rose-d)">$340</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m18</span>
-                <span class="cell-v" style="color:var(--rose-d)">$420</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m24</span>
-                <span class="cell-v" style="color:var(--rose-d)">$500</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cell 4: Costo acumulado (peach) -->
-          <div class="panel-cell">
-            <div class="cell-header">
-              <span class="cell-dot" style="background:var(--peach-d)"></span>
-              <span class="cell-name">Costo acumulado</span>
-            </div>
-            <div class="cell-rows">
-              <div class="cell-row">
-                <span class="cell-m">m0</span>
-                <span class="cell-v" style="color:var(--peach-d)">$420</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m6</span>
-                <span class="cell-v" style="color:var(--peach-d)">$2,640</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m12</span>
-                <span class="cell-v" style="color:var(--peach-d)">$4,710</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m18</span>
-                <span class="cell-v" style="color:var(--peach-d)">$7,110</span>
-              </div>
-              <div class="cell-row">
-                <span class="cell-m">m24</span>
-                <span class="cell-v" style="color:var(--peach-d)">$9,990</span>
-              </div>
-            </div>
-          </div>
-
+      <!-- KPI cards -->
+      <div class="kpis">
+        <div class="kpi rose">
+          <div class="kpi-label">Inversión total (24 m)</div>
+          <div class="kpi-val">$9,990</div>
+          <div class="kpi-sub">Costo acumulado · tiempo + efectivo</div>
+        </div>
+        <div class="kpi mint">
+          <div class="kpi-label">Ingreso acumulado (24 m)</div>
+          <div class="kpi-val">$15,780</div>
+          <div class="kpi-sub">IAP + AdMob Rewarded</div>
+        </div>
+        <div class="kpi lav">
+          <div class="kpi-label">Break-even mensual</div>
+          <div class="kpi-val">Mes 15</div>
+          <div class="kpi-sub">Primer mes con ingreso &gt; costo</div>
+        </div>
+        <div class="kpi peach">
+          <div class="kpi-label">Break-even acumulado</div>
+          <div class="kpi-val">Mes 20</div>
+          <div class="kpi-sub">Inversión acumulada recuperada</div>
         </div>
       </div>
-    </div><!-- .chart-layout -->
-  </div><!-- .chart-card -->
 
-  <!-- KPI cards -->
-  <div class="kpis">
-    <div class="kpi rose">
-      <div class="kpi-label">Inversión total (24 m)</div>
-      <div class="kpi-val">$9,990</div>
-      <div class="kpi-sub">Costo acumulado · tiempo + efectivo</div>
-    </div>
-    <div class="kpi mint">
-      <div class="kpi-label">Ingreso acumulado (24 m)</div>
-      <div class="kpi-val">$15,780</div>
-      <div class="kpi-sub">IAP + AdMob Rewarded</div>
-    </div>
-    <div class="kpi lav">
-      <div class="kpi-label">Break-even mensual</div>
-      <div class="kpi-val">Mes 15</div>
-      <div class="kpi-sub">Primer mes con ingreso &gt; costo</div>
-    </div>
-    <div class="kpi peach">
-      <div class="kpi-label">Break-even acumulado</div>
-      <div class="kpi-val">Mes 20</div>
-      <div class="kpi-sub">Inversión acumulada recuperada</div>
-    </div>
-  </div>
+      <!-- Insight -->
+      <div class="insight">
+        <div class="insight-icon">💡</div>
+        <div class="insight-text">
+          <strong>Lectura clave:</strong> el costo mensual se mantiene estable
+          ($340–$500) gracias a la arquitectura sin servidor. El ingreso cruza
+          el costo mensual en el <strong>mes 15</strong> y la inversión
+          acumulada queda recuperada en el <strong>mes 20</strong>. Inversión
+          total a 24 meses: <strong>$9,990</strong>. Ingreso acumulado
+          proyectado: <strong>$15,780</strong>. Ganancia neta acumulada al mes
+          24: <strong>$5,790</strong>.
+        </div>
+      </div>
 
-  <!-- Insight -->
-  <div class="insight">
-    <div class="insight-icon">💡</div>
-    <div class="insight-text">
-      <strong>Lectura clave:</strong> el costo mensual se mantiene estable ($340–$500) gracias a la arquitectura sin servidor.
-      El ingreso cruza el costo mensual en el <strong>mes 15</strong> y la inversión acumulada queda recuperada en el <strong>mes 20</strong>.
-      Inversión total a 24 meses: <strong>$9,990</strong>. Ingreso acumulado proyectado: <strong>$15,780</strong>. Ganancia neta acumulada al mes 24: <strong>$5,790</strong>.
+      <!-- Footer -->
+      <div class="footer">
+        <strong>My Reading Village</strong> · Fernando Pinto Villarroel · 2026 ·
+        Lab 4 — Proyección de ROI
+      </div>
     </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <strong>My Reading Town</strong> · Fernando Pinto Villarroel · 2026 · Lab 4 — Proyección de ROI
-  </div>
-
-</div>
-</body>
+  </body>
 </html>

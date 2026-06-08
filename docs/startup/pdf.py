@@ -27,7 +27,7 @@ MX = 34
 MY = 32
 CW = W - 2*MX
 
-ICON_NEW = "/home/university/Documents/Projects/jala-university/javascript-projects/OTHERS/my-reading-town/my_reading_town/assets/images/logos/my_reading_town_icon_cropped.png"
+ICON_NEW = "/home/university/Documents/Projects/jala-university/dart-projects/OTHERS/my-reading-village/my_reading_village/assets/images/logos/my_reading_village_icon_cropped.png"
 
 def rr(c, x, y, w, h, r=7, fill=None, stroke=None, sw=0.6):
     if fill:   c.setFillColor(fill)
@@ -140,7 +140,7 @@ def top_bar(c):
 def footer(c, pg):
     hline(c, MX, MY+4, CW, LAV, 0.6)
     c.setFont("Pop", 6.5); c.setFillColor(TS)
-    c.drawString(MX, MY-5, "My Reading Town  -  Fernando Pinto Villarroel  -  2026")
+    c.drawString(MX, MY-5, "My Reading Village  -  Fernando Pinto Villarroel  -  2026")
     c.setFont("PopB", 6.5); c.setFillColor(LAV_D)
     c.drawRightString(W-MX, MY-5, f"{pg} / 2")
 
@@ -155,7 +155,7 @@ def page1(c):
 
     ty = H - MY - 30
     c.setFont("PopB", 25); c.setFillColor(TD)
-    c.drawCentredString(W/2, ty, "My Reading Town")
+    c.drawCentredString(W/2, ty, "My Reading Village")
     c.setFont("PopM", 9); c.setFillColor(TM)
     c.drawCentredString(W/2, ty-26, "Resumen Ejecutivo - Tarea 4 - Proyectos de Software y Startups")
     c.setStrokeColor(LAV); c.setLineWidth(2.5)
@@ -187,7 +187,7 @@ def page1(c):
     cur = sec_hdr(c, "Solución Propuesta", MX, cur, MNT_D, MNT_L)
     cur -= 8
     sol = [
-        ("My Reading Town es una app móvil para Android que convierte cada página leída"
+        ("My Reading Village es una app móvil para Android que convierte cada página leída"
          " en recursos para construir una aldea virtual animada. El usuario registra", False),
         (" en menos de 10 segundos", True),
         (" cuántas páginas leyó, y al instante recibe monedas, madera, gemas y metal"
@@ -206,7 +206,7 @@ def page1(c):
 
     uvp = [
         ("No existe nada parecido en el mercado:", True),
-        (" My Reading Town es la", False),
+        (" My Reading Village es la", False),
         (" única app", True),
         (" que convierte las páginas que lees en recursos reales para construir una aldea"
          " animada con habitantes propios, edificios mejorables y eventos estacionales."
@@ -705,9 +705,9 @@ def page2(c):
     footer(c, 2)
 
 
-OUT = "/home/university/Documents/Projects/jala-university/javascript-projects/OTHERS/my-reading-town/docs/startup/Assignment4.SoftwareProjectsAndStartups.05.31.2026.FerPinto.pdf"
+OUT = "/home/university/Documents/Projects/jala-university/dart-projects/OTHERS/my-reading-village/docs/startup/Assignment4.SoftwareProjectsAndStartups.05.31.2026.FerPinto.pdf"
 cv = canvas.Canvas(OUT, pagesize=letter)
-cv.setTitle("My Reading Town - Fernando Pinto - Tarea 4 - Proyectos de Software y Startups")
+cv.setTitle("My Reading Village - Fernando Pinto - Tarea 4 - Proyectos de Software y Startups")
 cv.setAuthor("Fernando Pinto Villarroel")
 
 page1(cv); cv.showPage()

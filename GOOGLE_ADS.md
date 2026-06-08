@@ -1,4 +1,4 @@
-# Google AdMob — Complete Integration Guide for My Reading Town
+# Google AdMob — Complete Integration Guide for My Reading Village
 
 This guide explains how to go from zero to real ads running inside the app. Follow every step in order before setting `googleAds = true` in `lib/app_constants.dart`.
 
@@ -32,7 +32,7 @@ Google may ask you to verify your identity before your account is fully active. 
 2. Click **Add app**.
 3. Choose **Android** as the platform.
 4. If your app is not yet published on the Play Store, select **"No, my app isn't listed in a supported app store"**.
-5. Enter the app name: **My Reading Town**.
+5. Enter the app name: **My Reading Village**.
 6. Click **Add**.
 
 ### Step 2.2 — Copy Your AdMob App ID
@@ -51,7 +51,7 @@ You will need this. Keep this page open.
 
 ### Step 3.1 — Update AndroidManifest.xml
 
-Open `my_reading_town/android/app/src/main/AndroidManifest.xml` and replace the test App ID with your real one:
+Open `my_reading_village/android/app/src/main/AndroidManifest.xml` and replace the test App ID with your real one:
 
 ```xml
 <meta-data
@@ -69,10 +69,10 @@ All three ad placements in the app use **Rewarded ads** (the user watches a vide
 
 ### Step 4.1 — Create the Ad Unit
 
-1. In AdMob, go to **Apps > My Reading Town > Ad units**.
+1. In AdMob, go to **Apps > My Reading Village > Ad units**.
 2. Click **Add ad unit**.
 3. Select **Rewarded**.
-4. Give it a name: e.g., `my_reading_town_rewarded`.
+4. Give it a name: e.g., `my_reading_village_rewarded`.
 5. Leave all other settings at their defaults.
 6. Click **Create ad unit**.
 
@@ -86,7 +86,7 @@ ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX
 
 ### Step 4.3 — Update app_constants.dart
 
-Open `my_reading_town/lib/app_constants.dart` and replace the placeholder with your real ad unit ID:
+Open `my_reading_village/lib/app_constants.dart` and replace the placeholder with your real ad unit ID:
 
 ```dart
 static const String _adUnitIdReal = 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX';
@@ -100,7 +100,7 @@ Replace the value with the actual Ad Unit ID from Step 4.2.
 
 ### Step 5.1 — Turn on googleAds
 
-In `my_reading_town/lib/app_constants.dart`, change:
+In `my_reading_village/lib/app_constants.dart`, change:
 
 ```dart
 static const bool googleAds = false;
@@ -113,11 +113,13 @@ static const bool googleAds = true;
 ```
 
 When `googleAds = true`:
+
 - The AdMob SDK initializes on app start.
 - Real rewarded video ads are loaded and shown.
 - Users earn in-game rewards only after watching a full ad.
 
 When `googleAds = false` (default / test mode):
+
 - No real ads are loaded.
 - Tapping any "Watch Ad" button shows a test-mode dialog.
 - The user can press "Simulate Watched" to receive the reward instantly.
@@ -161,9 +163,11 @@ The app uses a single Rewarded ad unit in three different places:
 ### Step 7.1 — Use Test Ad Unit IDs (Already Configured)
 
 While `googleAds = false`, the app uses Google's official test Ad Unit ID:
+
 - **Rewarded**: `ca-app-pub-3940256099942544/5224354917`
 
 And the test App ID in the manifest:
+
 - `ca-app-pub-3940256099942544~3347511713`
 
 These IDs are safe to use during development — they always return test ads and never generate real revenue or policy violations.
@@ -217,9 +221,9 @@ Once ads are live, monitor performance at https://admob.google.com:
 
 - [ ] Create AdMob account at https://admob.google.com
 - [ ] Set up payment profile
-- [ ] Add app "My Reading Town" (Android) in AdMob
+- [ ] Add app "My Reading Village" (Android) in AdMob
 - [ ] Copy **AdMob App ID** → update `AndroidManifest.xml`
-- [ ] Create one **Rewarded** ad unit named `my_reading_town_rewarded`
+- [ ] Create one **Rewarded** ad unit named `my_reading_village_rewarded`
 - [ ] Copy **Ad Unit ID** → update `_adUnitIdReal` in `app_constants.dart`
 - [ ] Set `googleAds = true` in `app_constants.dart`
 - [ ] Build release AAB and upload to Play Console Internal Testing

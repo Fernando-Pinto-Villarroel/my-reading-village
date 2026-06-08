@@ -1,0 +1,518 @@
+import 'dart:math';
+import 'package:flame/components.dart';
+import 'package:flame/events.dart';
+import 'package:flutter/material.dart' hide Image;
+import 'package:my_reading_village/domain/entities/villager.dart';
+import 'package:my_reading_village/infrastructure/ui/config/ui_constants.dart';
+import 'package:my_reading_village/adapters/repositories/villager_favorites.dart'
+    show VillagerFavorites;
+import 'package:my_reading_village/infrastructure/ui/game/village_game.dart';
+
+class VillagerComponent extends PositionComponent with TapCallbacks {
+  Villager villager;
+  List<String> roadTiles;
+  List<String> missingBuildingTypes;
+  final Map<String, int> occupancyMap;
+  final void Function(Villager)? onTapped;
+
+  Sprite? _sprite;
+  String _currentSpriteFile = '';
+
+  late Vector2 _targetPosition;
+  double _waitTimer = 0;
+  bool _isWaiting = true;
+  bool _facingRight = true;
+  final double _speed = 120.0;
+  final Random _random = Random();
+
+  double _bobTimer = 0;
+  double _bobOffset = 0;
+
+  double _bubbleTimer = 0;
+  bool _showBubble = false;
+  int _bubbleIconIndex = 0;
+
+  double _happyBubbleTimer = 0;
+  bool _showHappyBubble = false;
+
+  double _zzzTimer = 0;
+
+  bool isHighlighted = false;
+  double _auraTimer = 0.0;
+  static const double _auraDuration = 2.5;
+
+  bool get isWalking => !_isWaiting;
+  Vector2 get targetPosition => _targetPosition;
+
+  void startHighlight() {
+    isHighlighted = true;
+    _auraTimer = 0;
+  }
+
+  final List<String> _recentTiles = [];
+  String? _claimedTile;
+  int _lastDx = 0;
+  int _lastDy = 0;
+  static const int _historySize = 12;
+
+  VillagerComponent({
+    required this.villager,
+    required Vector2 position,
+    required this.roadTiles,
+    required this.occupancyMap,
+    this.missingBuildingTypes = const [],
+    this.onTapped,
+    bool spawnFromHouse = false,
+  }) : super(
+          position: position,
+          size: Vector2(UiConstants.tilePixelSize * 0.38,
+              UiConstants.tilePixelSize * 0.50),
+          anchor: Anchor.center,
+          priority: 200,
+        ) {
+    _targetPosition = position.clone();
+    final id = villager.id ?? 0;
+    _waitTimer =
+        spawnFromHouse ? 0.3 : _random.nextDouble() * 3.0 + (id % 20) * 0.15;
+    _facingRight = _random.nextBool();
+  }
+
+  @override
+  void onMount() {
+    super.onMount();
+    final tileX = (position.x / UiConstants.tilePixelSize).floor();
+    final tileY = (position.y / UiConstants.tilePixelSize).floor();
+    _claimedTile = '$tileX,$tileY';
+    occupancyMap[_claimedTile!] = (occupancyMap[_claimedTile!] ?? 0) + 1;
+  }
+
+  @override
+  void onRemove() {
+    _releaseClaimed();
+    super.onRemove();
+  }
+
+  void _releaseClaimed() {
+    if (_claimedTile == null) return;
+    final occ = (occupancyMap[_claimedTile!] ?? 1) - 1;
+    if (occ <= 0) {
+      occupancyMap.remove(_claimedTile!);
+    } else {
+      occupancyMap[_claimedTile!] = occ;
+    }
+    _claimedTile = null;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    _currentSpriteFile = villager.spriteFile;
+    _sprite = await Sprite.load(_currentSpriteFile);
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    event.handled = true;
+    onTapped?.call(villager);
+  }
+
+  bool _isNightMode() => (findGame() as VillageGame?)?.isNightMode ?? false;
+
+  void randomizeFacing() => _facingRight = _random.nextBool();
+
+  Future<void> _refreshSprite() async {
+    final night = _isNightMode();
+    final newFile = night ? villager.sleepingSpriteFile : villager.spriteFile;
+    if (newFile != _currentSpriteFile) {
+      _currentSpriteFile = newFile;
+      _sprite = await Sprite.load(_currentSpriteFile);
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    priority = 200 + position.y.toInt();
+    _refreshSprite();
+
+    // Handle highlighting timer regardless of day/night mode
+    if (isHighlighted) {
+      _auraTimer += dt;
+      if (_auraTimer >= _auraDuration) {
+        isHighlighted = false;
+        _auraTimer = 0;
+      }
+    }
+
+    if (_isNightMode()) {
+      _isWaiting = true;
+      _showBubble = false;
+      _showHappyBubble = false;
+      _bubbleTimer = 0;
+      _happyBubbleTimer = 0;
+      _bobTimer += dt;
+      _bobOffset = sin(_bobTimer * 1.5) * 0.5;
+      _zzzTimer += dt;
+      return;
+    }
+
+    if (_isWaiting) {
+      _waitTimer -= dt;
+      if (_waitTimer <= 0) {
+        _pickNewTarget();
+        _isWaiting = false;
+      }
+    } else {
+      final direction = _targetPosition - position;
+      final distance = direction.length;
+
+      if (distance < 3) {
+        _isWaiting = true;
+        _waitTimer = 0.5 + _random.nextDouble() * 2.0;
+      } else {
+        final normalized = direction.normalized();
+        position += normalized * _speed * dt;
+        _facingRight = normalized.x > 0;
+      }
+    }
+
+    _bobTimer += dt;
+    if (!_isWaiting) {
+      _bobOffset = sin(_bobTimer * 8) * 3;
+    } else {
+      _bobOffset = sin(_bobTimer * 2) * 1;
+    }
+
+    if (villager.isSad && missingBuildingTypes.isNotEmpty) {
+      _bubbleTimer += dt;
+      if (_bubbleTimer > 3.0) {
+        _bubbleTimer = 0;
+        _showBubble = !_showBubble;
+        if (_showBubble) {
+          _bubbleIconIndex = _random.nextInt(missingBuildingTypes.length);
+        }
+      }
+      _showHappyBubble = false;
+      _happyBubbleTimer = 0;
+    } else {
+      _showBubble = false;
+      _bubbleTimer = 0;
+
+      if (villager.happiness >= 60) {
+        _happyBubbleTimer += dt;
+        if (_happyBubbleTimer > 8.0) {
+          _happyBubbleTimer = 0;
+          _showHappyBubble = !_showHappyBubble;
+        }
+      } else {
+        _showHappyBubble = false;
+        _happyBubbleTimer = 0;
+      }
+    }
+  }
+
+  void _pickNewTarget() {
+    final currentTileX = (position.x / UiConstants.tilePixelSize).floor();
+    final currentTileY = (position.y / UiConstants.tilePixelSize).floor();
+    final currentKey = '$currentTileX,$currentTileY';
+
+    _releaseClaimed();
+
+    if (_recentTiles.length >= _historySize) _recentTiles.removeAt(0);
+    _recentTiles.add(currentKey);
+
+    final candidates = [
+      (currentTileX + 1, currentTileY),
+      (currentTileX - 1, currentTileY),
+      (currentTileX, currentTileY + 1),
+      (currentTileX, currentTileY - 1),
+    ].where((n) => roadTiles.contains('${n.$1},${n.$2}')).toList();
+
+    if (candidates.isEmpty) {
+      if (roadTiles.isNotEmpty) {
+        String? nearest;
+        double minDist = double.infinity;
+        for (final tile in roadTiles) {
+          final parts = tile.split(',');
+          final tx = int.parse(parts[0]);
+          final ty = int.parse(parts[1]);
+          final dx = (tx - currentTileX).toDouble();
+          final dy = (ty - currentTileY).toDouble();
+          final dist = dx * dx + dy * dy;
+          if (dist < minDist) {
+            minDist = dist;
+            nearest = tile;
+          }
+        }
+        if (nearest != null) {
+          occupancyMap[nearest] = (occupancyMap[nearest] ?? 0) + 1;
+          _claimedTile = nearest;
+          final parts = nearest.split(',');
+          _targetPosition = Vector2(
+            int.parse(parts[0]) * UiConstants.tilePixelSize +
+                UiConstants.tilePixelSize / 2,
+            int.parse(parts[1]) * UiConstants.tilePixelSize +
+                UiConstants.tilePixelSize / 2,
+          );
+        }
+      }
+      return;
+    }
+
+    (int, int)? best;
+    double bestScore = double.infinity;
+
+    for (final n in candidates) {
+      final key = '${n.$1},${n.$2}';
+      double score = 0;
+
+      score += (occupancyMap[key] ?? 0) * 4.0;
+
+      final histIdx = _recentTiles.lastIndexOf(key);
+      if (histIdx >= 0) {
+        score += ((histIdx + 1) / _historySize) * 5.0;
+      }
+
+      final dx = n.$1 - currentTileX;
+      final dy = n.$2 - currentTileY;
+      if (dx == _lastDx && dy == _lastDy && (_lastDx != 0 || _lastDy != 0)) {
+        score -= 1.5;
+      }
+
+      score += _random.nextDouble() * 2.0;
+
+      if (score < bestScore) {
+        bestScore = score;
+        best = n;
+      }
+    }
+
+    if (best != null) {
+      _lastDx = best.$1 - currentTileX;
+      _lastDy = best.$2 - currentTileY;
+      final targetKey = '${best.$1},${best.$2}';
+      occupancyMap[targetKey] = (occupancyMap[targetKey] ?? 0) + 1;
+      _claimedTile = targetKey;
+      _targetPosition = Vector2(
+        best.$1 * UiConstants.tilePixelSize + UiConstants.tilePixelSize / 2,
+        best.$2 * UiConstants.tilePixelSize + UiConstants.tilePixelSize / 2,
+      );
+    }
+  }
+
+  void _renderZzz(Canvas canvas) {
+    const letters = ['z', 'z', 'Z'];
+    for (int i = 0; i < letters.length; i++) {
+      final offset = (_zzzTimer + i * 0.7) % 2.1;
+      final alpha =
+          (offset < 1.0 ? offset : max(0.0, 2.1 - offset)).clamp(0.0, 1.0);
+      if (alpha <= 0.05) continue;
+      final yOff = -5.0 - offset * 20.0;
+      final painter = TextPainter(
+        text: TextSpan(
+          text: letters[i],
+          style: TextStyle(
+            fontSize: 9.0 + i * 3.0,
+            color: Color.fromARGB((alpha * 180).round(), 120, 120, 220),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final xOff = _facingRight
+          ? size.x * 0.7 + i * 4.0
+          : size.x * 0.3 - i * 4.0 - painter.width;
+      painter.paint(canvas, Offset(xOff, yOff));
+    }
+  }
+
+  void _renderThoughtBubble(Canvas canvas) {
+    if (!_showBubble || missingBuildingTypes.isEmpty) return;
+
+    final type =
+        missingBuildingTypes[_bubbleIconIndex % missingBuildingTypes.length];
+
+    final bubbleX = _facingRight ? size.x * 0.7 + 4.0 : size.x * 0.3 - 4.0;
+    final bubbleY = -40.0;
+    final bubbleR = 34.0;
+
+    canvas.drawCircle(
+      Offset(bubbleX, bubbleY),
+      bubbleR,
+      Paint()..color = const Color(0xF0FFFFFF),
+    );
+    canvas.drawCircle(
+      Offset(bubbleX, bubbleY),
+      bubbleR,
+      Paint()
+        ..color = const Color(0x50000000)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0,
+    );
+
+    final tailOffsetX = _facingRight ? -3.0 : 3.0;
+    final tailOffsetX2 = _facingRight ? -8.0 : 8.0;
+    canvas.drawCircle(Offset(bubbleX + tailOffsetX, bubbleY + bubbleR + 10), 7,
+        Paint()..color = const Color(0xDDFFFFFF));
+    canvas.drawCircle(Offset(bubbleX + tailOffsetX2, bubbleY + bubbleR + 24), 4,
+        Paint()..color = const Color(0xBBFFFFFF));
+
+    _drawNeedIcon(canvas, type, bubbleX, bubbleY);
+  }
+
+  static const _needEmojis = {
+    'water_plant': '💧',
+    'power_plant': '⚡',
+    'hospital': '🏥',
+    'school': '🎒',
+    'park': '🌳',
+    'restaurant': '🍽️',
+    'library': '📚',
+  };
+
+  void _drawNeedIcon(Canvas canvas, String type, double cx, double cy) {
+    final emoji = _needEmojis[type] ?? '❓';
+    final painter = TextPainter(
+      text: TextSpan(
+        text: emoji,
+        style: const TextStyle(fontSize: 28),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(
+        canvas, Offset(cx - painter.width / 2, cy - painter.height / 2));
+  }
+
+  void _renderHappyBubble(Canvas canvas) {
+    if (!_showHappyBubble) return;
+
+    final idx = villager.id ?? 0;
+    final text = '❤️ ${VillagerFavorites.author(idx)}';
+
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(fontSize: 10, color: Color(0xFF4A4A4A)),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    )..layout(maxWidth: 140);
+
+    final padH = 8.0;
+    final padV = 5.0;
+    final bubbleW = painter.width + padH * 2;
+    final bubbleH = painter.height + padV * 2;
+    final bubbleX = size.x * 0.5 - bubbleW / 2;
+    final bubbleY = -bubbleH - 14;
+    final centerX = bubbleX + bubbleW / 2;
+
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(bubbleX, bubbleY, bubbleW, bubbleH),
+      const Radius.circular(10),
+    );
+    canvas.drawRRect(rrect, Paint()..color = const Color(0xF0FFFFFF));
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = const Color(0x30000000)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0,
+    );
+
+    final tailOffsetX = _facingRight ? 20.0 : -28.0;
+    final tailOffsetX2 = _facingRight ? 16.0 : -20.0;
+    canvas.drawCircle(
+      Offset(centerX + tailOffsetX, bubbleY + bubbleH + 10),
+      6,
+      Paint()..color = const Color(0xDDFFFFFF),
+    );
+    canvas.drawCircle(
+      Offset(centerX + tailOffsetX2, bubbleY + bubbleH + 24),
+      3,
+      Paint()..color = const Color(0xBBFFFFFF),
+    );
+
+    painter.paint(canvas, Offset(bubbleX + padH, bubbleY + padV));
+  }
+
+  @override
+  void render(Canvas canvas) {
+    if (_sprite == null) return;
+
+    canvas.save();
+    canvas.translate(0, _bobOffset);
+
+    if (isHighlighted) {
+      final progress = _auraTimer / _auraDuration;
+      final alpha = (0.75 * (1.0 - progress)).clamp(0.0, 0.75);
+      final pulse = 1.0 + 0.25 * sin(_auraTimer * 8.0);
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(size.x / 2, size.y / 2),
+          width: size.x * 1.6 * pulse,
+          height: size.y * 1.4 * pulse,
+        ),
+        Paint()
+          ..color = Color.fromARGB((alpha * 255).round(), 255, 215, 0)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+      );
+    }
+
+    if (!_facingRight) {
+      canvas.translate(size.x, 0);
+      canvas.scale(-1, 1);
+    }
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.x / 2, size.y - 3),
+        width: size.x * 0.6,
+        height: 12,
+      ),
+      Paint()..color = const Color(0x30000000),
+    );
+
+    _sprite!.render(canvas, size: size);
+
+    if (!_facingRight) {
+      canvas.scale(-1, 1);
+      canvas.translate(-size.x, 0);
+    }
+
+    if (_isNightMode()) {
+      _renderZzz(canvas);
+    } else {
+      _renderThoughtBubble(canvas);
+      _renderHappyBubble(canvas);
+    }
+
+    final namePainter = TextPainter(
+      text: TextSpan(
+        text: villager.name,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF4A4A4A),
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          (size.x - namePainter.width) / 2 - 5,
+          size.y + 2,
+          namePainter.width + 10,
+          16,
+        ),
+        const Radius.circular(6),
+      ),
+      Paint()..color = const Color(0xCCFFFFFF),
+    );
+    namePainter.paint(
+        canvas, Offset((size.x - namePainter.width) / 2, size.y + 3));
+
+    canvas.restore();
+  }
+}

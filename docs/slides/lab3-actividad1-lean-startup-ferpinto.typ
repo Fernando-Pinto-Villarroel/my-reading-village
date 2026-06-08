@@ -26,7 +26,7 @@
 )
 
 #show: project.with(
-  title: "My Reading Town",
+  title: "My Reading Village",
   sub-title: "Lab 3 - Actividad 1 - Presentación y Crítica de Startup Lean",
   author: "Fernando Pinto Villarroel",
   date: "17 de mayo de 2026",
@@ -117,7 +117,7 @@
 #columns-content()[
   #set text(size: 13pt)
 
-  *My Reading Town* es una app móvil que transforma el acto de leer en un juego de construcción de aldeas.
+  *My Reading Village* es una app móvil que transforma el acto de leer en un juego de construcción de aldeas.
 
   #v(8pt)
   El usuario registra páginas leídas de cualquier libro físico o digital. Esas páginas se convierten en recursos: monedas, madera, gemas. Con esos recursos construye edificios en una aldea que crece y cobra vida.
@@ -458,7 +458,7 @@
 #cbox(fill: pink)[
   #set align(center)
   #set text(size: 16pt)
-  *My Reading Town - Startup Lean*
+  *My Reading Village - Startup Lean*
   #v(8pt)
   *Problema:* falta de hábito lector\
   *Solución:* gamificación real de la lectura\

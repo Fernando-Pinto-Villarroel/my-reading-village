@@ -1,4 +1,4 @@
-# Google Play Store — Complete Publishing Guide for My Reading Town
+# Google Play Store — Complete Publishing Guide for My Reading Village
 
 This guide walks you through every step needed to go from zero to a published app with real in-app purchases on the Google Play Store. Follow the steps in order.
 
@@ -34,22 +34,22 @@ This guide walks you through every step needed to go from zero to a published ap
 
 ### Step 2.1 — Configure App Identity
 
-Edit `my_reading_town/pubspec.yaml`:
+Edit `my_reading_village/pubspec.yaml`:
 
 ```yaml
-name: my_reading_town
+name: my_reading_village
 version: 1.0.0+1 # format: version_name+version_code
 ```
 
 - `version_name` (e.g., `1.0.0`) is shown to users.
 - `version_code` (e.g., `1`) is an integer used internally by Google. It must increase with every upload.
 
-Edit `my_reading_town/android/app/build.gradle` and set:
+Edit `my_reading_village/android/app/build.gradle` and set:
 
 ```gradle
 android {
     defaultConfig {
-        applicationId "com.ferchostudiodev.my_reading_town"   // CHANGE THIS — must be unique on the Play Store
+        applicationId "com.ferchostudiodev.my_reading_village"   // CHANGE THIS — must be unique on the Play Store
         minSdkVersion 21
         targetSdkVersion 34
         versionCode 1
@@ -58,7 +58,7 @@ android {
 }
 ```
 
-**Important:** `applicationId` must be globally unique. Reverse-domain notation is standard (e.g., `com.ferchostudiodev.my_reading_town`).
+**Important:** `applicationId` must be globally unique. Reverse-domain notation is standard (e.g., `com.ferchostudiodev.my_reading_village`).
 
 ### Step 2.2 — Generate a Signing Key
 
@@ -66,27 +66,27 @@ You must sign your release APK/AAB with a keystore file. Run this **once** and k
 
 ```bash
 keytool -genkey -v \
-  -keystore ~/my-reading-town-release.jks \
+  -keystore ~/my-reading-village-release.jks \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000 \
-  -alias my-reading-town
+  -alias my-reading-village
 ```
 
 You will be asked for a password and your name/organization. **Never lose this file** — you cannot update your app without it.
 
 ### Step 2.3 — Configure Signing in Flutter
 
-Create `my_reading_town/android/key.properties`:
+Create `my_reading_village/android/key.properties`:
 
 ```properties
 storePassword=YOUR_STORE_PASSWORD
 keyPassword=YOUR_KEY_PASSWORD
-keyAlias=my-reading-town
-storeFile=/home/youruser/my-reading-town-release.jks
+keyAlias=my-reading-village
+storeFile=/home/youruser/my-reading-village-release.jks
 ```
 
-Edit `my_reading_town/android/app/build.gradle` to use the keystore:
+Edit `my_reading_village/android/app/build.gradle` to use the keystore:
 
 ```gradle
 def keystoreProperties = new Properties()
@@ -121,12 +121,12 @@ android {
 Google Play requires an **Android App Bundle (.aab)**, not an APK:
 
 ```bash
-cd my_reading_town
+cd my_reading_village
 flutter build appbundle --release
 ```
 
 The output file will be at:
-`my_reading_town/build/app/outputs/bundle/release/app-release.aab`
+`my_reading_village/build/app/outputs/bundle/release/app-release.aab`
 
 ---
 
@@ -136,7 +136,7 @@ The output file will be at:
 
 1. In Play Console, click **"Create app"**.
 2. Fill in:
-   - **App name**: My Reading Town
+   - **App name**: My Reading Village
    - **Default language**: English (United States)
    - **App or game**: Game
    - **Free or paid**: Free (you earn through in-app purchases)
@@ -146,8 +146,8 @@ The output file will be at:
 
 Go to **Grow > Store presence > Main store listing**:
 
-- **App name**: My Reading Town
-- **Short description** (max 80 chars): Build your reading village! Read books, earn resources, grow your town.
+- **App name**: My Reading Village
+- **Short description** (max 80 chars): Build your reading village! Read books, earn resources, grow your village.
 - **Full description** (max 4000 chars): Write a compelling description of the game.
 - **Screenshots**: At least 2 phone screenshots (1080×1920 px recommended).
 - **Feature graphic**: 1024×500 px banner image.
@@ -198,12 +198,12 @@ For each gem pack, click **"Create product"**:
 
 | Product ID  | Name      | Description             | Price  |
 | ----------- | --------- | ----------------------- | ------ |
-| `gems_50`   | 50 Gems   | 50 gems for your town   | $0.99  |
-| `gems_100`  | 100 Gems  | 100 gems for your town  | $1.99  |
-| `gems_200`  | 200 Gems  | 200 gems for your town  | $3.99  |
-| `gems_500`  | 500 Gems  | 500 gems for your town  | $8.99  |
-| `gems_1000` | 1000 Gems | 1000 gems for your town | $16.99 |
-| `gems_2000` | 2000 Gems | 2000 gems for your town | $29.99 |
+| `gems_50`   | 50 Gems   | 50 gems for your village   | $0.99  |
+| `gems_100`  | 100 Gems  | 100 gems for your village  | $1.99  |
+| `gems_200`  | 200 Gems  | 200 gems for your village  | $3.99  |
+| `gems_500`  | 500 Gems  | 500 gems for your village  | $8.99  |
+| `gems_1000` | 1000 Gems | 1000 gems for your village | $16.99 |
+| `gems_2000` | 2000 Gems | 2000 gems for your village | $29.99 |
 
 For each product:
 
@@ -220,7 +220,7 @@ For each product:
 | `pack_starter` | Starter Pack | 50 coins + 30 wood + 10 metal + 1 sandwich                        | $1.49  |
 | `pack_builder` | Builder Pack | 100 coins + 100 wood + 50 metal + 2 hammers                       | $2.99  |
 | `pack_reader`  | Reader Pack  | 200 coins + 50 gems + 3 books + 3 glasses                         | $4.99  |
-| `pack_town`    | Town Pack    | 500 coins + 200 wood + 100 metal + 100 gems + powerups            | $9.99  |
+| `pack_village` | Village Pack | 500 coins + 200 wood + 100 metal + 100 gems + powerups            | $9.99  |
 | `pack_mega`    | Mega Pack    | 1000 coins + 500 wood + 200 metal + 200 gems + 10 of each powerup | $19.99 |
 
 All packs are **Consumable** (can be repurchased).

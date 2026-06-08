@@ -1,10 +1,10 @@
 <div align="center">
 
-  <img src="my_reading_town/assets/images/logos/my_reading_town_icon_rounded.png" alt="My Reading Town" width="220" />
+  <img src="my_reading_village/assets/images/logos/my_reading_village_icon_rounded.png" alt="My Reading Village" width="220" />
 
   <br>
 
-# My Reading Town
+# My Reading Village
 
 **A mobile village-building game that turns real-world reading into dopamine-driven gameplay — built with Flutter and Flame Engine.**
 
@@ -46,7 +46,7 @@
 
 ## Overview
 
-**My Reading Town** is a privacy-first mobile game that rewards real-world reading with in-game village-building progression. Log the pages you read, earn coins, gems, wood, and metal, then use those resources to construct and upgrade buildings in a charming 2D isometric village populated by 43 unique kawaii animal villagers.
+**My Reading Village** is a privacy-first mobile game that rewards real-world reading with in-game village-building progression. Log the pages you read, earn coins, gems, wood, and metal, then use those resources to construct and upgrade buildings in a charming 2D isometric village populated by 43 unique kawaii animal villagers.
 
 The game replicates the dopamine reward loops found in addictive mobile games — but redirects them toward building a healthy reading habit. All gameplay data stays exclusively on your device: no accounts, no cloud sync, no tracking.
 
@@ -255,7 +255,7 @@ Event mission progress counters are baseline-snapshotted at activation, so only 
 
 ## Business Model & ROI
 
-My Reading Town is free-to-play with optional in-app purchases. No paywalls block core gameplay — all progression is achievable without spending.
+My Reading Village is free-to-play with optional in-app purchases. No paywalls block core gameplay — all progression is achievable without spending.
 
 ### Revenue Streams
 
@@ -384,8 +384,8 @@ lib/
 ## Project Structure
 
 ```
-my-reading-town/
-├── my_reading_town/              # Flutter application root
+my-reading-village/
+├── my_reading_village/              # Flutter application root
 │   ├── android/                  # Android platform files + build config
 │   ├── assets/
 │   │   ├── audios/               # Background music and sound effect files
@@ -402,7 +402,7 @@ my-reading-town/
 │   ├── remove_background.py      # Batch background removal via flood-fill
 │   ├── original-images/          # Source images before processing
 │   └── README.md                 # Full usage guide for all tools
-├── LICENSE.md                    # My Reading Town Community License v1.0
+├── LICENSE.md                    # My Reading Village Community License v1.0
 └── README.md                     # This file
 ```
 
@@ -424,7 +424,7 @@ All data is stored in a local SQLite database on-device. No data is ever transmi
 | `road_tiles`               | Player-placed road terrain tiles                                                                   |
 | `special_tiles`            | Water, sand, and rock terrain markers                                                              |
 | `unlocked_chunks`          | Map expansion tracking — which 5×5 tile chunks are unlocked                                        |
-| `game_state`               | Singleton player profile — XP, level, username, town name, language, settings, ad counters, volume |
+| `game_state`               | Singleton player profile — XP, level, username, village name, language, settings, ad counters, volume |
 | `inventory_items`          | Consumable item quantities — book, sandwich, glasses, hammer                                       |
 | `minigame_cooldowns`       | Per-minigame cooldown end timestamps                                                               |
 | `active_powerups`          | Time-limited active buffs — type, target villager, activation time, duration                       |
@@ -453,7 +453,7 @@ pip install -r requirements.txt
 
 For full usage details, flags, and examples see [`tools/README.md`](tools/README.md).
 
-AI generation prompts for all game assets (villagers, buildings, decorations, items, and more), including dimensions, style, and palette guidance, are in [`my_reading_town/assets/prompts/`](my_reading_town/assets/prompts/).
+AI generation prompts for all game assets (villagers, buildings, decorations, items, and more), including dimensions, style, and palette guidance, are in [`my_reading_village/assets/prompts/`](my_reading_village/assets/prompts/).
 
 ---
 
@@ -469,8 +469,8 @@ AI generation prompts for all game assets (villagers, buildings, decorations, it
 
 ```bash
 # Clone the repository
-git clone https://github.com/FernandoPV02/my-reading-town.git
-cd my-reading-town/my_reading_town
+git clone https://github.com/FernandoPV02/my-reading-village.git
+cd my-reading-village/my_reading_village
 
 # Install dependencies
 flutter pub get
@@ -506,7 +506,7 @@ flutter clean
 ## Building for Android
 
 ```bash
-cd my_reading_town
+cd my_reading_village
 
 # Debug APK
 flutter build apk --debug
@@ -528,7 +528,7 @@ For AdMob account setup, ad unit IDs, and enabling live ads see [`GOOGLE_ADS.md`
 
 ## License
 
-This project is licensed under the **My Reading Town Community License v1.0** — see [LICENSE.md](LICENSE.md) for full terms.
+This project is licensed under the **My Reading Village Community License v1.0** — see [LICENSE.md](LICENSE.md) for full terms.
 
 - Personal and non-commercial use is permitted.
 - Commercial use requires prior written authorization from the author.

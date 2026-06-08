@@ -1,4 +1,4 @@
-# My Reading Town Community License v1.0
+# My Reading Village Community License v1.0
 
 Copyright (c) 2026 Fernando Pinto. All rights reserved.
 
@@ -80,7 +80,7 @@ Removal, obscuring, or alteration of this attribution is a violation of this lic
 
 This license does **not** grant any rights to use:
 
-- The project name "My Reading Town" as a product or service name.
+- The project name "My Reading Village" as a product or service name.
 - Any logos, icons, or graphic assets associated with the original project.
 - Any branding elements or trade dress associated with the original project.
 
@@ -94,7 +94,7 @@ All trademark, branding, and trade dress rights remain **exclusively reserved** 
 
 Any fork, modified version, or derivative work of this software that is distributed, published, or deployed must:
 
-1. **Remain licensed under this exact same license** — the My Reading Town Community License v1.0.
+1. **Remain licensed under this exact same license** — the My Reading Village Community License v1.0.
 2. **Include the full, unmodified text of this license** in the root of the project or an equivalent prominent location.
 3. **Retain all original copyright notices** without removal or alteration.
 4. **Clearly document all changes** made to the original software, including a summary of modifications, in a CHANGES file, commit history, or equivalent documentation.
@@ -151,5 +151,5 @@ The failure of the copyright holder to enforce any provision of this license sha
 
 ---
 
-**My Reading Town Community License v1.0**
+**My Reading Village Community License v1.0**
 **Copyright (c) 2026 Fernando Pinto. All rights reserved.**
