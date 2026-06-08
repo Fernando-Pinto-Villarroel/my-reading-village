@@ -58,3 +58,6 @@ tools/images-to-mirror/*
 tools/images-to-cut/*
 !tools/images-to-cut/.gitkeep
 docs/slides/examples/
+
+.codegraph/
+.cursor/

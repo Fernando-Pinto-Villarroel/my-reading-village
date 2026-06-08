@@ -1,0 +1,508 @@
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Sora:wght@400;600;700&display=swap");
+
+  .lc-wrapper {
+    font-family: "Nunito", sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+  }
+
+  .lc-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1.5fr 2fr;
+    grid-template-rows: auto auto auto;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #e0d6f0;
+    box-shadow: 0 4px 24px rgba(180, 140, 200, 0.15);
+    background: #f5f0fa;
+  }
+
+  .lc-cell {
+    padding: 15px 16px;
+    box-sizing: border-box;
+    border: 1px solid #e0d6f0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lc-label {
+    font-family: "Sora", sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    margin-bottom: 3px;
+    padding-bottom: 7px;
+    border-bottom: 1.5px solid currentColor;
+    opacity: 0.7;
+  }
+
+  .lc-cell p,
+  .lc-cell ul {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #3a2e4a;
+  }
+
+  .lc-cell ul {
+    padding-left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .lc-cell li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #3a2e4a;
+  }
+
+  .lc-cell b {
+    font-weight: 800;
+  }
+  .lc-cell i {
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  /* subsección early adopters y high level concept */
+  .lc-sub-divider {
+    border: none;
+    border-top: 1px dashed #a0b0d0;
+    margin: 4px 0 2px 0;
+  }
+
+  .lc-sub-label {
+    font-family: "Sora", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: 0.7;
+    margin-bottom: 2px;
+  }
+
+  /* subsección de ingresos */
+  .lc-rev-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .lc-rev-title {
+    font-family: "Sora", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 1px;
+    opacity: 0.7;
+  }
+
+  /* ── PROBLEMA */
+  .lc-problem {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    background: #fff0f5;
+  }
+  .lc-problem .lc-label {
+    color: #c0395a;
+    border-bottom-color: #e8a0b4;
+  }
+  .lc-problem li {
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+
+  /* ── SOLUCIÓN */
+  .lc-solution {
+    grid-column: 2;
+    grid-row: 1;
+    background: #f3f0ff;
+  }
+  .lc-solution .lc-label {
+    color: #6c55cc;
+    border-bottom-color: #c0aff0;
+  }
+
+  /* ── UVP */
+  .lc-uvp {
+    grid-column: 3 / 5;
+    grid-row: 1 / 3;
+    background: #fffbf0;
+    border-left: 2px solid #f0d88a;
+    border-right: 2px solid #f0d88a;
+  }
+  .lc-uvp .lc-label {
+    color: #b07a00;
+    border-bottom-color: #f0d88a;
+  }
+  .lc-uvp p {
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+  .lc-uvp .lc-sub-label {
+    color: #b07a00;
+  }
+  .lc-uvp .lc-sub-divider {
+    border-top-color: #e0c060;
+  }
+
+  /* ── VENTAJA INJUSTA */
+  .lc-unfair {
+    grid-column: 5;
+    grid-row: 1;
+    background: #f0fff6;
+  }
+  .lc-unfair .lc-label {
+    color: #1a7a50;
+    border-bottom-color: #90d8b8;
+  }
+  .lc-unfair p {
+    font-size: 13.5px;
+    line-height: 1.8;
+  }
+
+  /* ── SEGMENTOS */
+  .lc-segments {
+    grid-column: 6;
+    grid-row: 1 / 3;
+    background: #f0f5ff;
+  }
+  .lc-segments .lc-label {
+    color: #2a55aa;
+    border-bottom-color: #a0b8e8;
+  }
+  .lc-segments .lc-sub-label {
+    color: #2a55aa;
+  }
+  .lc-segments li {
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  /* ── MÉTRICAS */
+  .lc-metrics {
+    grid-column: 2;
+    grid-row: 2;
+    background: #fff5ee;
+  }
+  .lc-metrics .lc-label {
+    color: #c05820;
+    border-bottom-color: #f0b890;
+  }
+
+  /* ── CANALES */
+  .lc-channels {
+    grid-column: 5;
+    grid-row: 2;
+    background: #f0fcfe;
+  }
+  .lc-channels .lc-label {
+    color: #1a7a8a;
+    border-bottom-color: #90d8e8;
+  }
+
+  /* ── COSTOS */
+  .lc-costs {
+    grid-column: 1 / 4;
+    grid-row: 3;
+    background: #f5f5f7;
+    border-top: 2px solid #d8d0e8;
+  }
+  .lc-costs .lc-label {
+    color: #5a5070;
+    border-bottom-color: #c8c0dc;
+  }
+
+  /* ── INGRESOS */
+  .lc-revenue {
+    grid-column: 4 / 7;
+    grid-row: 3;
+    background: #fffbf0;
+    border-top: 2px solid #f0d88a;
+  }
+  .lc-revenue .lc-label {
+    color: #b07a00;
+    border-bottom-color: #f0d88a;
+  }
+  .lc-revenue .lc-rev-title {
+    color: #b07a00;
+  }
+
+  /* ── RESPONSIVE */
+  @media (max-width: 640px) {
+    .lc-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: none;
+    }
+    .lc-problem,
+    .lc-solution,
+    .lc-uvp,
+    .lc-unfair,
+    .lc-segments,
+    .lc-metrics,
+    .lc-channels,
+    .lc-costs,
+    .lc-revenue {
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .lc-uvp {
+      grid-column: 1 / 3;
+      border-left: 1px solid #e0d6f0;
+      border-right: 1px solid #e0d6f0;
+    }
+    .lc-costs {
+      grid-column: 1 / 3;
+    }
+    .lc-revenue {
+      grid-column: 1 / 3;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .lc-grid {
+      grid-template-columns: 1fr;
+    }
+    .lc-uvp,
+    .lc-costs,
+    .lc-revenue {
+      grid-column: auto;
+    }
+  }
+</style>
+
+<div class="lc-wrapper">
+  <div class="lc-grid">
+    <!-- PROBLEMA -->
+    <div class="lc-cell lc-problem">
+      <div class="lc-label">Problema</div>
+      <ul>
+        <li>
+          Los usuarios <b>quieren leer más</b> pero no logran mantener el hábito
+          cuando compite contra el entretenimiento digital pasivo: redes
+          sociales, streaming y videojuegos.
+        </li>
+        <li>
+          La lectura <b>no ofrece retroalimentación inmediata</b> ni visible. No
+          hay recompensas, no hay progresión, no hay razón para volver mañana.
+          <i
+            >El libro no puede competir con la dopamina de una app bien
+            diseñada.</i
+          >
+        </li>
+        <li>
+          Las apps de hábitos existentes son
+          <b>demasiado simples o aburridas</b>: registrar una raya por día no
+          motiva a nadie, y las que gamifican (como Habitica) bloquean casi todo
+          detrás de un muro de pago.
+        </li>
+      </ul>
+    </div>
+
+    <!-- SOLUCIÓN -->
+    <div class="lc-cell lc-solution">
+      <div class="lc-label">Solución</div>
+      <ul>
+        <li>
+          <b>Registro rápido</b> de páginas leídas (&lt;10 seg) que genera
+          recursos al instante: monedas, madera, gemas y metal.
+        </li>
+        <li>
+          <b>Aldea isométrica animada</b> con 8 tipos de edificios y 3 niveles
+          de mejora que crece con cada sesión de lectura.
+        </li>
+        <li>
+          <b>Misiones ramificadas</b>, 13 eventos estacionales y minijuegos
+          literarios que sostienen el engagement a largo plazo.
+        </li>
+      </ul>
+    </div>
+
+    <!-- UVP -->
+    <div class="lc-cell lc-uvp">
+      <div class="lc-label">Propuesta de Valor Única</div>
+      <p>
+        La <b>única app</b> que convierte las páginas que lees en recursos
+        reales para construir una aldea animada con habitantes propios.
+      </p>
+      <p>
+        <i>No es un tracker de hábitos con un skin de juego.</i> Es un
+        <b>juego de construcción con profundidad real</b>: 43 especies
+        coleccionables, edificios con niveles, eventos de temporada, rueda de la
+        suerte y minijuegos, donde
+        <b>la moneda del juego es la lectura real</b>.
+      </p>
+      <p>
+        Todo funciona <b>offline, sin cuenta, sin suscripción</b> y sin paywalls
+        que bloqueen el progreso principal.
+        <i>Lees más y tu aldea crece. Así de simple y así de adictivo.</i>
+      </p>
+      <hr class="lc-sub-divider" />
+      <div class="lc-sub-label">High Level Concept</div>
+      <p
+        style="font-size: 12.5px; font-style: italic; color: #7a5a00; margin: 0"
+      >
+        <b>Clash of Clans</b> para lectores, donde cada página que lees te da
+        tus recursos de construcción.
+      </p>
+    </div>
+
+    <!-- VENTAJA INJUSTA -->
+    <div class="lc-cell lc-unfair">
+      <div class="lc-label">Ventaja Injusta</div>
+      <p>
+        La combinación de <b>profundidad de juego real</b> (43 especies,
+        misiones ramificadas, 13 eventos estacionales) con
+        <b>lectura real como mecánica central</b> es muy difícil de replicar
+        rápido.
+      </p>
+      <p>
+        <i
+          >Copiar la idea no es suficiente: hay que reconstruir todo el sistema
+          desde cero.</i
+        >
+      </p>
+    </div>
+
+    <!-- SEGMENTOS -->
+    <div class="lc-cell lc-segments">
+      <div class="lc-label">Segmentos de Clientes</div>
+      <ul>
+        <li>
+          Adolescentes y adultos jóvenes de <b>12 a 35 años</b> con hábito de
+          uso de apps en smartphone Android.
+        </li>
+        <li>
+          <b>Lectores frustrados</b>: personas que quieren leer más pero no
+          logran sostener el hábito frente al entretenimiento digital.
+        </li>
+        <li>
+          Usuarios familiarizados con <b>gaming casual y apps freemium</b> como
+          Duolingo, Habitica o Clash of Clans.
+        </li>
+        <li>
+          Personas en etapa escolar, universitaria o inicio de vida laboral, con
+          <i>tiempo intermitente y alta exposición al celular</i>.
+        </li>
+      </ul>
+      <hr class="lc-sub-divider" />
+      <div class="lc-sub-label">Early Adopters</div>
+      <ul>
+        <li>
+          Jóvenes de <b>16 a 28 años</b> activos en comunidades de lectores en
+          TikTok, Reddit o Discord.
+        </li>
+        <li>
+          Usuarios típicos de <b>Habitica, Duolingo y Clash Royale</b> que ya
+          entienden el modelo de hábito gamificado y buscan algo con mayor
+          profundidad personal.
+        </li>
+      </ul>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="lc-cell lc-metrics">
+      <div class="lc-label">Métricas Clave</div>
+      <ul>
+        <li>
+          <b>Páginas leídas / usuario activo / semana</b>
+          <i>(North Star Metric, meta ≥ 80)</i>
+        </li>
+        <li>Retención <b>día 7 ≥ 30%</b></li>
+        <li><b>DAU / MAU ≥ 25%</b></li>
+        <li>Libros terminados por el grupo beta inicial</li>
+      </ul>
+    </div>
+
+    <!-- CANALES -->
+    <div class="lc-cell lc-channels">
+      <div class="lc-label">Canales</div>
+      <ul>
+        <li><b>Google Play Store</b> (distribución principal)</li>
+        <li>Comunidades de lectores en <b>Reddit y Discord</b></li>
+        <li>Micro-influencers de libros en <b>TikTok e Instagram</b></li>
+        <li><i>Boca a boca orgánico</i> entre usuarios</li>
+      </ul>
+    </div>
+
+    <!-- COSTOS -->
+    <div class="lc-cell lc-costs">
+      <div class="lc-label">Estructura de Costos</div>
+      <ul>
+        <li>
+          <i>(Indirecto - Tiempo)</i> <b>Desarrollo - $3.120</b>: ~300 h
+          iniciales + 12 h/mes de iteración a $10/h (costo de oportunidad, no
+          efectivo)
+        </li>
+        <li>
+          <i>(Directo)</i> <b>Marketing y adquisición - $700</b>: ASO, contenido
+          orgánico, micro-influencers de BookTok
+        </li>
+        <li>
+          <i>(Indirecto - Tiempo)</i> <b>Assets y herramientas - $500</b>:
+          pipeline IA propio + scripts Python; más de 200 assets generados, ~50
+          h a $10/h (costo de oportunidad, no efectivo)
+        </li>
+        <li>
+          <i>(Indirecto)</i> <b>Soporte y mantenimiento - $400</b>: Bug fixes,
+          respuesta a reseñas, compatibilidad con la mayor cantidad de versiones
+          de Android posible
+        </li>
+        <li>
+          <i>(Directo)</i> <b>Comisiones de plataforma - $270</b>: 15% Google
+          Play sobre IAP (estimado año 1)
+        </li>
+        <li>
+          <i>(Directo - Único)</i> <b>Registro en Play Store - $25</b>: cuenta
+          de desarrollador, pago único de por vida
+        </li>
+      </ul>
+    </div>
+
+    <!-- INGRESOS -->
+    <div class="lc-cell lc-revenue">
+      <div class="lc-label">Flujos de Ingresos</div>
+      <div class="lc-rev-group">
+        <div class="lc-rev-title">Compras dentro de la App (IAP)</div>
+        <ul>
+          <li>
+            <b>Packs de gemas:</b> 6 tiers de $0.99 a $29.99 (consumibles)
+          </li>
+          <li>
+            <b>Packs de ítems:</b> 5 bundles de $1.49 a $19.99 (consumibles)
+          </li>
+          <li>
+            <b>Especies de habitantes:</b> 30 especies de $0.99 a $19.99 (compra
+            única permanente)
+          </li>
+        </ul>
+      </div>
+      <div class="lc-rev-group">
+        <div class="lc-rev-title">Anuncios Opcionales (AdMob Rewarded)</div>
+        <ul>
+          <li>
+            3 ubicaciones, <b>siempre iniciadas por el usuario</b>: saltar
+            construcción, rueda de la suerte y 5 gemas gratis/día
+          </li>
+        </ul>
+      </div>
+      <div class="lc-rev-group">
+        <div class="lc-rev-title">Proyección</div>
+        <ul>
+          <li>
+            <b>~$150–210/mes</b> con 1K MAU → <b>~$1,200–2,300/mes</b> con 10K
+            MAU
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
