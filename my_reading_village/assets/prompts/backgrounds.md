@@ -124,3 +124,58 @@ TECHNICAL:
 - Characters must be expressive, mid-action, full of personality — the scene should feel like it was caught in the middle of a fun moment
 - Mood: excitement of a new day, the joy of learning, playful morning energy — like showing up to your favorite place
 ```
+
+---
+
+## Horizontal Marketing Banner Backgrounds
+
+These are landscape-orientation hero illustrations for use outside the app — social media cover photos/banners (Facebook, X/Twitter, YouTube, LinkedIn) and the Play Store feature graphic. Same kawaii-pastel cozy/builder aesthetic as the splash backgrounds above, just composed for wide formats and framed so the focal scene survives aggressive cropping across platforms.
+
+---
+
+### marketing_banner_horizontal.png — The Village Welcome Panorama
+
+```
+Wide landscape hero illustration for a kawaii mobile village-builder game about reading habits, intended as a cross-platform social media cover/banner image. Style reference: Clash Royale / Pokémon GO loading-screen quality — polished, warm, storybook atmosphere, the same cozy-builder mood as the game's splash screens, just composed for a wide panoramic format instead of portrait. Landscape orientation, 2560×1440px (16:9), solid painted background (no transparency).
+
+REFERENCE SPRITES — READ THIS CAREFULLY, IT IS THE MOST IMPORTANT PART OF THIS BRIEF: I will attach the reference images for the three villager characters, the park, and the house (level 3) buildings. These two groups of references must be treated in COMPLETELY DIFFERENT ways — do not blend the two approaches:
+
+1. CHARACTERS — EXACT, LITERAL REPLICATION (no creative reinterpretation of any kind): The cat, dog, and rabbit sprites I attach are the FINAL, LOCKED designs already used throughout the published game. Your only job with them is to redraw the SAME EXACT character — same silhouette, same body proportions, same head-to-body ratio, same leg/ear/tail shapes, same exact fur colors and shading pattern, same simple dot eyes, same tiny mouth shape — at a larger illustrative scale and in a new pose/scene. Treat this exactly like an animation studio redrawing the same locked character model in a new keyframe: the audience must recognize them INSTANTLY as the very same character from the app, not as "a cat-like creature inspired by it." Do NOT redesign, restyle, "improve," elongate, simplify, add new markings, change the fur palette, change the eye style, or otherwise reinterpret them — any deviation from the attached sprite is a failure of this brief, no matter how appealing the new design might look on its own.
+2. BUILDINGS — style/theme inspiration only: use the park and house sprites only to understand the aesthetic (pastel colors, kawaii style, what kind of place each one represents) — do NOT copy-paste or directly reproduce the building sprites. Instead, illustrate natural, fully painted scene-versions of these places as if drawn by a storybook illustrator who was inspired by the sprites' style.
+
+Everything must feel like a real illustrated environment, not game assets pasted into a drawing — but the THREE CHARACTERS are the one exception where "illustrated reinterpretation" is explicitly NOT wanted: they must look like the exact same characters, simply painted at a bigger size.
+
+CHARACTER DESIGNS (these are descriptions of the LOCKED reference sprites for your own understanding — they do not replace the attached images, which are the actual source of truth to copy faithfully):
+- Cat villager: chubby round body, very short stubby legs, small round paws, large round head, simple dot eyes, tiny curved smile, soft pastel orange-cream fur with inner-ear pink, slightly darker orange tail tip. Personality: warm and welcoming.
+- Dog villager: chubby round body, short stubby legs, floppy rounded ears, simple dot eyes, tiny curved mouth, soft pastel golden-tan fur, small stub tail. Personality: cheerful and playful.
+- Rabbit villager: chubby round body, short stubby legs, long upright rounded ears, simple dot eyes, tiny curved mouth, soft white or lavender-white fur, small round fluffy tail. Personality: peaceful and absorbed.
+
+VILLAGE PANORAMA (use the building sprites only as style/theme inspiration — illustrate as real painted environments, not copied assets): a sweeping wide view of the kawaii village at golden hour — the park with its big round-canopy tree anchors the left third, a cozy three-story pastel cottage anchors the right third, and in between, a gentle path winds through flowering gardens connecting them, with soft rolling hills and tiny distant rooftops filling out the horizon.
+
+SCENE DESCRIPTION:
+A warm, inviting wide-angle establishing shot of the whole village basking in late-afternoon golden light — the kind of image that says "come visit, settle in, and stay a while."
+
+CHARACTER PLACEMENT (spread across the width so the trio reads well even when the sides are cropped):
+- Cat villager: sitting cross-legged under the park's central tree on the left third, an open glowing book in their lap, looking toward the viewer with a happy, welcoming expression — the clear focal point of the composition
+- Dog villager: mid-stride on the garden path in the center of the frame, waving cheerfully toward the viewer with one paw, a small satchel of books bouncing at their side
+- Rabbit villager: seated on the cottage's front step on the right third, peacefully absorbed in a large open book, long ears perked upward, a steaming mini cup of tea beside them
+
+ENVIRONMENT:
+- Foreground: a continuous strip of lush green grass and a meandering cobblestone path, dotted with tiny pastel wildflowers (pink, yellow, lavender) and a few fallen book-shaped leaves
+- Mid-ground: the park (with tree, flower beds, lamp post) on the left, the cottage (with glowing windows and a smoking chimney) on the right, a low decorative fence and scattered flower pots tying both halves together visually
+- Background: gentle rolling pastel-mint hills, two or three tiny distant cottage silhouettes, a warm sky gradient from peachy-gold near the horizon to soft lavender-blue at the top, three fluffy perfectly round white clouds spaced across the width
+- Lighting: warm golden-hour sunlight from the upper-left, long soft shadows stretching right, a gentle warm rim light on every character and building edge
+
+TECHNICAL:
+- Landscape, 2560×1440px (16:9), no transparent areas, solid painted background
+- Kawaii-pastel color palette throughout: soft pinks (#FFB3BA), lavender (#B5B3FF), mint (#B3FFD9), cream (#FFF8F0), peach (#FFDFC4), sky blue (#BAE1FF) — no dark, gritty, or desaturated tones
+- CRITICAL — safe-area composition: keep the three characters, the tree, and the cottage entirely inside the centered 1546×423px "safe area" (the vertical band centered on the image, spanning its full width). This crop is what survives on X/Twitter headers, Facebook covers, LinkedIn banners and the Play Store feature graphic — nothing essential to the story may fall outside it, and the very top/bottom edges of the 2560×1440 canvas should contain only sky, hill silhouettes, or grass that can be safely trimmed
+- CRITICAL — character fidelity (read again before generating): the cat, dog, and rabbit MUST be instantly recognizable as the exact same characters from the attached reference sprites — same proportions, same fur colors, same facial features, same silhouette — just bigger and in a new pose. This is the single most important requirement of this whole brief, more important than the panorama, the lighting, or the composition. If you find yourself wanting to make them "more expressive," "more dynamic," or "more painterly" in a way that changes their actual design, don't — channel that creative energy into their pose, gesture, and expression instead, while keeping the underlying character model 100% identical to the reference. The buildings and environment are where your illustrative interpretation belongs; the characters are not
+- Camera: wide establishing panorama, eye-level, gentle parallax — foreground path slightly larger and softly blurred at the very edges, mid-ground characters and buildings sharp and richly detailed, background hills and sky soft and hazy
+- No text, no UI elements, no logos, no watermarks anywhere in the image — this banner will have app branding overlaid separately
+- 2D illustrated style, clean kawaii outlines, smooth gradient color fills, slight depth shading — NOT 3D render, NOT photo-realistic
+- Characters must be expressive and mid-action, each one making welcoming eye contact or a warm gesture toward the viewer — this image's job is to make a stranger scrolling past want to stop and look closer
+- Mood: warm, peaceful, inviting — "this is a cozy little world you could happily get lost in"
+```
+
+> **If Gemini still drifts from the reference sprites on a regeneration attempt**: try splitting this into two passes — first generate the panorama background with the buildings and environment only (no characters), then run a second pass/edit asking it to insert the three characters "exactly as shown in these reference images, unchanged, just placed into this scene" — single-character insertion tends to preserve fidelity far better than asking a model to simultaneously invent a wide scene AND redraw three characters from memory.

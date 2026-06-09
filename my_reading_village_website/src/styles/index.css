@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Kawaii-pastel base palette ── */
+  --color-pink: #FFB3BA;
+  --color-lavender: #B5B3FF;
+  --color-mint: #B3FFD9;
+  --color-cream: #FEF0F4;
+  --color-peach: #FFDFC4;
+  --color-sky: #BAE1FF;
+
+  /* ── Neutrals & text ── */
+  --color-soft-white: #FFF6F9;
+  --color-dark-text: #4A4A4A;
+
+  /* ── Dark/medium accent variants ── */
+  --color-dark-pink: #E8637A;
+  --color-dark-lavender: #7B79E8;
+  --color-dark-orange: #CC7722;
+  --color-medium-orange: #F6A249;
+  --color-dark-mint: #2E9E6B;
+  --color-medium-mint: #58CE99;
+  --color-dark-sky: #509BE1;
+
+  /* ── Resource highlights ── */
+  --color-coin-gold: #FFD700;
+  --color-gem-purple: #BB86FC;
+
+  /* ── Typography ── */
+  --font-heading: 'Baloo 2', cursive;
+  --font-body: 'Quicksand', sans-serif;
+
+  /* ── Breakpoints ── */
+  --breakpoint-xs: 375px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+}
+
+/* ── Base reset & defaults ── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto; /* Lenis handles smooth scroll */
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-cream);
+    color: var(--color-dark-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-dark-text);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-pink);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-dark-pink);
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid var(--color-dark-lavender);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ── Utility layer additions ── */
+@layer utilities {
+  .font-heading { font-family: var(--font-heading); }
+  .font-body    { font-family: var(--font-body); }
+
+  /* Gradient helpers */
+  .bg-kawaii-gradient {
+    background: linear-gradient(135deg, var(--color-pink) 0%, var(--color-lavender) 50%, var(--color-sky) 100%);
+  }
+  .bg-hero-gradient {
+    background: linear-gradient(180deg, rgba(255,248,240,0) 0%, rgba(255,248,240,0.85) 60%, var(--color-cream) 100%);
+  }
+  .bg-cta-gradient {
+    background: linear-gradient(135deg, var(--color-peach) 0%, var(--color-pink) 50%, var(--color-lavender) 100%);
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-dark-pink) 0%, var(--color-dark-lavender) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Soft card shadow */
+  .shadow-kawaii {
+    box-shadow: 0 4px 24px 0 rgba(181, 179, 255, 0.18), 0 1px 4px 0 rgba(232, 99, 122, 0.08);
+  }
+  .shadow-kawaii-lg {
+    box-shadow: 0 8px 40px 0 rgba(181, 179, 255, 0.22), 0 2px 8px 0 rgba(232, 99, 122, 0.1);
+  }
+
+  /* Glass card effect */
+  .glass {
+    background: rgba(255, 254, 252, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 179, 186, 0.25);
+  }
+}
