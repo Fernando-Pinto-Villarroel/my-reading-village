@@ -2,6 +2,28 @@
 
 ---
 
+# Backup Encryptor Tool
+
+Batch encrypts JSON backup files into the `.mrvb` binary format (AES-256-GCM).
+The app only accepts `.mrvb` files — use this tool to produce valid backups from raw JSON exports.
+
+Requires `backup_key.dart` to be present at `my_reading_village/lib/infrastructure/security/backup_key.dart` (gitignored, never committed).
+
+## Usage
+
+1. Place your `.json` backup files in `json-to-encrypt/`
+2. Run from the **repo root**:
+
+```bash
+dart run tools/encrypt_backup.dart
+```
+
+3. Find the encrypted `.mrvb` files in `json-to-encrypt/output/`
+
+Input files and the output directory are gitignored — nothing in `json-to-encrypt/` is ever committed.
+
+---
+
 # Background Remover Tool
 
 Batch removes a specific background color from images using flood-fill from the edges.
