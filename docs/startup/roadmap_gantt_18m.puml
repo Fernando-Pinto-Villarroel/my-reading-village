@@ -1,0 +1,112 @@
+@startgantt MyReadingVillage_Roadmap_18m
+' ============================================================
+'  My Reading Village - Hoja de Ruta 18 meses - Gantt ejecutivo
+'  Fernando Pinto Villarroel - 2026
+'  Render: https://www.plantuml.com/plantuml  o  VS Code PlantUML
+' ============================================================
+
+' Mes 1 = Julio 2026 (lanzamiento real tras aprobación de Google Play)
+Project starts 2026-07-01
+saturday are closed
+sunday are closed
+
+printscale monthly
+
+' ---------- COLORES POR FASE ----------
+<style>
+ganttDiagram {
+  task {
+    FontName "Helvetica"
+    FontColor #2d2a3e
+    BackGroundColor #c9b8f5
+    LineColor #7b5ea7
+  }
+  milestone {
+    FontColor #b5385a
+    BackGroundColor #ffb3c6
+    LineColor #b5385a
+  }
+}
+</style>
+
+title My Reading Village — Hoja de Ruta de Desarrollo (18 meses · Jul 2026 – Dic 2027)
+
+' ============================================================
+'  FASE 1 — LANZAMIENTO DEL MVP (Meses 1-6)
+' ============================================================
+[Fase 1: Lanzamiento del MVP] as [F1] starts 2026-07-01
+[F1] lasts 180 days
+[F1] is colored in #ede7fc/#7b5ea7
+
+[Lanzamiento en Google Play] as [t1] starts 2026-07-01
+[t1] lasts 25 days
+[t1] is colored in #c9b8f5
+
+[Onboarding y primeras cohortes] as [t2] starts 2026-07-20
+[t2] lasts 50 days
+[t2] is colored in #c9b8f5
+
+[Primer ciclo de feedback / hotfixes] as [t3] starts 2026-08-15
+[t3] lasts 70 days
+[t3] is colored in #c9b8f5
+
+[Pulido del habit loop (D7/D30)] as [t4] starts 2026-09-15
+[t4] lasts 75 days
+[t4] is colored in #c9b8f5
+
+[Hito: Retención D7 >= 30%] as [m1] happens 2026-12-20
+[m1] is colored in #ffb3c6
+
+' ============================================================
+'  FASE 2 — CRECIMIENTO Y COMPROMISO (Meses 7-12)
+' ============================================================
+[Fase 2: Crecimiento y Compromiso] as [F2] starts 2027-01-01
+[F2] lasts 180 days
+[F2] is colored in #dff5ec/#3d9970
+
+[Eventos estacionales y misiones] as [t5] starts 2027-01-01
+[t5] lasts 70 days
+[t5] is colored in #a8e6cf
+
+[Funciones de comunidad ligera] as [t6] starts 2027-02-01
+[t6] lasts 80 days
+[t6] is colored in #a8e6cf
+
+[Personalizacion / recomendaciones] as [t7] starts 2027-03-15
+[t7] lasts 75 days
+[t7] is colored in #a8e6cf
+
+[Pilotos: micro-influencers BookTok] as [t8] starts 2027-04-01
+[t8] lasts 80 days
+[t8] is colored in #a8e6cf
+
+[Hito: 1.000 MAU + D30 >= 20%] as [m2] happens 2027-06-25
+[m2] is colored in #ffb3c6
+
+' ============================================================
+'  FASE 3 — MONETIZACION Y ESCALA (Meses 13-18)
+' ============================================================
+[Fase 3: Monetizacion y Escala] as [F3] starts 2027-07-01
+[F3] lasts 184 days
+[F3] is colored in #fff0da/#c77c2a
+
+[Optimizacion IAP y packs] as [t9] starts 2027-07-01
+[t9] lasts 80 days
+[t9] is colored in #ffd3a5
+
+[Tuning de Rewarded Ads / eCPM] as [t10] starts 2027-08-01
+[t10] lasts 70 days
+[t10] is colored in #ffd3a5
+
+[Localizacion y nuevos mercados] as [t11] starts 2027-09-01
+[t11] lasts 90 days
+[t11] is colored in #ffd3a5
+
+[ASO y escalado de adquisicion] as [t12] starts 2027-10-01
+[t12] lasts 90 days
+[t12] is colored in #ffd3a5
+
+[Hito: 10.000 MAU + ROI mensual +] as [m3] happens 2027-12-22
+[m3] is colored in #ffb3c6
+
+@endgantt

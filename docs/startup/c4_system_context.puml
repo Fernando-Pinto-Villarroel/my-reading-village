@@ -1,0 +1,25 @@
+@startuml C4_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Contexto del Sistema - My Reading Village
+
+Person(user, "Lector", "Cualquier persona que lee libros y quiere registrar su progreso de lectura mientras construye y expande un kawaii pueblo virtual recompensado por las paginas leidas")
+Person(dev, "Desarrollador", "Dueno y mantenedor de la app. Monitorea eventos de uso anonimos, adopcion de funcionalidades y datos de sesion para tomar decisiones de producto")
+
+System(app, "My Reading Village", "Aplicacion Android (minSdk 26). Registra libros y sesiones de lectura, convierte paginas leidas en recursos del juego, permite construir un kawaii pueblo virtual y recompensa habitos de lectura con aldeanos e items. Todos los datos del juego se almacenan localmente en SQLite y funciona completamente sin conexion")
+
+System_Ext(openlib, "Open Library API", "API REST de terceros de Internet Archive. Provee metadatos buscables incluyendo titulo, autor, imagen de portada y numero de paginas para los libros que el usuario agrega a su lista de lectura")
+System_Ext(billing, "Google Play Billing", "Infraestructura de compras dentro de la app de Google. Procesa packs de gemas (consumibles, 6 niveles), packs bundle (consumibles, recursos + potenciadores + especies exclusivas opcionales) y especies de aldeanos individuales (desbloqueos unicos no consumibles)")
+System_Ext(ads, "Unity Ads", "Red publicitaria de Unity Technologies. Entrega anuncios de video recompensados opcionales que otorgan gemas, saltan temporizadores de construccion o desbloquean giros de ruleta gratuitos")
+System_Ext(firebase, "Firebase Analytics", "Plataforma de analiticas de Google. Recopila eventos de uso anonimos y opcionales para ayudar al desarrollador a entender la adopcion de funcionalidades y mejorar la app (plan gratuito Spark)")
+
+Rel(user, app, "Registra paginas leidas, gestiona libros, construye y decora el pueblo", "Android UI")
+Rel(dev, firebase, "Consulta dashboards para monitorear uso, retencion y eventos de funcionalidades", "Firebase Console / Web")
+
+Rel(app, openlib, "Busca libros opcionalmente por titulo o autor; el usuario tambien puede agregar libros manualmente", "HTTPS / REST")
+Rel(app, billing, "Inicia y verifica compras de packs de gemas, packs bundle y especies de aldeanos individuales", "Google Play Billing Library")
+Rel(app, ads, "Solicita y muestra anuncios de video recompensados opcionales; recibe callback de recompensa al completarse", "Unity Ads SDK")
+Rel(app, firebase, "Envia eventos de uso anonimos y opcionales para analiticas", "HTTPS / Firebase SDK")
+
+SHOW_LEGEND()
+@enduml

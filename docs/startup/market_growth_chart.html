@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reading Village - Crecimiento Proyectado del Mercado</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --lavender: #c9b8f5;
+        --lavender-l: #ede7fc;
+        --lavender-d: #7b5ea7;
+        --mint: #a8e6cf;
+        --mint-l: #dff5ec;
+        --mint-d: #3d9970;
+        --peach: #ffd3a5;
+        --peach-l: #fff0da;
+        --peach-d: #c77c2a;
+        --rose: #ffb3c6;
+        --rose-l: #ffe4ec;
+        --rose-d: #b5385a;
+        --sky: #a8d8f0;
+        --sky-l: #dff1fb;
+        --sky-d: #2e7ea8;
+        --cream: #fdfaf5;
+        --sand: #f5efe0;
+        --text-dark: #2d2a3e;
+        --text-mid: #5a5475;
+        --text-soft: #9490a8;
+        --white: #ffffff;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        background: var(--cream);
+        color: var(--text-dark);
+        padding: 40px 28px;
+        display: flex;
+        justify-content: center;
+      }
+      .card {
+        background: var(--white);
+        border: 2px solid var(--lavender-l);
+        border-radius: 22px;
+        box-shadow: 0 8px 36px rgba(123, 94, 167, 0.12);
+        padding: 30px 34px 26px;
+        width: 880px;
+        max-width: 100%;
+      }
+      .head {
+        margin-bottom: 6px;
+      }
+      .title {
+        font-family: "Nunito", sans-serif;
+        font-weight: 900;
+        font-size: 23px;
+        color: var(--text-dark);
+        letter-spacing: -0.3px;
+      }
+      .sub {
+        font-size: 13.5px;
+        color: var(--text-mid);
+        margin-top: 4px;
+        font-weight: 500;
+      }
+      .chart-wrap {
+        margin-top: 16px;
+        height: 380px;
+      }
+      .foot {
+        margin-top: 18px;
+        border-top: 1px solid var(--sand);
+        padding-top: 12px;
+        font-size: 11px;
+        color: var(--text-soft);
+        line-height: 1.6;
+      }
+      .foot strong {
+        color: var(--lavender-d);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="head">
+        <div class="title">Crecimiento proyectado del mercado (2024-2032)</div>
+        <div class="sub">
+          Tamaño global en miles de millones de USD - Apps de lectura vs.
+          Gamificación
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="marketChart"></canvas>
+      </div>
+      <div class="foot">
+        <strong>Fuentes:</strong> Verified Market Research - Book Reading Apps
+        Market (USD 1.2 B en 2024 -> USD 2.56 B en 2032, CAGR 8.1%). The
+        Business Research Company / Research and Markets - Gamification Market
+        (USD 26.91 B en 2025 -> USD 92.37 B en 2030, CAGR ~28%). Cifras de
+        gamificación reescaladas a la misma ventana temporal con fines
+        comparativos. Gráfico de elaboración propia.
+      </div>
+    </div>
+
+    <script>
+      const ctx = document.getElementById("marketChart");
+
+      // Book Reading Apps Market: 1.2B (2024) -> 2.56B (2032), CAGR 8.1%
+      // Interpolado año a año con la CAGR
+      const years = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
+      // Book Reading Apps: 1.20B (2024) con CAGR 8.1% -> ~2.56B (2032)
+      const readingClean = years.map(
+        (y, i) => +(1.2 * Math.pow(1.081, i)).toFixed(2),
+      );
+
+      // Gamification Market: ~26.91B (2025) -> 92.37B (2030), CAGR ~28%
+      // base 2024 ~21.0B
+      const gamification = years.map(
+        (y, i) => +(21.0 * Math.pow(1.28, i)).toFixed(1),
+      );
+
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: years,
+          datasets: [
+            {
+              label: "Apps de lectura (USD B)",
+              data: readingClean,
+              borderColor: "#7b5ea7",
+              backgroundColor: "rgba(201, 184, 245, 0.25)",
+              borderWidth: 3,
+              fill: true,
+              tension: 0.35,
+              pointRadius: 4,
+              pointBackgroundColor: "#7b5ea7",
+              pointBorderColor: "#ffffff",
+              pointBorderWidth: 1.5,
+              yAxisID: "yReading",
+            },
+            {
+              label: "Gamificación (USD B)",
+              data: gamification,
+              borderColor: "#3d9970",
+              backgroundColor: "rgba(168, 230, 207, 0.18)",
+              borderWidth: 3,
+              borderDash: [6, 4],
+              fill: true,
+              tension: 0.35,
+              pointRadius: 4,
+              pointBackgroundColor: "#3d9970",
+              pointBorderColor: "#ffffff",
+              pointBorderWidth: 1.5,
+              yAxisID: "yGam",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                font: { family: "Nunito", weight: "700", size: 13 },
+                color: "#2d2a3e",
+                usePointStyle: true,
+                pointStyle: "rectRounded",
+                padding: 18,
+              },
+            },
+            tooltip: {
+              backgroundColor: "#2d2a3e",
+              titleFont: { family: "Nunito", weight: "800" },
+              bodyFont: { family: "Nunito Sans" },
+              padding: 12,
+              callbacks: {
+                label: (c) => ` ${c.dataset.label}: $${c.parsed.y} B`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { color: "rgba(149, 144, 168, 0.10)" },
+              ticks: {
+                font: { family: "Nunito Sans", weight: "600", size: 12 },
+                color: "#5a5475",
+              },
+            },
+            yReading: {
+              position: "left",
+              title: {
+                display: true,
+                text: "Apps de lectura (USD B)",
+                color: "#7b5ea7",
+                font: { family: "Nunito", weight: "700", size: 12 },
+              },
+              grid: { color: "rgba(149, 144, 168, 0.10)" },
+              ticks: {
+                font: { family: "Nunito Sans", weight: "600", size: 11 },
+                color: "#7b5ea7",
+              },
+              min: 0,
+            },
+            yGam: {
+              position: "right",
+              title: {
+                display: true,
+                text: "Gamificación (USD B)",
+                color: "#3d9970",
+                font: { family: "Nunito", weight: "700", size: 12 },
+              },
+              grid: { drawOnChartArea: false },
+              ticks: {
+                font: { family: "Nunito Sans", weight: "600", size: 11 },
+                color: "#3d9970",
+              },
+              min: 0,
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

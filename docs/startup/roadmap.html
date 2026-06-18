@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reading Village - Hoja de Ruta 18 meses</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --lavender: #c9b8f5;
+        --lavender-l: #ede7fc;
+        --lavender-d: #7b5ea7;
+        --mint: #a8e6cf;
+        --mint-l: #dff5ec;
+        --mint-d: #3d9970;
+        --peach: #ffd3a5;
+        --peach-l: #fff0da;
+        --peach-d: #c77c2a;
+        --rose: #ffb3c6;
+        --rose-l: #ffe4ec;
+        --rose-d: #b5385a;
+        --sky: #a8d8f0;
+        --sky-l: #dff1fb;
+        --sky-d: #2e7ea8;
+        --cream: #fdfaf5;
+        --sand: #f5efe0;
+        --brown-xs: #f0e8d0;
+        --text-dark: #2d2a3e;
+        --text-mid: #5a5475;
+        --text-soft: #9490a8;
+        --white: #ffffff;
+        --radius-sm: 8px;
+        --radius-md: 14px;
+        --radius-lg: 22px;
+        --radius-xl: 32px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        background: var(--cream);
+        color: var(--text-dark);
+        min-height: 100vh;
+        padding: 48px 24px 32px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          #c9b8f530 1px,
+          transparent 1px
+        );
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 28px;
+        animation: fadeDown 0.6s ease both;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--lavender-l);
+        color: var(--lavender-d);
+        border: 1.5px solid var(--lavender);
+        border-radius: 99px;
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 5px 16px;
+        margin-bottom: 20px;
+      }
+
+      .badge svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+
+      h1 {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(28px, 5vw, 46px);
+        font-weight: 900;
+        line-height: 1.1;
+        color: var(--text-dark);
+        margin-bottom: 14px;
+        letter-spacing: -0.5px;
+      }
+
+      h1 span {
+        color: var(--lavender-d);
+        position: relative;
+      }
+
+      h1 span::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: var(--lavender);
+        border-radius: 99px;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      .header-sub {
+        font-size: 15px;
+        color: var(--text-mid);
+        max-width: 480px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .timeline-wrap {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .spine-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 3px solid var(--white);
+        position: relative;
+        z-index: 1;
+        flex-shrink: 0;
+      }
+
+      .spine-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+      }
+
+      .phases {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      @media (max-width: 600px) {
+        .phases {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .q-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1.5px solid transparent;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        animation: fadeUp 0.5s ease both;
+      }
+
+      .q-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+      }
+
+      .q-card:nth-child(1) {
+        animation-delay: 0.1s;
+        border-color: var(--lavender);
+      }
+      .q-card:nth-child(2) {
+        animation-delay: 0.2s;
+        border-color: var(--mint);
+      }
+      .q-card:nth-child(3) {
+        animation-delay: 0.3s;
+        border-color: var(--peach);
+      }
+
+      .q-top {
+        padding: 18px 18px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+      }
+
+      .q-tag {
+        display: inline-block;
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        border-radius: 99px;
+        padding: 3px 10px;
+      }
+
+      .f1 .q-tag {
+        background: var(--lavender-l);
+        color: var(--lavender-d);
+      }
+      .f2 .q-tag {
+        background: var(--mint-l);
+        color: var(--mint-d);
+      }
+      .f3 .q-tag {
+        background: var(--peach-l);
+        color: var(--peach-d);
+      }
+
+      .q-emoji {
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .q-goal {
+        font-family: "Nunito", sans-serif;
+        font-size: 13.5px;
+        font-weight: 800;
+        color: var(--text-dark);
+        line-height: 1.35;
+      }
+
+      .q-stripe {
+        height: 5px;
+        border-radius: 0;
+      }
+      .f1 .q-stripe {
+        background: linear-gradient(90deg, var(--lavender-d), var(--lavender));
+      }
+      .f2 .q-stripe {
+        background: linear-gradient(90deg, var(--mint-d), var(--mint));
+      }
+      .f3 .q-stripe {
+        background: linear-gradient(90deg, var(--peach-d), var(--peach));
+      }
+
+      .q-divider {
+        height: 1px;
+        background: var(--brown-xs);
+        margin: 0 18px;
+      }
+
+      .q-features {
+        padding: 12px 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      .feat {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .feat-pip {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 5px;
+      }
+
+      .f1 .feat-pip {
+        background: var(--lavender-d);
+      }
+      .f2 .feat-pip {
+        background: var(--mint-d);
+      }
+      .f3 .feat-pip {
+        background: var(--peach-d);
+      }
+
+      .feat-text {
+        font-size: 12.5px;
+        color: var(--text-mid);
+        line-height: 1.4;
+      }
+
+      .q-metric {
+        margin: 4px 18px 18px;
+        border-radius: var(--radius-md);
+        padding: 10px 12px;
+      }
+
+      .f1 .q-metric {
+        background: var(--lavender-l);
+      }
+      .f2 .q-metric {
+        background: var(--mint-l);
+      }
+      .f3 .q-metric {
+        background: var(--peach-l);
+      }
+
+      .metric-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+      }
+
+      .f1 .metric-label {
+        color: var(--lavender-d);
+      }
+      .f2 .metric-label {
+        color: var(--mint-d);
+      }
+      .f3 .metric-label {
+        color: var(--peach-d);
+      }
+
+      .metric-val {
+        font-family: "Nunito", sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--text-dark);
+        line-height: 1.4;
+      }
+
+      .northstar {
+        margin-top: 36px;
+        background: var(--text-dark);
+        border-radius: var(--radius-lg);
+        padding: 28px 36px;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        animation: fadeUp 0.5s 0.5s ease both;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .northstar::before {
+        content: "★";
+        position: absolute;
+        right: -10px;
+        top: -20px;
+        font-size: 140px;
+        color: var(--lavender);
+        opacity: 0.06;
+        line-height: 1;
+        pointer-events: none;
+      }
+
+      .ns-icon {
+        font-size: 36px;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      .ns-body {
+        flex: 1;
+      }
+
+      .ns-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: var(--lavender);
+        margin-bottom: 4px;
+      }
+
+      .ns-title {
+        font-family: "Nunito", sans-serif;
+        font-size: 17px;
+        font-weight: 900;
+        color: var(--white);
+        margin-bottom: 4px;
+      }
+
+      .ns-sub {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.55);
+        line-height: 1.5;
+      }
+
+      .ns-chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+
+      .ns-chip {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 99px;
+        padding: 6px 14px;
+        font-family: "Nunito", sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--white);
+        white-space: nowrap;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 12px;
+        color: var(--text-mid);
+        animation: fadeUp 0.5s 0.6s ease both;
+      }
+
+      .footer strong {
+        color: var(--text-dark);
+      }
+
+      @keyframes fadeDown {
+        from {
+          opacity: 0;
+          transform: translateY(-18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="badge">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M8 2v4l2.5 2.5" />
+            <circle cx="8" cy="8" r="6" />
+          </svg>
+          Hoja de ruta - 18 meses (Jul 2026 - Dic 2027)
+        </div>
+        <h1>My Reading <span>Village</span></h1>
+        <p class="header-sub">
+          Hoja de ruta de 18 meses dividida en 3 fases de 6 meses. Cada fase
+          responde una pregunta clave sobre el usuario y el negocio.
+        </p>
+      </div>
+
+      <!-- TIMELINE SPINE (3 nodes) -->
+      <div class="timeline-wrap">
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            position: relative;
+            animation: fadeUp 0.5s 0.05s ease both;
+          "
+        >
+          <!-- connecting line from Fase 1 to Fase 3 -->
+          <div
+            style="
+              position: absolute;
+              top: 10px;
+              left: calc(100% / 6);
+              right: calc(100% / 6);
+              height: 3px;
+              background: linear-gradient(
+                90deg,
+                var(--lavender-d),
+                var(--mint-d),
+                var(--peach-d)
+              );
+              border-radius: 99px;
+              z-index: 0;
+            "
+          ></div>
+
+          <!-- Fase 1 -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+              position: relative;
+              z-index: 1;
+            "
+          >
+            <div
+              class="spine-dot"
+              style="
+                background: #fff;
+                box-shadow: 0 0 0 2.5px var(--lavender-d);
+              "
+            ></div>
+            <span
+              class="spine-label"
+              style="
+                font-family: &quot;Nunito&quot;, sans-serif;
+                font-size: 12px;
+                font-weight: 800;
+                color: var(--lavender-d);
+              "
+              >Fase 1</span
+            >
+            <span
+              style="
+                font-family: &quot;Nunito Sans&quot;, sans-serif;
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--text-soft);
+              "
+              >Jul – Dic 2026</span
+            >
+          </div>
+
+          <!-- Fase 2 -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+              position: relative;
+              z-index: 1;
+            "
+          >
+            <div
+              class="spine-dot"
+              style="background: #fff; box-shadow: 0 0 0 2.5px var(--mint-d)"
+            ></div>
+            <span
+              class="spine-label"
+              style="
+                font-family: &quot;Nunito&quot;, sans-serif;
+                font-size: 12px;
+                font-weight: 800;
+                color: var(--mint-d);
+              "
+              >Fase 2</span
+            >
+            <span
+              style="
+                font-family: &quot;Nunito Sans&quot;, sans-serif;
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--text-soft);
+              "
+              >Ene – Jun 2027</span
+            >
+          </div>
+
+          <!-- Fase 3 -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+              position: relative;
+              z-index: 1;
+            "
+          >
+            <div
+              class="spine-dot"
+              style="background: #fff; box-shadow: 0 0 0 2.5px var(--peach-d)"
+            ></div>
+            <span
+              class="spine-label"
+              style="
+                font-family: &quot;Nunito&quot;, sans-serif;
+                font-size: 12px;
+                font-weight: 800;
+                color: var(--peach-d);
+              "
+              >Fase 3</span
+            >
+            <span
+              style="
+                font-family: &quot;Nunito Sans&quot;, sans-serif;
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--text-soft);
+              "
+              >Jul – Dic 2027</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE CARDS -->
+      <div class="phases">
+        <!-- Fase 1 -->
+        <div class="q-card f1">
+          <div class="q-stripe"></div>
+          <div class="q-top">
+            <span class="q-tag">Fase 1 · M1–6 · Lanzamiento MVP</span>
+            <span class="q-emoji">📖</span>
+            <div class="q-goal">
+              La app llega a usuarios reales y genera hábito
+            </div>
+          </div>
+          <div class="q-divider"></div>
+          <div class="q-features">
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Lanzamiento en Google Play</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Onboarding y primeras cohortes</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Primer ciclo de feedback</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Pulido del habit loop</div>
+            </div>
+          </div>
+          <div class="q-metric">
+            <div class="metric-label">Métrica clave</div>
+            <div class="metric-val">Retención D7 ≥ 30%</div>
+          </div>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="q-card f2">
+          <div class="q-stripe"></div>
+          <div class="q-top">
+            <span class="q-tag">Fase 2 · M7–12 · Crecimiento</span>
+            <span class="q-emoji">🏡</span>
+            <div class="q-goal">
+              El usuario vuelve, comparte y la comunidad crece
+            </div>
+          </div>
+          <div class="q-divider"></div>
+          <div class="q-features">
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">13 eventos estacionales</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Comunidad ligera</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Personalización y recomendaciones</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Pilotos BookTok</div>
+            </div>
+          </div>
+          <div class="q-metric">
+            <div class="metric-label">Métricas clave</div>
+            <div class="metric-val">1.000 MAU<br />Retención D30 ≥ 20%</div>
+          </div>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="q-card f3">
+          <div class="q-stripe"></div>
+          <div class="q-top">
+            <span class="q-tag">Fase 3 · M13–18 · Monetización</span>
+            <span class="q-emoji">🌟</span>
+            <div class="q-goal">
+              La app genera ingresos y escala globalmente
+            </div>
+          </div>
+          <div class="q-divider"></div>
+          <div class="q-features">
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Optimización IAP y packs</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Tuning Rewarded Ads/eCPM</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">Localización nuevos mercados</div>
+            </div>
+            <div class="feat">
+              <div class="feat-pip"></div>
+              <div class="feat-text">ASO y escalado</div>
+            </div>
+          </div>
+          <div class="q-metric">
+            <div class="metric-label">Métricas clave</div>
+            <div class="metric-val">10.000 MAU<br />ROI mensual positivo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NORTH STAR BANNER -->
+      <div class="northstar">
+        <div class="ns-icon">⭐</div>
+        <div class="ns-body">
+          <div class="ns-label">North Star Metric</div>
+          <div class="ns-title">
+            Páginas leídas por usuario activo por semana
+          </div>
+          <div class="ns-sub">
+            Meta: ≥ 80 páginas · Si este número sube, todo lo demás está
+            funcionando.
+          </div>
+        </div>
+        <div class="ns-chips">
+          <div class="ns-chip">18 meses</div>
+          <div class="ns-chip">10.000 MAU</div>
+          <div class="ns-chip">Sin servidor</div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <strong>My Reading Village</strong> · Fernando Pinto Villarroel · 2026 ·
+        Proyecto Final - Hoja de Ruta de Producto
+      </div>
+    </div>
+  </body>
+</html>

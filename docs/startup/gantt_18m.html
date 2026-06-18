@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reading Village — Gantt 18 meses</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --lavender: #c9b8f5;
+        --lavender-l: #ede7fc;
+        --lavender-d: #7b5ea7;
+        --mint: #a8e6cf;
+        --mint-l: #dff5ec;
+        --mint-d: #3d9970;
+        --peach: #ffd3a5;
+        --peach-l: #fff0da;
+        --peach-d: #c77c2a;
+        --rose: #ffb3c6;
+        --rose-l: #ffe4ec;
+        --rose-d: #b5385a;
+        --sky: #a8d8f0;
+        --sky-l: #dff1fb;
+        --sky-d: #2e7ea8;
+        --cream: #fdfaf5;
+        --sand: #f5efe0;
+        --text-dark: #2d2a3e;
+        --text-mid: #5a5475;
+        --text-soft: #9490a8;
+        --white: #ffffff;
+        --month-lines: linear-gradient(
+          to right,
+          transparent 5.65%,
+          rgba(149, 144, 168, 0.22) 5.65%,
+          rgba(149, 144, 168, 0.22) calc(5.65% + 1px),
+          transparent calc(5.65% + 1px),
+          transparent 11.29%,
+          rgba(149, 144, 168, 0.22) 11.29%,
+          rgba(149, 144, 168, 0.22) calc(11.29% + 1px),
+          transparent calc(11.29% + 1px),
+          transparent 16.76%,
+          rgba(149, 144, 168, 0.22) 16.76%,
+          rgba(149, 144, 168, 0.22) calc(16.76% + 1px),
+          transparent calc(16.76% + 1px),
+          transparent 22.4%,
+          rgba(149, 144, 168, 0.22) 22.4%,
+          rgba(149, 144, 168, 0.22) calc(22.4% + 1px),
+          transparent calc(22.4% + 1px),
+          transparent 27.87%,
+          rgba(149, 144, 168, 0.22) 27.87%,
+          rgba(149, 144, 168, 0.22) calc(27.87% + 1px),
+          transparent calc(27.87% + 1px),
+          transparent 33.52%,
+          rgba(149, 144, 168, 0.22) 33.52%,
+          rgba(149, 144, 168, 0.22) calc(33.52% + 1px),
+          transparent calc(33.52% + 1px),
+          transparent 39.16%,
+          rgba(149, 144, 168, 0.22) 39.16%,
+          rgba(149, 144, 168, 0.22) calc(39.16% + 1px),
+          transparent calc(39.16% + 1px),
+          transparent 44.26%,
+          rgba(149, 144, 168, 0.22) 44.26%,
+          rgba(149, 144, 168, 0.22) calc(44.26% + 1px),
+          transparent calc(44.26% + 1px),
+          transparent 49.91%,
+          rgba(149, 144, 168, 0.22) 49.91%,
+          rgba(149, 144, 168, 0.22) calc(49.91% + 1px),
+          transparent calc(49.91% + 1px),
+          transparent 55.37%,
+          rgba(149, 144, 168, 0.22) 55.37%,
+          rgba(149, 144, 168, 0.22) calc(55.37% + 1px),
+          transparent calc(55.37% + 1px),
+          transparent 61.02%,
+          rgba(149, 144, 168, 0.22) 61.02%,
+          rgba(149, 144, 168, 0.22) calc(61.02% + 1px),
+          transparent calc(61.02% + 1px),
+          transparent 66.48%,
+          rgba(149, 144, 168, 0.22) 66.48%,
+          rgba(149, 144, 168, 0.22) calc(66.48% + 1px),
+          transparent calc(66.48% + 1px),
+          transparent 72.13%,
+          rgba(149, 144, 168, 0.22) 72.13%,
+          rgba(149, 144, 168, 0.22) calc(72.13% + 1px),
+          transparent calc(72.13% + 1px),
+          transparent 77.78%,
+          rgba(149, 144, 168, 0.22) 77.78%,
+          rgba(149, 144, 168, 0.22) calc(77.78% + 1px),
+          transparent calc(77.78% + 1px),
+          transparent 83.24%,
+          rgba(149, 144, 168, 0.22) 83.24%,
+          rgba(149, 144, 168, 0.22) calc(83.24% + 1px),
+          transparent calc(83.24% + 1px),
+          transparent 88.89%,
+          rgba(149, 144, 168, 0.22) 88.89%,
+          rgba(149, 144, 168, 0.22) calc(88.89% + 1px),
+          transparent calc(88.89% + 1px),
+          transparent 94.35%,
+          rgba(149, 144, 168, 0.22) 94.35%,
+          rgba(149, 144, 168, 0.22) calc(94.35% + 1px),
+          transparent calc(94.35% + 1px)
+        );
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        background: var(--cream);
+        color: var(--text-dark);
+        min-height: 100vh;
+        padding: 40px 24px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          #c9b8f530 1px,
+          transparent 1px
+        );
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ── Header ─────────────────────────────────────── */
+      .header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--lavender-l);
+        color: var(--lavender-d);
+        border: 1.5px solid var(--lavender);
+        border-radius: 99px;
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 5px 16px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(22px, 3.5vw, 34px);
+        font-weight: 900;
+        line-height: 1.15;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+        letter-spacing: -0.3px;
+      }
+
+      h1 span {
+        color: var(--lavender-d);
+        position: relative;
+      }
+      h1 span::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: var(--lavender);
+        border-radius: 99px;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      .header-sub {
+        font-size: 14.5px;
+        color: var(--text-mid);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      /* ── Card ───────────────────────────────────────── */
+      .gantt-card {
+        background: var(--white);
+        border-radius: 24px;
+        border: 1.5px solid var(--sand);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .card-head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        padding: 20px 24px 16px;
+        border-bottom: 2px dashed var(--sand);
+      }
+
+      .card-title {
+        font-family: "Nunito", sans-serif;
+        font-size: 16px;
+        font-weight: 900;
+        color: var(--text-dark);
+      }
+      .card-sub {
+        font-size: 12px;
+        color: var(--text-mid);
+        margin-top: 4px;
+      }
+
+      /* Legend */
+      .legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .leg {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Nunito", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-mid);
+      }
+      .leg-pill {
+        width: 22px;
+        height: 10px;
+        border-radius: 99px;
+        flex-shrink: 0;
+      }
+      .leg-diamond {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        transform: rotate(45deg);
+        flex-shrink: 0;
+        background: var(--rose-d);
+      }
+
+      /* ── Gantt body ─────────────────────────────────── */
+      .gantt-wrap {
+        overflow-x: auto;
+      }
+      .gantt-inner {
+        min-width: 720px;
+      }
+
+      /* Base row */
+      .g-row {
+        display: flex;
+        align-items: stretch;
+        border-bottom: 1px solid var(--sand);
+      }
+      .g-row.no-border {
+        border-bottom: none;
+      }
+
+      /* Label column */
+      .g-label {
+        width: 230px;
+        flex-shrink: 0;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        border-right: 2px solid var(--sand);
+        background: var(--white);
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-dark);
+        gap: 8px;
+      }
+
+      /* Timeline column */
+      .g-time {
+        flex: 1;
+        position: relative;
+        min-width: 0;
+      }
+
+      /* ── Year band ──────────────────────────────────── */
+      .year-row {
+        height: 26px;
+        border-bottom: none;
+      }
+      .year-row .g-label {
+        background: var(--sand);
+        border-right-color: transparent;
+      }
+
+      .year-strip {
+        display: flex;
+        height: 100%;
+      }
+      .year-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-right: 2px solid var(--sand);
+      }
+      .year-cell:last-child {
+        border-right: none;
+      }
+      .year-cell.y26 {
+        background: var(--lavender-l);
+        color: var(--lavender-d);
+      }
+      .year-cell.y27 {
+        background: var(--mint-l);
+        color: var(--mint-d);
+      }
+
+      /* ── Month header ───────────────────────────────── */
+      .month-row {
+        height: 34px;
+        border-bottom: 2px solid var(--sand);
+      }
+      .month-row .g-label {
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: var(--text-soft);
+        background: var(--sand);
+        border-right-color: var(--text-soft);
+        opacity: 0.9;
+      }
+
+      .month-strip {
+        display: flex;
+        height: 100%;
+      }
+      .m-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--text-soft);
+        border-right: 1px solid var(--sand);
+      }
+      .m-cell:last-child {
+        border-right: none;
+      }
+      .m-cell.new-year {
+        color: var(--text-mid);
+        border-left: 2px solid var(--text-mid);
+      }
+
+      /* ── Phase rows ─────────────────────────────────── */
+      .phase-row {
+        min-height: 32px;
+      }
+
+      .phase-row.f1 .g-label {
+        background: #f0ecfb;
+        color: var(--lavender-d);
+      }
+      .phase-row.f2 .g-label {
+        background: #eaf7f2;
+        color: var(--mint-d);
+      }
+      .phase-row.f3 .g-label {
+        background: #fdf5e8;
+        color: var(--peach-d);
+      }
+      .phase-row.f1 .g-time {
+        background-color: #f4f0fd;
+      }
+      .phase-row.f2 .g-time {
+        background-color: #edfaf5;
+      }
+      .phase-row.f3 .g-time {
+        background-color: #fef8ed;
+      }
+
+      .phase-row .g-label {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.3px;
+      }
+
+      .ph-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        flex-shrink: 0;
+        letter-spacing: 0;
+      }
+      .f1 .ph-badge {
+        background: var(--lavender);
+        color: var(--lavender-d);
+      }
+      .f2 .ph-badge {
+        background: var(--mint);
+        color: var(--mint-d);
+      }
+      .f3 .ph-badge {
+        background: var(--peach);
+        color: var(--peach-d);
+      }
+
+      /* Phase band inside timeline */
+      .phase-band {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 12px;
+        border-radius: 99px;
+        opacity: 0.85;
+      }
+      .phase-band.f1 {
+        background: linear-gradient(90deg, var(--lavender-d), var(--lavender));
+      }
+      .phase-band.f2 {
+        background: linear-gradient(90deg, var(--mint-d), var(--mint));
+      }
+      .phase-band.f3 {
+        background: linear-gradient(90deg, var(--peach-d), var(--peach));
+      }
+
+      /* ── Task rows ──────────────────────────────────── */
+      .task-row {
+        min-height: 42px;
+      }
+      .task-row.f1 .g-time {
+        background-color: #fbf9ff;
+      }
+      .task-row.f2 .g-time {
+        background-color: #f6fdf9;
+      }
+      .task-row.f3 .g-time {
+        background-color: #fffcf7;
+      }
+      .task-row:hover .g-time {
+        filter: brightness(0.97);
+      }
+
+      /* Task bar */
+      .t-bar {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 24px;
+        border-radius: 99px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        min-width: 6px;
+      }
+      .t-bar.f1 {
+        background: linear-gradient(90deg, var(--lavender-d) 0%, #b9a4ef 100%);
+      }
+      .t-bar.f2 {
+        background: linear-gradient(90deg, var(--mint-d) 0%, #7dd4b0 100%);
+      }
+      .t-bar.f3 {
+        background: linear-gradient(90deg, var(--peach-d) 0%, #f0ad69 100%);
+      }
+
+      /* ── Milestone rows ─────────────────────────────── */
+      .ms-row {
+        min-height: 36px;
+      }
+      .ms-row .g-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        font-style: italic;
+      }
+      .ms-row.f1 .g-label {
+        color: var(--lavender-d);
+      }
+      .ms-row.f2 .g-label {
+        color: var(--mint-d);
+      }
+      .ms-row.f3 .g-label {
+        color: var(--peach-d);
+      }
+      .ms-row .g-time {
+        background-color: #fff7fa;
+      }
+
+      .phase-row .g-time,
+      .task-row .g-time,
+      .ms-row .g-time {
+        background-image: var(--month-lines);
+      }
+
+      /* Milestone vertical line */
+      .ms-vline {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 1.5px;
+        background: var(--rose);
+        transform: translateX(-50%);
+        z-index: 1;
+        opacity: 0.5;
+      }
+
+      /* Milestone diamond */
+      @keyframes ms-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 3px var(--rose-l);
+        }
+        50% {
+          box-shadow: 0 0 0 7px var(--rose-l);
+        }
+      }
+      .ms-mark {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--rose-d);
+        animation: ms-pulse 2.4s ease-in-out infinite;
+        z-index: 2;
+      }
+
+      /* ── KPI cards ──────────────────────────────────── */
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 20px;
+      }
+      @media (max-width: 700px) {
+        .kpis {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 480px) {
+        .kpis {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi {
+        background: var(--white);
+        border-radius: 18px;
+        padding: 18px 16px;
+        border: 1.5px solid var(--sand);
+      }
+      .kpi.lav {
+        border-color: var(--lavender);
+        background: linear-gradient(150deg, var(--white), var(--lavender-l));
+      }
+      .kpi.mint {
+        border-color: var(--mint);
+        background: linear-gradient(150deg, var(--white), var(--mint-l));
+      }
+      .kpi.peach {
+        border-color: var(--peach);
+        background: linear-gradient(150deg, var(--white), var(--peach-l));
+      }
+
+      .kpi-label {
+        font-family: "Nunito", sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+      }
+      .kpi-val {
+        font-family: "Nunito", sans-serif;
+        font-size: 20px;
+        font-weight: 900;
+        color: var(--text-dark);
+        line-height: 1.1;
+        margin-bottom: 4px;
+      }
+      .kpi-sub {
+        font-size: 11.5px;
+        color: var(--text-mid);
+        line-height: 1.4;
+      }
+
+      /* ── Footer ─────────────────────────────────────── */
+      .footer {
+        margin-top: 28px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-soft);
+        padding-top: 16px;
+        border-top: 1px dashed var(--sand);
+      }
+      .footer strong {
+        color: var(--text-mid);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- ── Header ───────────────────────────────────── -->
+      <div class="header">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <path
+              d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"
+            />
+          </svg>
+          Hoja de Ruta · 18 meses · Jul 2026 – Dic 2027
+        </div>
+        <h1>Plan de desarrollo y <span>lanzamiento</span></h1>
+        <p class="header-sub">
+          Tres fases ejecutivas desde el lanzamiento en Google Play hasta los
+          <strong>10.000 MAU</strong> con ROI mensual positivo. Escenario
+          conservador.
+        </p>
+      </div>
+
+      <!-- ── Gantt card ────────────────────────────────── -->
+      <div class="gantt-card">
+        <!-- Head -->
+        <div class="card-head">
+          <div>
+            <div class="card-title">Diagrama de Gantt - Hoja de Ruta</div>
+            <div class="card-sub">
+              3 fases · 12 tareas · 3 hitos · Jul 2026 – Dic 2027
+            </div>
+          </div>
+          <div class="legend">
+            <div class="leg">
+              <div
+                class="leg-pill"
+                style="
+                  background: linear-gradient(
+                    90deg,
+                    var(--lavender-d),
+                    var(--lavender)
+                  );
+                "
+              ></div>
+              F1 - MVP
+            </div>
+            <div class="leg">
+              <div
+                class="leg-pill"
+                style="
+                  background: linear-gradient(
+                    90deg,
+                    var(--mint-d),
+                    var(--mint)
+                  );
+                "
+              ></div>
+              F2 - Crecimiento
+            </div>
+            <div class="leg">
+              <div
+                class="leg-pill"
+                style="
+                  background: linear-gradient(
+                    90deg,
+                    var(--peach-d),
+                    var(--peach)
+                  );
+                "
+              ></div>
+              F3 - Escala
+            </div>
+            <div class="leg">
+              <div class="leg-diamond"></div>
+              Hito
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="gantt-wrap">
+          <div class="gantt-inner">
+            <!--
+              Timeline math (total = 549 days: Jul 1 2026 – Dec 31 2027)
+              left%  = start_day / 549 * 100
+              width% = duration  / 549 * 100
+
+              Month flex units match actual day counts so bars align perfectly.
+
+              Phase bands  F1: 0%→32.79%  F2: 33.52%→66.31%  F3: 66.48%→100%
+              t1  Lanzamiento             0.00% / 4.55%   (day 0,   25d)
+              t2  Onboarding              3.46% / 9.11%   (day 19,  50d)
+              t3  Feedback/hotfixes       8.20% / 12.75%  (day 45,  70d)
+              t4  Habit loop             13.84% / 13.66%  (day 76,  75d)
+              m1  Retención D7           31.33%            (day 172, Dec 20)
+              t5  Eventos               33.52% / 12.75%  (day 184, 70d)
+              t6  Comunidad             39.16% / 14.57%  (day 215, 80d)
+              t7  Personalización       46.81% / 13.66%  (day 257, 75d)
+              t8  BookTok               49.91% / 14.57%  (day 274, 80d)
+              m2  1.000 MAU             65.39%            (day 359, Jun 25)
+              t9  IAP / packs           66.48% / 14.57%  (day 365, 80d)
+              t10 Rewarded Ads          72.13% / 12.75%  (day 396, 70d)
+              t11 Localización          77.78% / 16.39%  (day 427, 90d)
+              t12 ASO                   83.24% / 16.39%  (day 457, 90d)
+              m3  10.000 MAU            98.18%            (day 539, Dec 22)
+            -->
+
+            <!-- Year band -->
+            <div class="g-row year-row">
+              <div
+                class="g-label"
+                style="background: var(--sand); border-right-color: var(--sand)"
+              ></div>
+              <div class="g-time year-strip">
+                <div class="year-cell y26" style="flex: 184">2026</div>
+                <div class="year-cell y27" style="flex: 365">2027</div>
+              </div>
+            </div>
+
+            <!-- Month header -->
+            <div class="g-row month-row">
+              <div class="g-label">Tarea / Fase</div>
+              <div class="g-time month-strip">
+                <!-- 2026 -->
+                <div class="m-cell" style="flex: 31">Jul</div>
+                <div class="m-cell" style="flex: 31">Ago</div>
+                <div class="m-cell" style="flex: 30">Sep</div>
+                <div class="m-cell" style="flex: 31">Oct</div>
+                <div class="m-cell" style="flex: 30">Nov</div>
+                <div class="m-cell" style="flex: 31">Dic</div>
+                <!-- 2027 -->
+                <div class="m-cell new-year" style="flex: 31">Ene</div>
+                <div class="m-cell" style="flex: 28">Feb</div>
+                <div class="m-cell" style="flex: 31">Mar</div>
+                <div class="m-cell" style="flex: 30">Abr</div>
+                <div class="m-cell" style="flex: 31">May</div>
+                <div class="m-cell" style="flex: 30">Jun</div>
+                <div class="m-cell new-year" style="flex: 31">Jul</div>
+                <div class="m-cell" style="flex: 31">Ago</div>
+                <div class="m-cell" style="flex: 30">Sep</div>
+                <div class="m-cell" style="flex: 31">Oct</div>
+                <div class="m-cell" style="flex: 30">Nov</div>
+                <div class="m-cell" style="flex: 31">Dic</div>
+              </div>
+            </div>
+
+            <!-- ══ FASE 1 ══════════════════════════════ -->
+            <div class="g-row phase-row f1">
+              <div class="g-label">
+                <span class="ph-badge">F1</span>
+                MVP · Lanzamiento
+              </div>
+              <div class="g-time">
+                <div
+                  class="phase-band f1"
+                  style="left: 0%; width: 32.79%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f1">
+              <div class="g-label">Lanzamiento en Google Play</div>
+              <div class="g-time">
+                <div class="t-bar f1" style="left: 0%; width: 4.55%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f1">
+              <div class="g-label">Onboarding y primeras cohortes</div>
+              <div class="g-time">
+                <div class="t-bar f1" style="left: 3.46%; width: 9.11%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f1">
+              <div class="g-label">Feedback y hotfixes</div>
+              <div class="g-time">
+                <div class="t-bar f1" style="left: 8.2%; width: 12.75%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f1">
+              <div class="g-label">Pulido del habit loop (D7/D30)</div>
+              <div class="g-time">
+                <div class="t-bar f1" style="left: 13.84%; width: 13.66%"></div>
+              </div>
+            </div>
+
+            <div class="g-row ms-row f1">
+              <div class="g-label">◆ Retención D7 ≥ 30%</div>
+              <div class="g-time">
+                <div class="ms-vline" style="left: 31.33%"></div>
+                <div class="ms-mark" style="left: 31.33%"></div>
+              </div>
+            </div>
+
+            <!-- ══ FASE 2 ══════════════════════════════ -->
+            <div class="g-row phase-row f2">
+              <div class="g-label">
+                <span class="ph-badge">F2</span>
+                Crecimiento y Compromiso
+              </div>
+              <div class="g-time">
+                <div
+                  class="phase-band f2"
+                  style="left: 33.52%; width: 32.79%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f2">
+              <div class="g-label">Eventos estacionales y misiones</div>
+              <div class="g-time">
+                <div class="t-bar f2" style="left: 33.52%; width: 12.75%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f2">
+              <div class="g-label">Funciones de comunidad ligera</div>
+              <div class="g-time">
+                <div class="t-bar f2" style="left: 39.16%; width: 14.57%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f2">
+              <div class="g-label">Personalización y recomendaciones</div>
+              <div class="g-time">
+                <div class="t-bar f2" style="left: 46.81%; width: 13.66%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f2">
+              <div class="g-label">Pilotos micro-influencers BookTok</div>
+              <div class="g-time">
+                <div class="t-bar f2" style="left: 49.91%; width: 14.57%"></div>
+              </div>
+            </div>
+
+            <div class="g-row ms-row f2">
+              <div class="g-label">◆ 1.000 MAU + D30 ≥ 20%</div>
+              <div class="g-time">
+                <div class="ms-vline" style="left: 65.39%"></div>
+                <div class="ms-mark" style="left: 65.39%"></div>
+              </div>
+            </div>
+
+            <!-- ══ FASE 3 ══════════════════════════════ -->
+            <div class="g-row phase-row f3">
+              <div class="g-label">
+                <span class="ph-badge">F3</span>
+                Monetización y Escala
+              </div>
+              <div class="g-time">
+                <div
+                  class="phase-band f3"
+                  style="left: 66.48%; width: 33.52%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f3">
+              <div class="g-label">Optimización IAP y packs</div>
+              <div class="g-time">
+                <div class="t-bar f3" style="left: 66.48%; width: 14.57%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f3">
+              <div class="g-label">Tuning Rewarded Ads / eCPM</div>
+              <div class="g-time">
+                <div class="t-bar f3" style="left: 72.13%; width: 12.75%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f3">
+              <div class="g-label">Localización y nuevos mercados</div>
+              <div class="g-time">
+                <div class="t-bar f3" style="left: 77.78%; width: 16.39%"></div>
+              </div>
+            </div>
+
+            <div class="g-row task-row f3 no-border">
+              <div class="g-label">ASO y escalado de adquisición</div>
+              <div class="g-time">
+                <div class="t-bar f3" style="left: 83.24%; width: 16.39%"></div>
+              </div>
+            </div>
+
+            <div class="g-row ms-row f3 no-border">
+              <div class="g-label">◆ 10.000 MAU + ROI mensual +</div>
+              <div class="g-time">
+                <div class="ms-vline" style="left: 98.18%"></div>
+                <div class="ms-mark" style="left: 98.18%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── KPI cards ─────────────────────────────────── -->
+      <div class="kpis">
+        <div class="kpi lav">
+          <div class="kpi-label">Fase 1 · MVP</div>
+          <div class="kpi-val">Jul – Dic 2026</div>
+          <div class="kpi-sub">
+            Lanzamiento + retención + habit loop · Meta: D7 ≥ 30%
+          </div>
+        </div>
+        <div class="kpi mint">
+          <div class="kpi-label">Fase 2 · Crecimiento</div>
+          <div class="kpi-val">Ene – Jun 2027</div>
+          <div class="kpi-sub">
+            Comunidad + eventos + BookTok · Meta: 1.000 MAU
+          </div>
+        </div>
+        <div class="kpi peach">
+          <div class="kpi-label">Fase 3 · Escala</div>
+          <div class="kpi-val">Jul – Dic 2027</div>
+          <div class="kpi-sub">
+            IAP + Ads + ASO + localización · Meta: 10.000 MAU
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Footer ────────────────────────────────────── -->
+      <div class="footer">
+        <strong>My Reading Village</strong> · Fernando Pinto Villarroel · 2026 ·
+        Proyecto Final — Hoja de Ruta 18 meses
+      </div>
+    </div>
+  </body>
+</html>

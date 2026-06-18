@@ -12,7 +12,7 @@ Use `my_reading_village_icon_cropped.png` (`assets/images/logos/my_reading_villa
 
 ### Cover / banner image
 
-Generate a new landscape hero image from the **`marketing_banner_horizontal.png`** prompt that has been added to `assets/prompts/backgrounds.md` (under "Horizontal Marketing Banner Backgrounds"). It's composed at 2560×1440px with all the important content inside a centered 1546×423px safe area, so a single generated image can be cropped to fit:
+Generate a new landscape hero image from the **`marketing_banner_horizontal_1.png`** prompt that has been added to `assets/prompts/backgrounds.md` (under "Horizontal Marketing Banner Backgrounds"). It's composed at 2560×1440px with all the important content inside a centered 1546×423px safe area, so a single generated image can be cropped to fit:
 
 - Facebook cover photo (≈ 820×312)
 - X/Twitter header (1500×500)
@@ -58,7 +58,7 @@ Reddit, TikTok, YouTube and the broad indie-game/cozy-game discovery audiences o
 3. Verify your email (required to post in most communities).
 4. Open **Settings > Profile**, set:
    - **Avatar**: `my_reading_village_icon_cropped.png`
-   - **Banner**: `marketing_banner_horizontal.png` (cropped to Reddit's banner ratio)
+   - **Banner**: `marketing_banner_horizontal_1.png` (cropped to Reddit's banner ratio)
    - **Display name**: My Reading Village
 
 ### Step 1.2 — Bio (≈180/200 chars)
@@ -115,7 +115,7 @@ Genuinely curious what would pull YOU into reading more — trying to make sure 
 ```
 Title: I turned "read more books" into a village-builder game with Flutter + SQLite — here's how the reading-to-resources loop works
 
-Body: short technical walkthrough of the core loop (log a reading session → pages convert to coins/gems/wood/metal → spend them on buildings/villagers), one or two architecture notes, and the marketing_banner_horizontal artwork as the header image. Close with the Play Store link once live.
+Body: short technical walkthrough of the core loop (log a reading session → pages convert to coins/gems/wood/metal → spend them on buildings/villagers), one or two architecture notes, and the marketing_banner_horizontal_1 artwork as the header image. Close with the Play Store link once live.
 ```
 
 ---
@@ -130,7 +130,7 @@ Body: short technical walkthrough of the core loop (log a reading session → pa
 4. Category: search for and select **Game** (or **App Page** / **Video Game** depending on what Meta surfaces).
 5. Set:
    - **Profile picture**: `my_reading_village_icon_cropped.png` (square crop)
-   - **Cover photo**: `marketing_banner_horizontal.png` (cropped to ≈ 820×312)
+   - **Cover photo**: `marketing_banner_horizontal_1.png` (cropped to ≈ 820×312)
    - **Username/handle**: `@MyReadingVillage` (Page Settings > Username)
 6. Fill in **Page bio** (short) and **About > Description** (long) — see below.
 7. Add the Play Store link under **Contact and basic info** once the listing is live.
@@ -151,7 +151,7 @@ Perfect for book lovers, parents raising young readers, and anyone who wants a r
 
 ### Step 2.4 — First publication: launch-teaser image post
 
-Post the `marketing_banner_horizontal.png` artwork with this caption:
+Post the `marketing_banner_horizontal_1.png` artwork with this caption:
 
 ```
 🌸 Hello, fellow readers! 🌸
@@ -196,7 +196,7 @@ Which animal friend would you want to welcome to your village first? 🐱 = Cat 
 
 ### Step 3.3 — First publication: launch carousel
 
-Post a 4-slide carousel: slide 1 = `marketing_banner_horizontal.png` (the hook), slides 2–4 = in-game screenshots (village view, species collection, a minigame).
+Post a 4-slide carousel: slide 1 = `marketing_banner_horizontal_1.png` (the hook), slides 2–4 = in-game screenshots (village view, species collection, a minigame).
 
 ```
 🌸 Welcome to My Reading Village — where every page you read helps grow your own cozy town! 📚🏘️
@@ -279,7 +279,7 @@ POV: you found an app that turns reading into the cutest village game 🌸📚�
 2. **Settings > Create a channel**, name it `My Reading Village`.
 3. **Customization > Branding**:
    - **Picture**: `my_reading_village_icon_cropped.png`
-   - **Banner**: `marketing_banner_horizontal.png` — its 2560×1440 canvas with a 1546×423 safe area was generated to match YouTube's exact banner spec, so it needs no extra cropping here.
+   - **Banner**: `marketing_banner_horizontal_1.png` — its 2560×1440 canvas with a 1546×423 safe area was generated to match YouTube's exact banner spec, so it needs no extra cropping here.
    - **Handle**: `@MyReadingVillage`
 4. **Customization > Basic info**: paste the description and keywords below, add links to the Play Store listing and other socials.
 5. **Customization > Layout**: set a **Channel trailer** for people who haven't subscribed yet — this is the single highest-leverage piece of real estate on a new channel.
@@ -332,7 +332,7 @@ my reading village, cozy game, village builder game, reading app, book tracker a
 | 0:05–0:20 | Reading tracker → resources flying in → quick village-building montage |
 | 0:20–0:40 | Villager collection showcase — a rarity-reveal moment from common up to godly |
 | 0:40–0:55 | Fast montage: minigames, lucky wheel spin, seasonal event badge, mission confetti |
-| 0:55–1:10 | Wide pastel village panorama — use `marketing_banner_horizontal.png` as the closing hero shot |
+| 0:55–1:10 | Wide pastel village panorama — use `marketing_banner_horizontal_1.png` as the closing hero shot |
 | 1:10–1:20 | End card: app icon, "Coming soon to Google Play", language flags |
 
 ---
@@ -349,7 +349,7 @@ my reading village, cozy game, village builder game, reading app, book tracker a
 
 ## Quick Reference Checklist
 
-- [x] Generate `marketing_banner_horizontal.png` from the new prompt in `assets/prompts/backgrounds.md`
+- [x] Generate `marketing_banner_horizontal_1.png` from the new prompt in `assets/prompts/backgrounds.md`
 - [ ] Reddit: create account, set avatar/banner/bio, build standing in target subs, post the launch poll
 - [ ] Facebook: create Page, set assets/bios, publish the launch image post
 - [ ] Instagram: switch to a Professional account, set assets/bio, publish the launch carousel

@@ -447,7 +447,7 @@ Go to **Policy > App content > Data safety** and declare data collection accurat
   - In the purpose field, describe it as: *"Anonymous, aggregate counters about how the game is used (e.g., reading sessions logged, buildings placed, villagers unlocked) — never usernames, village names, book titles, authors, quotes, or photos."*
 
 **Data collected regardless of consent (existing, unrelated to analytics):**
-- **Advertising IDs / device info** via Google AdMob, for serving and measuring rewarded ads — declare per AdMob's own Data safety guidance (Google provides a reference mapping for this in the AdMob documentation).
+- **Advertising IDs / device info** via Unity Ads, for serving and measuring rewarded ads — declare per Unity Ads' own Data safety guidance.
 - **App info and performance** (e.g., crash logs) if you have Play Console's automatic crash reporting enabled.
 - Book search queries are sent to Open Library only when the player actively uses "Search Online" — declare as **App activity → Search history**, *not* required to function, *not* shared for advertising.
 
@@ -478,10 +478,10 @@ For each gem pack, click **"Create product"**:
 | Product ID  | Name      | Description             | Price  |
 | ----------- | --------- | ----------------------- | ------ |
 | `gems_50`   | 50 Gems   | 50 gems for your village   | $0.99  |
-| `gems_100`  | 100 Gems  | 100 gems for your village  | $1.99  |
-| `gems_200`  | 200 Gems  | 200 gems for your village  | $3.99  |
-| `gems_500`  | 500 Gems  | 500 gems for your village  | $8.99  |
-| `gems_1000` | 1000 Gems | 1000 gems for your village | $16.99 |
+| `gems_100`  | 100 Gems  | 100 gems for your village  | $1.79  |
+| `gems_200`  | 200 Gems  | 200 gems for your village  | $3.29  |
+| `gems_500`  | 500 Gems  | 500 gems for your village  | $7.99  |
+| `gems_1000` | 1000 Gems | 1000 gems for your village | $14.99 |
 | `gems_2000` | 2000 Gems | 2000 gems for your village | $29.99 |
 
 For each product:
@@ -496,8 +496,8 @@ For each product:
 
 | Product ID     | Name         | Description                                                       | Price  |
 | -------------- | ------------ | ----------------------------------------------------------------- | ------ |
-| `pack_starter` | Starter Pack | 50 coins + 30 wood + 10 metal + 1 sandwich                        | $1.49  |
-| `pack_builder` | Builder Pack | 100 coins + 100 wood + 50 metal + 2 hammers                       | $2.99  |
+| `pack_starter` | Starter Pack | 200 coins + 100 wood + 60 metal + 2 sandwiches                    | $1.99  |
+| `pack_builder` | Builder Pack | 400 coins + 200 wood + 120 metal + 3 hammers                      | $3.49  |
 | `pack_reader`  | Reader Pack  | 200 coins + 50 gems + 3 books + 3 glasses                         | $4.99  |
 | `pack_village` | Village Pack | 500 coins + 200 wood + 100 metal + 100 gems + powerups            | $9.99  |
 | `pack_mega`    | Mega Pack    | 1000 coins + 500 wood + 200 metal + 200 gems + 10 of each powerup | $19.99 |
@@ -530,19 +530,20 @@ Species purchases are **Non-Consumable** (bought once; owning a species is perma
 | `species_bat`          | Bat          | Extraordinary | $4.99  |
 | `species_donkey`       | Donkey       | Extraordinary | $4.99  |
 | `species_turkey`       | Turkey       | Extraordinary | $4.99  |
-| `species_monkey`       | Monkey       | Legendary     | $9.99  |
-| `species_gorilla`      | Gorilla      | Legendary     | $9.99  |
-| `species_zebra`        | Zebra        | Legendary     | $9.99  |
-| `species_horse`        | Horse        | Legendary     | $9.99  |
-| `species_skunk`        | Skunk        | Legendary     | $9.99  |
-| `species_hyena`        | Hyena        | Legendary     | $9.99  |
-| `species_mouse`        | Mouse        | Legendary     | $9.99  |
-| `species_lion`         | Lion         | Godly         | $19.99 |
-| `species_armadillo`    | Armadillo    | Godly         | $19.99 |
-| `species_beaver`       | Beaver       | Godly         | $19.99 |
-| `species_fox`          | Fox          | Godly         | $19.99 |
-| `species_tiger`        | Tiger        | Godly         | $19.99 |
-| `species_leopard`      | Leopard      | Godly         | $19.99 |
+
+| `species_monkey`       | Monkey       | Legendary     | $7.99  |
+| `species_gorilla`      | Gorilla      | Legendary     | $7.99  |
+| `species_zebra`        | Zebra        | Legendary     | $7.99  |
+| `species_horse`        | Horse        | Legendary     | $7.99  |
+| `species_skunk`        | Skunk        | Legendary     | $7.99  |
+| `species_hyena`        | Hyena        | Legendary     | $7.99  |
+| `species_mouse`        | Mouse        | Legendary     | $7.99  |
+| `species_lion`         | Lion         | Godly         | $13.99 |
+| `species_armadillo`    | Armadillo    | Godly         | $13.99 |
+| `species_beaver`       | Beaver       | Godly         | $13.99 |
+| `species_fox`          | Fox          | Godly         | $13.99 |
+| `species_tiger`        | Tiger        | Godly         | $13.99 |
+| `species_leopard`      | Leopard      | Godly         | $13.99 |
 
 For each product:
 
@@ -686,7 +687,7 @@ Add new in-app product IDs in Play Console **before** releasing the app version 
 - [ ] Complete store listing (screenshots, description, icon)
 - [ ] Complete content rating questionnaire
 - [ ] Add Privacy Policy URL (and Terms & Conditions URL alongside it on the website)
-- [ ] Complete the **Data safety** form — declare consent-gated analytics (Firebase) plus existing AdMob/Open Library data flows
+- [ ] Complete the **Data safety** form — declare consent-gated analytics (Firebase) plus existing Unity Ads/Open Library data flows
 - [ ] Register all 15 in-app products (6 gem packs + 5 regular packs + 4 species)
 - [ ] Upload AAB to Internal Testing track
 - [ ] Test purchases with license testers

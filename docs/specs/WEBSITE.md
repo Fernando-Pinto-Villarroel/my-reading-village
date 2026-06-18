@@ -92,7 +92,7 @@ All paths below are relative to `my_reading_village/` in this repo. Copy (don't 
 
 - **Logo** (use everywhere — header, footer, favicon source): `assets/images/logos/my_reading_village_icon_cropped.png`
 - **Hero / section backgrounds** (splash-screen illustrations — gorgeous, full-scene kawaii art, perfect for full-bleed hero sections or section dividers): `assets/images/backgrounds/splash_bg_1.png`, `splash_bg_2.png`, `splash_bg_3.png`
-- **Horizontal marketing banner** (wide-format hero art generated from the prompt in `assets/prompts/backgrounds.md` → "Horizontal Marketing Banner Backgrounds" → `marketing_banner_horizontal.png`): **check whether this file has been generated yet** at `assets/images/backgrounds/marketing_banner_horizontal.png` (or ask the user where they saved it) — if it doesn't exist yet, fall back to the splash backgrounds above and flag it to the user as a follow-up asset to drop in later.
+- **Horizontal marketing banner** (wide-format hero art generated from the prompt in `assets/prompts/backgrounds.md` → "Horizontal Marketing Banner Backgrounds" → `marketing_banner_horizontal_1.png`): **check whether this file has been generated yet** at `assets/images/backgrounds/marketing_banner_horizontal_1.png` (or ask the user where they saved it) — if it doesn't exist yet, fall back to the splash backgrounds above and flag it to the user as a follow-up asset to drop in later.
 - **Villager carousel** — 42 species, each with a default "happy" sprite at `assets/images/villagers/<species>/<species>_villager.png`, e.g.:
   - `assets/images/villagers/cat/cat_villager.png`
   - `assets/images/villagers/red_panda/red_panda_villager.png`
@@ -164,7 +164,7 @@ You can change your mind at any time from **Settings → Data Management → Ana
 
 **Book search.** When you search for a book by title, author or ISBN using the "Search Online" feature, your search query is sent to the [Open Library](https://openlibrary.org) API, a free service operated by the Internet Archive, in order to retrieve book details and cover images. Please refer to Open Library's own privacy policy for how they handle that request.
 
-**Advertising.** The app displays optional rewarded video ads through Google AdMob (Google Mobile Ads). To serve and measure ads, Google AdMob may collect and process information such as advertising identifiers, IP address, and device information, in accordance with [Google's Privacy Policy](https://policies.google.com/privacy) and [ad technology policy](https://policies.google.com/technologies/ads). You can manage your ad personalization preferences in your device's settings.
+**Advertising.** The app displays optional rewarded video ads through Unity Ads (Unity Technologies). To serve and measure ads, Unity Ads may collect and process information such as advertising identifiers, IP address, and device information, in accordance with [Unity's Privacy Policy](https://unity.com/legal/privacy-policy). You can manage your ad personalization preferences in your device's settings.
 
 **Analytics (only if you consent).** As described above, if — and only if — you accept analytics on the consent screen, the app uses Google Analytics for Firebase to collect anonymous, aggregate usage events. This library is never initialized, and no event is ever sent, unless you have actively opted in.
 
@@ -176,7 +176,7 @@ All of your game and reading data lives locally on your device. The app's "Expor
 
 ## 4. Data Sharing & Sale
 
-We do not sell your personal information. The only data that ever leaves your device is: (a) book search queries sent to Open Library when you use that feature, (b) information collected by Google AdMob to serve ads, and (c) — only if you have explicitly consented — the anonymous, aggregate analytics events described in Section 1, sent via Google Analytics for Firebase.
+We do not sell your personal information. The only data that ever leaves your device is: (a) book search queries sent to Open Library when you use that feature, (b) information collected by Unity Ads to serve ads, and (c) — only if you have explicitly consented — the anonymous, aggregate analytics events described in Section 1, sent via Google Analytics for Firebase.
 
 ## 5. Children's Privacy
 
@@ -221,7 +221,7 @@ The app does not require you to create an account or sign in. Your village, read
 
 ## 3. Acceptable Use
 
-You agree to use the app only for its intended purpose — as a personal reading companion and cozy game — and not to attempt to reverse-engineer, exploit, disrupt, or interfere with the app, its assets, or the third-party services it relies on (Open Library, Google AdMob, Google Analytics for Firebase).
+You agree to use the app only for its intended purpose — as a personal reading companion and cozy game — and not to attempt to reverse-engineer, exploit, disrupt, or interfere with the app, its assets, or the third-party services it relies on (Open Library, Unity Ads, Google Analytics for Firebase).
 
 ## 4. In-App Resources & Purchases
 
@@ -229,7 +229,7 @@ Coins, gems, wood, metal, villagers, buildings, and similar in-game items have n
 
 ## 5. Third-Party Services
 
-The app integrates with the third-party services described in our [Privacy Policy](/privacy) — Open Library (book search), Google AdMob (advertising), and, only with your consent, Google Analytics for Firebase (anonymous usage analytics). Your use of those services through the app is also subject to their own terms and policies.
+The app integrates with the third-party services described in our [Privacy Policy](/privacy) — Open Library (book search), Unity Ads (advertising), and, only with your consent, Google Analytics for Firebase (anonymous usage analytics). Your use of those services through the app is also subject to their own terms and policies.
 
 ## 6. Analytics Consent
 
