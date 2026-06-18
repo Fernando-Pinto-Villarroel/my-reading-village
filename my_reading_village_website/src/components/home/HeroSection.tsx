@@ -104,7 +104,7 @@ export default function HeroSection() {
         style={{ y: bgY }}
       >
         <img
-          src="/assets/images/backgrounds/marketing_banner_horizontal.webp"
+          src="/assets/images/backgrounds/marketing_banner_horizontal_1.webp"
           alt=""
           className="w-full h-full object-cover object-center"
           loading="eager"
