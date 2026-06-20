@@ -10,6 +10,8 @@ FONT_XB = os.path.join(_LATO, 'Lato-Black.ttf')
 FONT_B  = os.path.join(_LATO, 'Lato-Bold.ttf')
 FONT_SB = os.path.join(_LATO, 'Lato-Semibold.ttf')
 FONT_R  = os.path.join(_LATO, 'Lato-Regular.ttf')
+FONT_LI = os.path.join(_LATO, 'Lato-LightItalic.ttf')
+FONT_I  = os.path.join(_LATO, 'Lato-Italic.ttf')
 
 W, H = 1080, 1920
 FPS  = 30
