@@ -168,10 +168,14 @@ LOGO   = None
 BOOK_I = None
 
 
-def setup(lang: str):
-    global _S, _CARDS
+_BGS = [1, 2, 3]
+
+
+def setup(lang: str, bg: int = 1):
+    global _S, _CARDS, _BGS
     _S     = _STRINGS.get(lang, _STRINGS['en'])
     _CARDS = _S['cards']
+    _BGS   = [((bg - 1 + i) % 6) + 1 for i in range(3)]
 
 
 def preload():
@@ -185,7 +189,7 @@ def preload():
 
 def scene_hook(canvas, t, a):
     zoom = lerp(1.10, 1.00, eoc(remap(t, 0.0, 5.0)))
-    canvas.alpha_composite(load_bg('images/backgrounds/splash_bg_1.png',
+    canvas.alpha_composite(load_bg(f'images/backgrounds/splash_bg_{_BGS[0]}.png',
                                    zoom=zoom, pan_y=0.40))
     color_ov(canvas, (12, 6, 22), 0.55 * a)
 
@@ -263,7 +267,7 @@ def scene_hook(canvas, t, a):
 
 
 def scene_benefits(canvas, t, a):
-    bgimg = load_bg('images/backgrounds/splash_bg_2.png', zoom=1.06, pan_y=0.45)
+    bgimg = load_bg(f'images/backgrounds/splash_bg_{_BGS[1]}.png', zoom=1.06, pan_y=0.45)
     bgimg = bgimg.filter(ImageFilter.GaussianBlur(7))
     canvas.alpha_composite(bgimg)
     color_ov(canvas, LAVENDER, 0.18 * a)
@@ -350,7 +354,7 @@ def scene_benefits(canvas, t, a):
 
 
 def scene_app(canvas, t, a):
-    canvas.alpha_composite(load_bg('images/backgrounds/splash_bg_3.png',
+    canvas.alpha_composite(load_bg(f'images/backgrounds/splash_bg_{_BGS[2]}.png',
                                    zoom=1.04, pan_y=0.35))
     color_ov(canvas, CREAM, 0.25 * a)
     color_ov(canvas, (0, 0, 0), 0.18 * a)
@@ -472,7 +476,7 @@ _TIMELINE = [
     (14.0, 18.0, scene_app),
     (18.0, 20.0, scene_cta),
 ]
-_CF = 0.50
+_CF = 0.12
 
 
 def make_frame(t):
@@ -509,8 +513,8 @@ def make_frame(t):
     return np.array(canvas.convert('RGB'))
 
 
-def run(lang='en'):
-    setup(lang)
+def run(lang='en', bg=1):
+    setup(lang, bg)
     preload()
     out = os.path.join(_OUT, f'reading_benefits_story_{lang}.mp4')
     print(f'Rendering "Benefits of Reading" story ({lang})…')

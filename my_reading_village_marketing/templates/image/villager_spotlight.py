@@ -14,7 +14,7 @@ _OUT = _assets.OUTPUT_DIR
 os.makedirs(_OUT, exist_ok=True)
 
 
-def run(villager='cat', lang='en'):
+def run(villager='cat', lang='en', bg=2):
     rarity, tint, accent = SPECIES.get(villager, ('common', MINT, D_MINT))
     rlabel = RARITY_LABEL.get(lang, RARITY_LABEL['en'])[rarity]
     name   = species_name(villager, lang)
@@ -22,11 +22,11 @@ def run(villager='cat', lang='en'):
 
     canvas = Image.new('RGBA', (W, H), (0, 0, 0, 255))
 
-    bg = load_bg('images/backgrounds/splash_bg_2.png', zoom=1.08, pan_y=0.42)
-    bg = bg.filter(ImageFilter.GaussianBlur(6))
-    canvas.alpha_composite(bg)
+    bg_img = load_bg(f'images/backgrounds/splash_bg_{bg}.png', zoom=1.08, pan_y=0.42)
+    bg_img = bg_img.filter(ImageFilter.GaussianBlur(7))
+    canvas.alpha_composite(bg_img)
     color_ov(canvas, tint, 0.14)
-    color_ov(canvas, (10, 5, 20), 0.48)
+    color_ov(canvas, (10, 5, 20), 0.50)
 
     pl = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     draw_particles(pl, 3.5, 0.45)
@@ -77,11 +77,11 @@ def run(villager='cat', lang='en'):
 
     lines = wrap_text(desc, max_chars=30)
     for i, line in enumerate(lines[:2]):
-        txt_c(d, line, W * 0.5, H * 0.860 + i * 52,
-              F(FONT_R, 38), (*CREAM[:3], 210), shadow=(0, 0, 0), sd=3)
+        txt_c(d, line, W * 0.5, H * 0.860 + i * 56,
+              F(FONT_R, 44), (*CREAM[:3], 210), shadow=(0, 0, 0), sd=3)
 
-    logo = load_img('images/logos/my_reading_village_icon_rounded.png', w=88)
-    paste_c(canvas, logo, W * 0.5, H * 0.950)
+    logo = load_img('images/logos/my_reading_village_icon_rounded.png', w=160)
+    paste_c(canvas, logo, W * 0.5, H * 0.958)
 
     out = os.path.join(_OUT, f'villager_spotlight_{villager}_{lang}.png')
     canvas.convert('RGB').save(out)

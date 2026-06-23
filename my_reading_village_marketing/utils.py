@@ -194,7 +194,7 @@ def draw_sparkles(canvas, t, positions, a=1.0):
     canvas.alpha_composite(layer)
 
 # ── Video compositor helper ───────────────────────────────────────────────────
-def make_video_frame(timeline, duration, cf=0.50):
+def make_video_frame(timeline, duration, cf=0.12):
     def _make_frame(t):
         active = []
         for s0, s1, fn in timeline:

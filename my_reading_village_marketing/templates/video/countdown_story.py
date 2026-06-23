@@ -39,18 +39,20 @@ _FOLLOW = {
 _VILLAGER  = 'fox'
 _LANG      = 'en'
 _RARITY    = ('godly', GEM_PURP, (130, 60, 185))
+_BGS       = [1, 2]
 
 
-def preload(villager, lang):
-    global _VILLAGER, _LANG, _RARITY
+def preload(villager, lang, bg=1):
+    global _VILLAGER, _LANG, _RARITY, _BGS
     _VILLAGER = villager
     _LANG     = lang
     _RARITY   = SPECIES.get(villager, ('common', MINT, D_MINT))
+    _BGS      = [((bg - 1 + i) % 6) + 1 for i in range(2)]
 
 
 def scene_tease(canvas, t, a):
     _, tint, accent = _RARITY
-    canvas.alpha_composite(load_bg('images/backgrounds/splash_bg_1.png',
+    canvas.alpha_composite(load_bg(f'images/backgrounds/splash_bg_{_BGS[0]}.png',
                                    zoom=lerp(1.10, 1.02, eoc(remap(t, 0, 6.0))),
                                    pan_y=0.40))
     color_ov(canvas, (12, 6, 26), 0.65 * a)
@@ -130,7 +132,7 @@ def scene_tease(canvas, t, a):
 
 def scene_reveal_tease(canvas, t, a):
     _, tint, accent = _RARITY
-    canvas.alpha_composite(load_bg('images/backgrounds/splash_bg_2.png',
+    canvas.alpha_composite(load_bg(f'images/backgrounds/splash_bg_{_BGS[1]}.png',
                                    zoom=1.04, pan_y=0.42))
     color_ov(canvas, tint, 0.18 * a)
     color_ov(canvas, (8, 4, 20), 0.50 * a)
@@ -197,13 +199,13 @@ def scene_reveal_tease(canvas, t, a):
 
 
 _TIMELINE = [
-    (0.0,  6.0, scene_tease),
+    (0.0,  5.5, scene_tease),
     (5.5, 10.0, scene_reveal_tease),
 ]
 
 
-def run(villager='fox', lang='en'):
-    preload(villager, lang)
+def run(villager='fox', lang='en', bg=1):
+    preload(villager, lang, bg)
     mf  = make_video_frame(_TIMELINE, _DURATION)
     out = os.path.join(_OUT, f'countdown_story_{villager}_{lang}.mp4')
     print(f'Rendering countdown story ({villager}, {lang})…')

@@ -38,12 +38,12 @@ _TIP_SOURCES = {
 }
 
 
-def run(lang='en'):
+def run(lang='en', bg=3, tip=0, villager='cat'):
     tips_path = _assets.asset(f'messages/{lang}/reading_tips.json')
     if not os.path.exists(tips_path):
         tips_path = _assets.asset('messages/en/reading_tips.json')
     tips       = json.load(open(tips_path))['tips']
-    tip_index  = 0
+    tip_index  = min(tip, len(tips) - 1)
     tip        = tips[tip_index]
     source     = _TIP_SOURCES.get(tip_index)
 
@@ -51,7 +51,7 @@ def run(lang='en'):
 
     canvas = Image.new('RGBA', (W, H), (0, 0, 0, 255))
 
-    bg = load_bg('images/backgrounds/splash_bg_3.png', zoom=1.06, pan_y=0.40)
+    bg = load_bg(f'images/backgrounds/splash_bg_{bg}.png', zoom=1.06, pan_y=0.40)
     bg = bg.filter(ImageFilter.GaussianBlur(7))
     canvas.alpha_composite(bg)
     color_ov(canvas, PINK, 0.12)
@@ -112,7 +112,7 @@ def run(lang='en'):
         txt_c(d, f'— {source}', W * 0.5, src_y,
               F(FONT_I, _src_font), (*WHITE[:3], 255), shadow=(0, 0, 0), sd=2)
 
-    cat = load_img('images/villagers/cat/cat_villager.png', w=420)
+    cat = load_img(f'images/villagers/{villager}/{villager}_villager.png', w=420)
     paste_c(canvas, cat, W * 0.5, int(H * 0.700))
 
     glass_card(canvas, (W - 660) // 2, int(H * 0.860),

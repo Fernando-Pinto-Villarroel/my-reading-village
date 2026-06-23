@@ -45,12 +45,14 @@ _SOON = {
 
 _VILLAGER  = 'cat'
 _LANG      = 'en'
+_BGS       = [1, 2]
 _RARITY    = ('common', MINT, D_MINT)
 _NAME      = 'Cat'
 
 
-def preload(villager, lang):
-    global _VILLAGER, _LANG, _RARITY, _NAME
+def preload(villager, lang, bg=1):
+    global _VILLAGER, _LANG, _RARITY, _NAME, _BGS
+    _BGS = [((bg - 1 + i) % 6) + 1 for i in range(2)]
     _VILLAGER = villager
     _LANG     = lang
     _RARITY   = SPECIES.get(villager, ('common', MINT, D_MINT))
@@ -58,7 +60,7 @@ def preload(villager, lang):
 
 
 def scene_intro(canvas, t, a):
-    canvas.alpha_composite(load_bg('images/backgrounds/splash_bg_1.png',
+    canvas.alpha_composite(load_bg(f'images/backgrounds/splash_bg_{_BGS[0]}.png',
                                    zoom=lerp(1.08, 1.0, eoc(remap(t, 0, 3.5))),
                                    pan_y=0.35))
     color_ov(canvas, (12, 6, 22), 0.60 * a)
@@ -76,7 +78,7 @@ def scene_intro(canvas, t, a):
 
     lt = eob(clamp(remap(t, 0.1, 1.0)))
     if lt > 0:
-        logo = load_img('images/logos/my_reading_village_icon_rounded.png', w=200)
+        logo = load_img('images/logos/my_reading_village_icon_rounded.png', w=260)
         paste_c(canvas, logo, W * 0.5, H * 0.28, scale=lt, alpha=lt * a)
 
     d = ImageDraw.Draw(canvas)
@@ -84,20 +86,20 @@ def scene_intro(canvas, t, a):
 
     t1 = eoc(clamp(remap(t, 0.6, 1.4)))
     if t1 > 0:
-        txt_c(d, line1, W * 0.5, H * 0.455 + (1 - t1) * 50,
-              F(FONT_SB, 68), (*CREAM[:3], int(240 * t1 * a)), shadow=(0, 0, 0))
+        txt_c(d, line1, W * 0.5, H * 0.448 + (1 - t1) * 50,
+              F(FONT_SB, 84), (*CREAM[:3], int(240 * t1 * a)), shadow=(0, 0, 0))
 
     t2 = eob(clamp(remap(t, 1.0, 1.9)))
     if t2 > 0:
-        txt_c(d, line2, W * 0.5, H * 0.545 + (1 - t2) * 50,
-              F(FONT_XB, 84), (*WHITE[:3], int(255 * t2 * a)),
+        txt_c(d, line2, W * 0.5, H * 0.520 + (1 - t2) * 50,
+              F(FONT_XB, 106), (*WHITE[:3], int(255 * t2 * a)),
               stroke_fill=(0, 0, 0), stroke_width=5)
 
 
 def scene_reveal(canvas, t, a):
     _, tint, accent = _RARITY
     canvas.alpha_composite(
-        load_bg('images/backgrounds/splash_bg_2.png', zoom=1.04, pan_y=0.42))
+        load_bg(f'images/backgrounds/splash_bg_{_BGS[1]}.png', zoom=1.04, pan_y=0.42))
     color_ov(canvas, tint, 0.16 * a)
     color_ov(canvas, (8, 4, 18), 0.46 * a)
 
@@ -131,27 +133,27 @@ def scene_reveal(canvas, t, a):
 
     nt = eoc(clamp(remap(t, 3.8, 4.6)))
     if nt > 0:
-        txt_c(d, _NAME, W * 0.5, H * 0.720 + (1 - nt) * 40,
-              F(FONT_XB, 110), (*WHITE[:3], int(255 * nt * a)),
+        txt_c(d, _NAME, W * 0.5, H * 0.705 + (1 - nt) * 40,
+              F(FONT_XB, 124), (*WHITE[:3], int(255 * nt * a)),
               stroke_fill=(0, 0, 0), stroke_width=6)
 
     rt = eoc(clamp(remap(t, 4.3, 5.0)))
     if rt > 0:
         rarity, _, _ = _RARITY
         rlabel = RARITY_LABEL.get(_LANG, RARITY_LABEL['en'])[rarity]
-        rw = max(280, len(rlabel) * 24 + 80)
+        rw = max(300, len(rlabel) * 26 + 80)
         rx0 = (W - rw) // 2
-        solid_pill(canvas, rx0, int(H * 0.800), rx0 + rw, int(H * 0.800) + 58, r=29,
+        solid_pill(canvas, rx0, int(H * 0.784), rx0 + rw, int(H * 0.784) + 64, r=32,
                    fill=(*accent[:3], int(220 * rt * a)))
-        txt_c(d, rlabel.upper(), W * 0.5, H * 0.800 + 29,
-              F(FONT_XB, 36), (*WHITE[:3], int(255 * rt * a)),
+        txt_c(d, rlabel.upper(), W * 0.5, H * 0.784 + 32,
+              F(FONT_XB, 40), (*WHITE[:3], int(255 * rt * a)),
               stroke_fill=(0, 0, 0), stroke_width=2)
 
     jt = eoc(clamp(remap(t, 4.8, 5.5)))
     if jt > 0:
         txt_c(d, f'{_NAME} {_JOIN.get(_LANG, _JOIN["en"])}',
-              W * 0.5, H * 0.880 + (1 - jt) * 30,
-              F(FONT_SB, 44), (*CREAM[:3], int(220 * jt * a)), shadow=(0, 0, 0))
+              W * 0.5, H * 0.866 + (1 - jt) * 30,
+              F(FONT_SB, 52), (*CREAM[:3], int(220 * jt * a)), shadow=(0, 0, 0))
 
 
 def scene_cta(canvas, t, a):
@@ -201,14 +203,14 @@ def scene_cta(canvas, t, a):
 
 
 _TIMELINE = [
-    (0.0,  4.5,  scene_intro),
-    (4.0,  9.5,  scene_reveal),
+    (0.0,  4.0,  scene_intro),
+    (4.0,  9.0,  scene_reveal),
     (9.0, 12.0,  scene_cta),
 ]
 
 
-def run(villager='cat', lang='en'):
-    preload(villager, lang)
+def run(villager='cat', lang='en', bg=1):
+    preload(villager, lang, bg)
     mf  = make_video_frame(_TIMELINE, _DURATION)
     out = os.path.join(_OUT, f'villager_reveal_reel_{villager}_{lang}.mp4')
     print(f'Rendering villager reveal reel ({villager}, {lang})…')

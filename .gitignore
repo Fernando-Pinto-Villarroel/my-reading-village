@@ -49,6 +49,9 @@ out/
 build/
 CLAUDE.md
 
+tools/json-to-encrypt/*
+!tools/json-to-encrypt/.gitkeep
+
 tools/images-to-remove-background/*
 !tools/images-to-remove-background/.gitkeep
 
@@ -62,3 +65,7 @@ my_reading_village_marketing/output/
 
 .codegraph/
 .cursor/
+
+docs/others/
+docs/startup/requirements/
+my_reading_village/android/app/google-services.json
