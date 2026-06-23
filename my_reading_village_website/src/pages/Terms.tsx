@@ -23,7 +23,7 @@ export default function Terms() {
             Terms &amp; Conditions
           </h1>
           <p className="font-body text-sm text-dark-text/50 mb-10">
-            <em>Last updated: June 8, 2026</em>
+            <em>Last updated: June 20, 2026</em>
           </p>
         </motion.div>
 
@@ -260,18 +260,20 @@ function TermsContent() {
           — Open Library (optional book search), a third-party advertising
           network (optional rewarded ads), Google Play Billing (optional
           purchases), and, only with your explicit consent, Google Analytics for
-          Firebase (anonymous usage analytics). Your use of those services
-          through the app is also subject to their own terms and policies.
+          Firebase (anonymous usage analytics) and Firebase Crashlytics (crash
+          reporting). Your use of those services through the app is also subject
+          to their own terms and policies.
         </p>
       </Section>
 
-      <Section title="9. Analytics Consent">
+      <Section title="9. Analytics & Crash Reporting Consent">
         <p>
           As explained in our Privacy Policy, the app will only collect
-          anonymous usage analytics if you actively opt in via the consent
-          screen shown after the welcome tour. Accepting these Terms does not,
-          by itself, enable analytics — that requires a separate, explicit
-          choice. You can change your analytics preference at any time from{" "}
+          anonymous usage analytics and crash reports if you actively opt in via
+          the consent screen shown after the welcome tour. Accepting these Terms
+          does not, by itself, enable analytics or crash reporting — that
+          requires a separate, explicit choice. You can change your preference
+          at any time from{" "}
           <strong className="font-semibold text-dark-text">
             Settings → Data Management → Analytics &amp; Privacy
           </strong>

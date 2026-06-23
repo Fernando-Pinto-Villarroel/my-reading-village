@@ -22,7 +22,7 @@ export default function Privacy() {
             Privacy Policy
           </h1>
           <p className="font-body text-sm text-dark-text/50 mb-10">
-            <em>Last updated: June 8, 2026</em>
+            <em>Last updated: June 20, 2026</em>
           </p>
         </motion.div>
 
@@ -106,9 +106,10 @@ function PolicyContent() {
           analytics are and asks you to accept or decline them — with a separate
           checkbox for this Privacy Policy and for the Terms &amp; Conditions.{" "}
           <strong className="font-semibold text-dark-text">
-            If you decline, or leave a box unchecked, no analytics library is
-            ever started and no usage data is ever collected or sent anywhere;
-            the app works exactly the same either way.
+            If you decline, or leave a box unchecked, no analytics or
+            crash-reporting library is ever started and no usage data is ever
+            collected or sent anywhere; the app works exactly the same either
+            way.
           </strong>
         </p>
         <p>
@@ -135,6 +136,17 @@ function PolicyContent() {
             Google's Privacy Policy
           </a>
           .
+        </p>
+        <p>
+          With your consent, the app also uses{" "}
+          <strong className="font-semibold text-dark-text">
+            Firebase Crashlytics
+          </strong>{" "}
+          to automatically collect crash reports and error logs. This helps us
+          identify and fix bugs that might affect your experience. Crash reports
+          include technical information such as the device model, OS version,
+          app version, and the stack trace of the error — they never include
+          your personal reading data, username, or village name.
         </p>
         <p>
           You can change your mind at any time from{" "}
@@ -245,12 +257,13 @@ function PolicyContent() {
         </p>
         <p>
           <strong className="font-semibold text-dark-text">
-            Analytics (only if you consent).
+            Analytics &amp; Crash Reporting (only if you consent).
           </strong>{" "}
           As described in Section 1, if — and only if — you accept analytics on
           the consent screen, the app uses Google Analytics for Firebase to
-          collect anonymous, aggregate usage events. This library is never
-          initialized, and no event is ever sent, unless you have actively opted
+          collect anonymous, aggregate usage events, and Firebase Crashlytics to
+          collect crash reports and error logs. Neither library is ever
+          initialized, and no data is ever sent, unless you have actively opted
           in.
         </p>
         <p>
@@ -290,8 +303,8 @@ function PolicyContent() {
           third-party advertising network to serve ads, (c) purchase tokens
           processed by Google Play Billing when you make an in-app purchase, and
           (d) — only if you have explicitly consented — the anonymous, aggregate
-          analytics events described in Section 1, sent via Google Analytics for
-          Firebase.
+          analytics events and crash reports described in Section 1, sent via
+          Google Analytics for Firebase and Firebase Crashlytics.
         </p>
       </Section>
 
