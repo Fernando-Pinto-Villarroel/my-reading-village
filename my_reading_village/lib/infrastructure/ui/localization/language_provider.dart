@@ -22,6 +22,15 @@ class LanguageProvider extends ChangeNotifier {
   String translate(String key, {String? fallback}) =>
       _translations[key] ?? fallback ?? key;
 
+  String translateWith(String key, Map<String, String> params,
+      {String? fallback}) {
+    String result = _translations[key] ?? fallback ?? key;
+    params.forEach((k, v) {
+      result = result.replaceAll('{$k}', v);
+    });
+    return result;
+  }
+
   Future<void> load(String locale) async {
     final validLocale =
         supportedLanguages.containsKey(locale) ? locale : defaultLocale;

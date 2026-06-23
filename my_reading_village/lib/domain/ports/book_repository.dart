@@ -5,6 +5,8 @@ abstract class BookRepository {
   Future<void> updateMaxRewardedPages(int bookId, int maxRewardedPages);
   Future<void> updateBook(int bookId, Map<String, dynamic> values);
   Future<void> updateBookRating(int bookId, int? rating);
+  Future<void> updateBookNote(int bookId, String note);
+  Future<void> updateBookCompletedAt(int bookId, String? completedAt);
   Future<void> deleteBook(int bookId);
   Future<int> getCompletedBooksCount();
   Future<int> insertReadingSession(Map<String, dynamic> session);

@@ -102,50 +102,59 @@ class DiscountInfo {
 class StoreRules {
   static const List<StoreResourceItem> coinItems = [
     StoreResourceItem(
-        id: 'coins_50', resource: ResourceType.coins, amount: 50, gemCost: 15),
+        id: 'coins_200', resource: ResourceType.coins, amount: 200, gemCost: 40),
     StoreResourceItem(
-        id: 'coins_100',
+        id: 'coins_600',
         resource: ResourceType.coins,
-        amount: 100,
-        gemCost: 27),
+        amount: 600,
+        gemCost: 105),
     StoreResourceItem(
-        id: 'coins_200',
+        id: 'coins_1500',
         resource: ResourceType.coins,
-        amount: 200,
-        gemCost: 53),
+        amount: 1500,
+        gemCost: 235),
     StoreResourceItem(
-        id: 'coins_500',
+        id: 'coins_3500',
         resource: ResourceType.coins,
-        amount: 500,
-        gemCost: 120),
+        amount: 3500,
+        gemCost: 470),
   ];
 
   static const List<StoreResourceItem> woodItems = [
     StoreResourceItem(
-        id: 'wood_50', resource: ResourceType.wood, amount: 50, gemCost: 12),
+        id: 'wood_150', resource: ResourceType.wood, amount: 150, gemCost: 30),
     StoreResourceItem(
-        id: 'wood_100', resource: ResourceType.wood, amount: 100, gemCost: 23),
+        id: 'wood_450', resource: ResourceType.wood, amount: 450, gemCost: 80),
     StoreResourceItem(
-        id: 'wood_200', resource: ResourceType.wood, amount: 200, gemCost: 42),
+        id: 'wood_1200',
+        resource: ResourceType.wood,
+        amount: 1200,
+        gemCost: 185),
     StoreResourceItem(
-        id: 'wood_500', resource: ResourceType.wood, amount: 500, gemCost: 98),
+        id: 'wood_3000',
+        resource: ResourceType.wood,
+        amount: 3000,
+        gemCost: 400),
   ];
 
   static const List<StoreResourceItem> metalItems = [
     StoreResourceItem(
-        id: 'metal_30', resource: ResourceType.metal, amount: 30, gemCost: 12),
+        id: 'metal_80', resource: ResourceType.metal, amount: 80, gemCost: 30),
     StoreResourceItem(
-        id: 'metal_60', resource: ResourceType.metal, amount: 60, gemCost: 23),
-    StoreResourceItem(
-        id: 'metal_120',
+        id: 'metal_250',
         resource: ResourceType.metal,
-        amount: 120,
-        gemCost: 42),
+        amount: 250,
+        gemCost: 82),
     StoreResourceItem(
-        id: 'metal_300',
+        id: 'metal_650',
         resource: ResourceType.metal,
-        amount: 300,
-        gemCost: 98),
+        amount: 650,
+        gemCost: 190),
+    StoreResourceItem(
+        id: 'metal_1600',
+        resource: ResourceType.metal,
+        amount: 1600,
+        gemCost: 400),
   ];
 
   static const List<StorePowerupItem> bookItems = [
@@ -164,22 +173,22 @@ class StoreRules {
         id: 'sandwich_1',
         powerup: PowerupType.sandwich,
         quantity: 1,
-        gemCost: 13),
+        gemCost: 15),
     StorePowerupItem(
         id: 'sandwich_3',
         powerup: PowerupType.sandwich,
         quantity: 3,
-        gemCost: 30),
+        gemCost: 34),
     StorePowerupItem(
         id: 'sandwich_5',
         powerup: PowerupType.sandwich,
         quantity: 5,
-        gemCost: 45),
+        gemCost: 52),
     StorePowerupItem(
         id: 'sandwich_10',
         powerup: PowerupType.sandwich,
         quantity: 10,
-        gemCost: 75),
+        gemCost: 87),
   ];
 
   static const List<StorePowerupItem> hammerItems = [
@@ -188,7 +197,7 @@ class StoreRules {
     StorePowerupItem(
         id: 'hammer_3', powerup: PowerupType.hammer, quantity: 3, gemCost: 50),
     StorePowerupItem(
-        id: 'hammer_5', powerup: PowerupType.hammer, quantity: 5, gemCost: 88),
+        id: 'hammer_5', powerup: PowerupType.hammer, quantity: 5, gemCost: 80),
     StorePowerupItem(
         id: 'hammer_10',
         powerup: PowerupType.hammer,
@@ -201,62 +210,62 @@ class StoreRules {
         id: 'glasses_1',
         powerup: PowerupType.glasses,
         quantity: 1,
-        gemCost: 25),
+        gemCost: 40),
     StorePowerupItem(
         id: 'glasses_3',
         powerup: PowerupType.glasses,
         quantity: 3,
-        gemCost: 63),
+        gemCost: 105),
     StorePowerupItem(
         id: 'glasses_5',
         powerup: PowerupType.glasses,
         quantity: 5,
-        gemCost: 100),
+        gemCost: 165),
     StorePowerupItem(
         id: 'glasses_10',
         powerup: PowerupType.glasses,
         quantity: 10,
-        gemCost: 188),
+        gemCost: 310),
   ];
 
   static const List<StoreGemsItem> gemsItems = [
-    StoreGemsItem(gems: 50, basePrice: 0.59, productId: 'gems_50'),
-    StoreGemsItem(gems: 100, basePrice: 0.99, productId: 'gems_100'),
-    StoreGemsItem(gems: 200, basePrice: 1.99, productId: 'gems_200'),
-    StoreGemsItem(gems: 500, basePrice: 4.99, productId: 'gems_500'),
-    StoreGemsItem(gems: 1000, basePrice: 9.99, productId: 'gems_1000'),
-    StoreGemsItem(gems: 2000, basePrice: 17.99, productId: 'gems_2000'),
+    StoreGemsItem(gems: 50, basePrice: 0.99, productId: 'gems_50'),
+    StoreGemsItem(gems: 100, basePrice: 1.79, productId: 'gems_100'),
+    StoreGemsItem(gems: 200, basePrice: 3.29, productId: 'gems_200'),
+    StoreGemsItem(gems: 500, basePrice: 7.99, productId: 'gems_500'),
+    StoreGemsItem(gems: 1000, basePrice: 14.99, productId: 'gems_1000'),
+    StoreGemsItem(gems: 2000, basePrice: 29.99, productId: 'gems_2000'),
   ];
 
   static const List<StorePack> packs = [
     StorePack(
       id: 'pack_starter',
       productId: 'pack_starter',
-      coins: 50,
-      wood: 30,
-      metal: 10,
+      coins: 200,
+      wood: 100,
+      metal: 60,
       gems: 0,
       bookPowerups: 0,
-      sandwichPowerups: 1,
+      sandwichPowerups: 2,
       hammerPowerups: 0,
       glassesPowerups: 0,
-      basePrice: 0.99,
-      savingsPercent: 25,
+      basePrice: 1.99,
+      savingsPercent: 20,
       colorHex: 'FFB3BA',
     ),
     StorePack(
       id: 'pack_builder',
       productId: 'pack_builder',
-      coins: 100,
-      wood: 100,
-      metal: 50,
+      coins: 400,
+      wood: 200,
+      metal: 120,
       gems: 0,
       bookPowerups: 0,
       sandwichPowerups: 0,
-      hammerPowerups: 2,
+      hammerPowerups: 3,
       glassesPowerups: 0,
-      basePrice: 1.99,
-      savingsPercent: 30,
+      basePrice: 3.49,
+      savingsPercent: 20,
       colorHex: 'FFD700',
     ),
     StorePack(
@@ -270,8 +279,8 @@ class StoreRules {
       sandwichPowerups: 0,
       hammerPowerups: 0,
       glassesPowerups: 3,
-      basePrice: 2.99,
-      savingsPercent: 30,
+      basePrice: 4.99,
+      savingsPercent: 15,
       colorHex: 'B5B3FF',
       speciesId: 'capybara',
     ),
@@ -286,8 +295,8 @@ class StoreRules {
       sandwichPowerups: 5,
       hammerPowerups: 5,
       glassesPowerups: 0,
-      basePrice: 5.99,
-      savingsPercent: 35,
+      basePrice: 9.99,
+      savingsPercent: 25,
       colorHex: 'B3FFD9',
       speciesId: 'otter',
     ),
@@ -302,8 +311,8 @@ class StoreRules {
       sandwichPowerups: 10,
       hammerPowerups: 10,
       glassesPowerups: 10,
-      basePrice: 11.99,
-      savingsPercent: 40,
+      basePrice: 19.99,
+      savingsPercent: 25,
       colorHex: 'FFCDD2',
       speciesId: 'kangaroo',
     ),
@@ -356,20 +365,20 @@ class StoreRules {
         maxPct: 40),
   ];
 
-  static Map<String, DiscountInfo> computeDiscounts() {
-    final now = DateTime.now();
+  static Map<String, DiscountInfo> computeDiscounts({DateTime? now}) {
+    final now_ = now ?? DateTime.now();
     DiscountEvent? active;
     DateTime? endsAt;
 
     if (AppConstants.testMode) {
       active = discountEvents.last;
-      endsAt = now.add(const Duration(days: 1));
+      endsAt = now_.add(const Duration(days: 1));
     } else {
       for (final event in discountEvents) {
-        final start = DateTime(now.year, event.startMonth, event.startDay);
+        final start = DateTime(now_.year, event.startMonth, event.startDay);
         final end =
-            DateTime(now.year, event.endMonth, event.endDay, 23, 59, 59);
-        if (now.isAfter(start) && now.isBefore(end)) {
+            DateTime(now_.year, event.endMonth, event.endDay, 23, 59, 59);
+        if (now_.isAfter(start) && now_.isBefore(end)) {
           active = event;
           endsAt = end;
           break;
@@ -417,13 +426,13 @@ class StoreRules {
     return result;
   }
 
-  static String? computeActiveDiscountKey() {
-    final now = DateTime.now();
+  static String? computeActiveDiscountKey({DateTime? now}) {
+    final now_ = now ?? DateTime.now();
     if (AppConstants.testMode) return discountEvents.last.labelKey;
     for (final event in discountEvents) {
-      final start = DateTime(now.year, event.startMonth, event.startDay);
-      final end = DateTime(now.year, event.endMonth, event.endDay, 23, 59, 59);
-      if (now.isAfter(start) && now.isBefore(end)) return event.labelKey;
+      final start = DateTime(now_.year, event.startMonth, event.startDay);
+      final end = DateTime(now_.year, event.endMonth, event.endDay, 23, 59, 59);
+      if (now_.isAfter(start) && now_.isBefore(end)) return event.labelKey;
     }
     return null;
   }

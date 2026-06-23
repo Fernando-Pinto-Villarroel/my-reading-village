@@ -89,9 +89,95 @@ void showBookDetailSheet(BuildContext context, Book book) {
                                 (b) => b.id == book.id,
                                 orElse: () => book,
                               );
-                              return StarRatingRow(
-                                rating: liveBook.rating,
-                                bookId: book.id!,
+                              final hasNote =
+                                  liveBook.notes?.isNotEmpty == true;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  StarRatingRow(
+                                    rating: liveBook.rating,
+                                    bookId: book.id!,
+                                    hasNote: hasNote,
+                                  ),
+                                  if (hasNote) ...[
+                                    SizedBox(height: 10),
+                                    GestureDetector(
+                                      onTap: () => showBookNotesDialog(
+                                        context,
+                                        liveBook.id!,
+                                        bp,
+                                        initialNote: liveBook.notes,
+                                      ),
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.lavender
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: AppTheme.lavender
+                                                .withValues(alpha: 0.25),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.note_alt_outlined,
+                                                size: 16,
+                                                color: AppTheme.lavender),
+                                            SizedBox(width: 6),
+                                            Expanded(
+                                              child: Text(
+                                                liveBook.notes!,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: AppTheme.darkText
+                                                      .withValues(alpha: 0.8),
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 6),
+                                            Icon(Icons.edit_outlined,
+                                                size: 18,
+                                                color: AppTheme.lavender
+                                                    .withValues(alpha: 0.95)),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ] else ...[
+                                    SizedBox(height: 8),
+                                    GestureDetector(
+                                      onTap: () => showBookNotesDialog(
+                                        context,
+                                        liveBook.id!,
+                                        bp,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.add,
+                                              size: 14,
+                                              color: AppTheme.lavender
+                                                  .withValues(alpha: 0.65)),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            langProvider.translate('add_note'),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: AppTheme.lavender
+                                                  .withValues(alpha: 0.75),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               );
                             },
                           ),

@@ -6,6 +6,8 @@ import 'package:my_reading_village/domain/entities/mission_data.dart';
 import 'package:my_reading_village/domain/ports/inventory_repository.dart';
 import 'package:my_reading_village/domain/ports/village_repository.dart';
 import 'package:my_reading_village/domain/rules/holiday_rules.dart';
+import 'package:my_reading_village/infrastructure/di/service_locator.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 
 class MissionService {
   final InventoryRepository _invRepo;
@@ -25,7 +27,7 @@ class MissionService {
     if (HolidayRules.isHolidayBranch(branch)) {
       final event = HolidayRules.eventForBranch(branch);
       if (event == null) return false;
-      if (event.isActive(DateTime.now())) return true;
+      if (event.isActive(sl<TimeVerificationService>().trustedNow())) return true;
       return MissionData.getMissionsForBranch(branch)
           .any((m) => progress.containsKey(m.id));
     }
@@ -145,6 +147,8 @@ class MissionService {
     int? completedBooks,
     int nonGrassTileCount = 0,
     int expansionCount = 0,
+    int readingMissionExcludedPages = 0,
+    int readingMissionExcludedBooks = 0,
   }) async {
     for (final branch in MissionBranch.values) {
       final mission = getActiveMission(branch, progress);
@@ -153,20 +157,68 @@ class MissionService {
       final p = _getOrCreateProgress(mission, progress);
       if (p.isCompleted) continue;
 
+      final effectivePages = _effectivePages(
+          mission, totalPagesRead, readingMissionExcludedPages);
+      final effectiveBooks = _effectiveBooks(
+          mission, completedBooks, readingMissionExcludedBooks);
+
       await _ensureMissionActivated(mission, progress,
-          totalPagesRead: totalPagesRead,
-          completedBooks: completedBooks,
+          totalPagesRead: effectivePages,
+          completedBooks: effectiveBooks,
           buildings: buildings);
 
       final isComplete = _checkMissionCondition(mission, p, buildings,
           villagers, activePowerups, booksUsedSinceActive,
-          totalPagesRead: totalPagesRead,
-          completedBooks: completedBooks,
+          totalPagesRead: effectivePages,
+          completedBooks: effectiveBooks,
           nonGrassTileCount: nonGrassTileCount,
           expansionCount: expansionCount);
       if (isComplete) {
         p.isCompleted = true;
         await _invRepo.upsertMissionProgress(mission.id, isCompleted: true);
+      }
+    }
+  }
+
+  int? _effectivePages(Mission mission, int? raw, int excluded) {
+    if (mission.branch == MissionBranch.pageReading) {
+      return ((raw ?? 0) - excluded).clamp(0, 999999999);
+    }
+    return raw;
+  }
+
+  int? _effectiveBooks(Mission mission, int? raw, int excluded) {
+    if (mission.branch == MissionBranch.booksCompleted) {
+      return ((raw ?? 0) - excluded).clamp(0, 999999999);
+    }
+    return raw;
+  }
+
+  Future<void> bulkPrecompleteMissionsForImport({
+    required Map<String, MissionProgress> progress,
+    required int totalPages,
+    required int completedBooks,
+  }) async {
+    final pageBranch = MissionData.getMissionsForBranch(MissionBranch.pageReading);
+    for (final mission in pageBranch) {
+      if ((mission.targetCount ?? 0) <= totalPages) {
+        final p = progress[mission.id] ?? MissionProgress(missionId: mission.id);
+        p.isCompleted = true;
+        p.isClaimed = true;
+        progress[mission.id] = p;
+        await _invRepo.upsertMissionProgress(mission.id,
+            isCompleted: true, isClaimed: true);
+      }
+    }
+    final bookBranch = MissionData.getMissionsForBranch(MissionBranch.booksCompleted);
+    for (final mission in bookBranch) {
+      if ((mission.targetCount ?? 0) <= completedBooks) {
+        final p = progress[mission.id] ?? MissionProgress(missionId: mission.id);
+        p.isCompleted = true;
+        p.isClaimed = true;
+        progress[mission.id] = p;
+        await _invRepo.upsertMissionProgress(mission.id,
+            isCompleted: true, isClaimed: true);
       }
     }
   }
@@ -285,7 +337,13 @@ class MissionService {
       {int? totalPagesRead,
       int? completedBooks,
       int nonGrassTileCount = 0,
-      int expansionCount = 0}) {
+      int expansionCount = 0,
+      int readingMissionExcludedPages = 0,
+      int readingMissionExcludedBooks = 0}) {
+    totalPagesRead =
+        _effectivePages(mission, totalPagesRead, readingMissionExcludedPages);
+    completedBooks =
+        _effectiveBooks(mission, completedBooks, readingMissionExcludedBooks);
     if (_isEventReadingMission(mission) && missionProgress != null) {
       totalPagesRead =
           ((totalPagesRead ?? 0) - (missionProgress.pagesAtActivation ?? 0))
@@ -392,6 +450,27 @@ class MissionService {
       case MissionConditionType.buyTerrainSpace:
         current = expansionCount.clamp(0, target);
         return (current: current, target: target);
+    }
+  }
+
+  Future<void> resetReadingMissionsIfOverExclusion({
+    required Map<String, MissionProgress> progress,
+    required int effectivePages,
+    required int effectiveBooks,
+  }) async {
+    final pairs = [
+      (MissionBranch.pageReading, effectivePages),
+      (MissionBranch.booksCompleted, effectiveBooks),
+    ];
+    for (final (branch, effective) in pairs) {
+      for (final mission in MissionData.getMissionsForBranch(branch)) {
+        final p = progress[mission.id];
+        if (p == null) continue;
+        if (effective < (mission.targetCount ?? 1)) {
+          progress.remove(mission.id);
+          await _invRepo.deleteMissionProgress(mission.id);
+        }
+      }
     }
   }
 

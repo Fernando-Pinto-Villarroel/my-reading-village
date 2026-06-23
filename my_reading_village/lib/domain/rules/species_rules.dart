@@ -69,127 +69,127 @@ class SpeciesRules {
     ),
     VillagerSpeciesData(
       id: 'grizzly_bear', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_grizzly_bear', descriptionKey: 'species_desc_grizzly_bear',
+      realPrice: 1.99, nameKey: 'species_grizzly_bear', descriptionKey: 'species_desc_grizzly_bear',
     ),
     VillagerSpeciesData(
       id: 'polar_bear', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_polar_bear', descriptionKey: 'species_desc_polar_bear',
+      realPrice: 1.99, nameKey: 'species_polar_bear', descriptionKey: 'species_desc_polar_bear',
     ),
     VillagerSpeciesData(
       id: 'panda_bear', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_panda_bear', descriptionKey: 'species_desc_panda_bear',
+      realPrice: 1.99, nameKey: 'species_panda_bear', descriptionKey: 'species_desc_panda_bear',
     ),
     VillagerSpeciesData(
       id: 'red_panda', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_red_panda', descriptionKey: 'species_desc_red_panda',
+      realPrice: 1.99, nameKey: 'species_red_panda', descriptionKey: 'species_desc_red_panda',
     ),
     VillagerSpeciesData(
       id: 'sloth', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_sloth', descriptionKey: 'species_desc_sloth',
+      realPrice: 1.99, nameKey: 'species_sloth', descriptionKey: 'species_desc_sloth',
     ),
     VillagerSpeciesData(
       id: 'hedgehog', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_hedgehog', descriptionKey: 'species_desc_hedgehog',
+      realPrice: 1.99, nameKey: 'species_hedgehog', descriptionKey: 'species_desc_hedgehog',
     ),
     VillagerSpeciesData(
       id: 'capybara', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_capybara', descriptionKey: 'species_desc_capybara',
+      realPrice: 1.99, nameKey: 'species_capybara', descriptionKey: 'species_desc_capybara',
     ),
     VillagerSpeciesData(
       id: 'cow', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_cow', descriptionKey: 'species_desc_cow',
+      realPrice: 1.99, nameKey: 'species_cow', descriptionKey: 'species_desc_cow',
     ),
     VillagerSpeciesData(
       id: 'sheep', rarity: VillagerRarity.rare, unlockType: 'special',
-      realPrice: 0.99, nameKey: 'species_sheep', descriptionKey: 'species_desc_sheep',
+      realPrice: 1.99, nameKey: 'species_sheep', descriptionKey: 'species_desc_sheep',
     ),
     VillagerSpeciesData(
       id: 'bull', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_bull', descriptionKey: 'species_desc_bull',
+      realPrice: 4.99, nameKey: 'species_bull', descriptionKey: 'species_desc_bull',
     ),
     VillagerSpeciesData(
       id: 'otter', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_otter', descriptionKey: 'species_desc_otter',
+      realPrice: 4.99, nameKey: 'species_otter', descriptionKey: 'species_desc_otter',
     ),
     VillagerSpeciesData(
       id: 'kangaroo', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_kangaroo', descriptionKey: 'species_desc_kangaroo',
+      realPrice: 4.99, nameKey: 'species_kangaroo', descriptionKey: 'species_desc_kangaroo',
     ),
     VillagerSpeciesData(
       id: 'reindeer', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_reindeer', descriptionKey: 'species_desc_reindeer',
+      realPrice: 4.99, nameKey: 'species_reindeer', descriptionKey: 'species_desc_reindeer',
     ),
     VillagerSpeciesData(
       id: 'ferret', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_ferret', descriptionKey: 'species_desc_ferret',
+      realPrice: 4.99, nameKey: 'species_ferret', descriptionKey: 'species_desc_ferret',
     ),
     VillagerSpeciesData(
       id: 'mole', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_mole', descriptionKey: 'species_desc_mole',
+      realPrice: 4.99, nameKey: 'species_mole', descriptionKey: 'species_desc_mole',
     ),
     VillagerSpeciesData(
       id: 'bat', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_bat', descriptionKey: 'species_desc_bat',
+      realPrice: 4.99, nameKey: 'species_bat', descriptionKey: 'species_desc_bat',
     ),
     VillagerSpeciesData(
       id: 'donkey', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_donkey', descriptionKey: 'species_desc_donkey',
+      realPrice: 4.99, nameKey: 'species_donkey', descriptionKey: 'species_desc_donkey',
     ),
     VillagerSpeciesData(
       id: 'turkey', rarity: VillagerRarity.extraordinary, unlockType: 'special',
-      realPrice: 2.99, nameKey: 'species_turkey', descriptionKey: 'species_desc_turkey',
+      realPrice: 4.99, nameKey: 'species_turkey', descriptionKey: 'species_desc_turkey',
     ),
     VillagerSpeciesData(
       id: 'monkey', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_monkey', descriptionKey: 'species_desc_monkey',
+      realPrice: 7.99, nameKey: 'species_monkey', descriptionKey: 'species_desc_monkey',
     ),
     VillagerSpeciesData(
       id: 'gorilla', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_gorilla', descriptionKey: 'species_desc_gorilla',
+      realPrice: 7.99, nameKey: 'species_gorilla', descriptionKey: 'species_desc_gorilla',
     ),
     VillagerSpeciesData(
       id: 'zebra', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_zebra', descriptionKey: 'species_desc_zebra',
+      realPrice: 7.99, nameKey: 'species_zebra', descriptionKey: 'species_desc_zebra',
     ),
     VillagerSpeciesData(
       id: 'horse', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_horse', descriptionKey: 'species_desc_horse',
+      realPrice: 7.99, nameKey: 'species_horse', descriptionKey: 'species_desc_horse',
     ),
     VillagerSpeciesData(
       id: 'skunk', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_skunk', descriptionKey: 'species_desc_skunk',
+      realPrice: 7.99, nameKey: 'species_skunk', descriptionKey: 'species_desc_skunk',
     ),
     VillagerSpeciesData(
       id: 'hyena', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_hyena', descriptionKey: 'species_desc_hyena',
+      realPrice: 7.99, nameKey: 'species_hyena', descriptionKey: 'species_desc_hyena',
     ),
     VillagerSpeciesData(
       id: 'mouse', rarity: VillagerRarity.legendary, unlockType: 'special',
-      realPrice: 5.99, nameKey: 'species_mouse', descriptionKey: 'species_desc_mouse',
+      realPrice: 7.99, nameKey: 'species_mouse', descriptionKey: 'species_desc_mouse',
     ),
     VillagerSpeciesData(
       id: 'lion', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_lion', descriptionKey: 'species_desc_lion',
+      realPrice: 13.99, nameKey: 'species_lion', descriptionKey: 'species_desc_lion',
     ),
     VillagerSpeciesData(
       id: 'armadillo', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_armadillo', descriptionKey: 'species_desc_armadillo',
+      realPrice: 13.99, nameKey: 'species_armadillo', descriptionKey: 'species_desc_armadillo',
     ),
     VillagerSpeciesData(
       id: 'beaver', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_beaver', descriptionKey: 'species_desc_beaver',
+      realPrice: 13.99, nameKey: 'species_beaver', descriptionKey: 'species_desc_beaver',
     ),
     VillagerSpeciesData(
       id: 'fox', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_fox', descriptionKey: 'species_desc_fox',
+      realPrice: 13.99, nameKey: 'species_fox', descriptionKey: 'species_desc_fox',
     ),
     VillagerSpeciesData(
       id: 'tiger', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_tiger', descriptionKey: 'species_desc_tiger',
+      realPrice: 13.99, nameKey: 'species_tiger', descriptionKey: 'species_desc_tiger',
     ),
     VillagerSpeciesData(
       id: 'leopard', rarity: VillagerRarity.godly, unlockType: 'special',
-      realPrice: 9.99, nameKey: 'species_leopard', descriptionKey: 'species_desc_leopard',
+      realPrice: 13.99, nameKey: 'species_leopard', descriptionKey: 'species_desc_leopard',
     ),
   ];
 
@@ -217,8 +217,8 @@ class SpeciesRules {
       allSpecies.where((s) => s.unlockType == 'special').toList();
 
   static List<VillagerSpeciesData> getAvailableForStore(
-      List<String> unlockedIds, {int manualSeed = 0}) {
-    final today = DateTime.now();
+      List<String> unlockedIds, {int manualSeed = 0, required DateTime now}) {
+    final today = now;
     final dayseed = today.year * 10000 + today.month * 100 + today.day;
     final result = <VillagerSpeciesData>[];
     for (final rarity in [
@@ -255,16 +255,15 @@ class SpeciesRules {
   static bool rollSpeciesBonus(Random random) =>
       random.nextDouble() < speciesBonusProbability;
 
-  static VillagerSpeciesData? weeklySpeciesReward() {
-    final now = DateTime.now();
-    final seed = now.year * 100 + _isoWeek(now);
+  static VillagerSpeciesData? weeklySpeciesReward({required DateTime now}) {
+    final seed = now.year * 100 + isoWeek(now);
     final rng = Random(seed);
     final pool = allSpecies.where((s) => s.rarity != VillagerRarity.common).toList();
     if (pool.isEmpty) return null;
     return pool[rng.nextInt(pool.length)];
   }
 
-  static int _isoWeek(DateTime date) {
+  static int isoWeek(DateTime date) {
     final doy = date.difference(DateTime(date.year, 1, 1)).inDays + 1;
     return ((doy - date.weekday + 10) / 7).floor();
   }

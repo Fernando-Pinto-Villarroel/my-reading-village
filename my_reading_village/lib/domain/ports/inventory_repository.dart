@@ -10,4 +10,5 @@ abstract class InventoryRepository {
   Future<void> deleteExpiredPowerups();
   Future<List<Map<String, dynamic>>> getMissionProgress();
   Future<void> upsertMissionProgress(String missionId, {bool? isCompleted, bool? isClaimed, String? activatedAt, int? pagesAtActivation, int? booksAtActivation, int? buildingCountAtActivation});
+  Future<void> deleteMissionProgress(String missionId);
 }

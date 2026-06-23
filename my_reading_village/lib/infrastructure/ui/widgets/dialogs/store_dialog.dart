@@ -13,6 +13,7 @@ import 'package:my_reading_village/infrastructure/ui/localization/language_provi
 import 'package:my_reading_village/infrastructure/ui/widgets/common/resource_icon.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/species_bonus_popup.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 
 void showStoreDialog(BuildContext context) {
   showDialog(
@@ -37,10 +38,59 @@ class _StoreDialogState extends State<_StoreDialog>
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
-    _discounts = StoreRules.computeDiscounts();
-    _storeService = StoreService();
-    _storeService.initialize();
+    _discounts = StoreRules.computeDiscounts(
+        now: sl<TimeVerificationService>().trustedNow());
+    _storeService = sl<StoreService>();
+    _storeService.addListener(_onPurchaseStateChanged);
     _tabController.addListener(_onTabChanged);
+  }
+
+  void _onPurchaseStateChanged() {
+    if (!mounted) return;
+    final state = _storeService.purchaseState;
+    if (state == StorePurchaseState.success) {
+      final village = context.read<VillageProvider>();
+      village.refreshResources();
+      final grantedIds = _storeService.consumeGrantedProductIds();
+      _storeService.resetState();
+      if (mounted) _handleGrantedProducts(grantedIds, village);
+    } else if (state == StorePurchaseState.error) {
+      _storeService.resetState();
+      if (mounted) {
+        final lang = context.read<LanguageProvider>();
+        showErrorToast(context, lang.translate('store_purchase_error'));
+      }
+    }
+  }
+
+  Future<void> _handleGrantedProducts(
+      List<String> grantedIds, VillageProvider village) async {
+    await village.refreshSpeciesUnlocks();
+    for (final productId in grantedIds) {
+      if (!mounted) return;
+      if (productId.startsWith('species_')) {
+        final speciesId = productId.substring('species_'.length);
+        final speciesData = SpeciesRules.findById(speciesId);
+        if (speciesData != null && mounted) {
+          final alreadyOwned = village.isSpeciesUnlocked(speciesId);
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => SpeciesBonusPopup(
+              speciesData: speciesData,
+              isDuplicate: alreadyOwned,
+            ),
+          );
+        }
+      }
+    }
+    if (grantedIds.isNotEmpty && mounted) {
+      final lang = context.read<LanguageProvider>();
+      final hasNonSpecies = grantedIds.any((id) => !id.startsWith('species_'));
+      if (hasNonSpecies) {
+        showSuccessToast(context, lang.translate('store_purchase_success'));
+      }
+    }
   }
 
   void _onTabChanged() {
@@ -59,7 +109,7 @@ class _StoreDialogState extends State<_StoreDialog>
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
-    _storeService.dispose();
+    _storeService.removeListener(_onPurchaseStateChanged);
     super.dispose();
   }
 
@@ -1064,7 +1114,7 @@ class _PacksTab extends StatelessWidget {
 
   Future<void> _applyAndShowSpeciesBonus(
       BuildContext context, VillageProvider village, String speciesId) async {
-    final speciesResult = await village.applySpeciesBonus(speciesId);
+    final speciesResult = await village.applySpeciesBonus(speciesId, isPurchased: true);
     if (!context.mounted || speciesResult == null) return;
     final speciesData = SpeciesRules.findById(speciesResult.speciesId);
     if (speciesData == null) return;
@@ -1827,7 +1877,7 @@ class _SpeciesTab extends StatelessWidget {
     final result = await storeService.purchaseSpecies(productId);
     if (!context.mounted) return;
     if (result.state == StorePurchaseState.success) {
-      final bonus = await village.applySpeciesBonus(species.id);
+      final bonus = await village.applySpeciesBonus(species.id, isPurchased: true);
       if (!context.mounted || bonus == null) return;
       final speciesData = SpeciesRules.findById(bonus.speciesId);
       if (speciesData == null || !context.mounted) return;
@@ -1935,7 +1985,7 @@ class _SpeciesTab extends StatelessWidget {
   }
 
   String _nextRefreshText() {
-    final now = DateTime.now();
+    final now = sl<TimeVerificationService>().trustedNow();
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
     final diff = tomorrow.difference(now);
     final h = diff.inHours;

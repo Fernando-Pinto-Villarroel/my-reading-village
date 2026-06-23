@@ -18,8 +18,7 @@ void showExpansionDialog(
 }) {
   final gemCost = VillageRules.expansionGemCost(village.expansionCount);
   final coinCost = VillageRules.expansionCoinCost(village.expansionCount);
-  final canAffordGems = village.gems >= gemCost;
-  final canAffordCoins = village.coins >= coinCost;
+  final canAfford = village.gems >= gemCost && village.coins >= coinCost;
 
   final langProvider = context.read<LanguageProvider>();
   game.setHighlightedChunk(chunkX, chunkY);
@@ -36,8 +35,7 @@ void showExpansionDialog(
         landscape: landscape,
         coinCost: coinCost,
         gemCost: gemCost,
-        canAffordCoins: canAffordCoins,
-        canAffordGems: canAffordGems,
+        canAfford: canAfford,
         village: village,
         game: game,
         chunkX: chunkX,
@@ -168,8 +166,7 @@ Widget _buildPayButtons(
   required bool landscape,
   required int coinCost,
   required int gemCost,
-  required bool canAffordCoins,
-  required bool canAffordGems,
+  required bool canAfford,
   required VillageProvider village,
   required VillageGame game,
   required int chunkX,
@@ -188,104 +185,93 @@ Widget _buildPayButtons(
         ),
       ),
       SizedBox(height: landscape ? 8 : 12),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: _ExpansionPayButton(
-              icon: ResourceIcon.coin(size: landscape ? 22 : 28),
-              amount: coinCost,
-              canAfford: canAffordCoins,
-              color: AppTheme.coinGold,
-              isCompact: landscape,
-              onPressed: () async {
-                Navigator.pop(ctx);
-                game.setHighlightedChunk(null, null);
-                final success =
-                    await village.expandTerritoryWithCoins(chunkX, chunkY);
-                if (success) onSyncGameState();
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(
-              langProvider.translate('or'),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkText.withAlpha(140),
-                fontSize: landscape ? 11 : 13,
-              ),
-            ),
-          ),
-          Expanded(
-            child: _ExpansionPayButton(
-              icon: ResourceIcon.gem(size: landscape ? 22 : 28),
-              amount: gemCost,
-              canAfford: canAffordGems,
-              color: AppTheme.gemPurple,
-              isCompact: landscape,
-              onPressed: () async {
-                Navigator.pop(ctx);
-                game.setHighlightedChunk(null, null);
-                final success =
-                    await village.expandTerritoryWithGems(chunkX, chunkY);
-                if (success) onSyncGameState();
-              },
-            ),
-          ),
-        ],
+      _ExpansionPayButton(
+        coinAmount: coinCost,
+        gemAmount: gemCost,
+        canAfford: canAfford,
+        isCompact: landscape,
+        onPressed: () async {
+          Navigator.pop(ctx);
+          game.setHighlightedChunk(null, null);
+          final success = await village.expandTerritory(chunkX, chunkY);
+          if (success) onSyncGameState();
+        },
       ),
     ],
   );
 }
 
 class _ExpansionPayButton extends StatelessWidget {
-  final Widget icon;
-  final int amount;
+  final int coinAmount;
+  final int gemAmount;
   final bool canAfford;
-  final Color color;
   final VoidCallback onPressed;
   final bool isCompact;
 
   const _ExpansionPayButton({
-    required this.icon,
-    required this.amount,
+    required this.coinAmount,
+    required this.gemAmount,
     required this.canAfford,
-    required this.color,
     required this.onPressed,
     this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = canAfford
+        ? AppTheme.mint.withAlpha(180)
+        : Colors.grey.withAlpha(60);
+    final bgColor = canAfford
+        ? AppTheme.mint.withAlpha(30)
+        : Colors.grey.withAlpha(20);
+
     return AnimatedOpacity(
       opacity: canAfford ? 1.0 : 0.5,
       duration: const Duration(milliseconds: 200),
       child: Material(
-        color: canAfford ? color.withAlpha(30) : Colors.grey.withAlpha(20),
+        color: bgColor,
         borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
         child: InkWell(
           onTap: canAfford ? onPressed : null,
           borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
           child: Container(
             padding: EdgeInsets.symmetric(
-                vertical: isCompact ? 8 : 12, horizontal: isCompact ? 6 : 8),
+                vertical: isCompact ? 10 : 14,
+                horizontal: isCompact ? 12 : 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
-              border: Border.all(
-                color: canAfford
-                    ? color.withAlpha(120)
-                    : Colors.grey.withAlpha(60),
-                width: 2,
-              ),
+              border: Border.all(color: borderColor, width: 2),
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                icon,
-                SizedBox(height: isCompact ? 4 : 6),
+                ResourceIcon.coin(size: isCompact ? 20 : 26),
+                SizedBox(width: isCompact ? 4 : 5),
                 Text(
-                  '$amount',
+                  '$coinAmount',
+                  style: TextStyle(
+                    fontSize: isCompact ? 13 : 16,
+                    fontWeight: FontWeight.bold,
+                    color: canAfford ? AppTheme.darkText : Colors.grey,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 8 : 12),
+                  child: Text(
+                    '+',
+                    style: TextStyle(
+                      fontSize: isCompact ? 14 : 18,
+                      fontWeight: FontWeight.bold,
+                      color: canAfford
+                          ? AppTheme.darkText.withAlpha(140)
+                          : Colors.grey,
+                    ),
+                  ),
+                ),
+                ResourceIcon.gem(size: isCompact ? 20 : 26),
+                SizedBox(width: isCompact ? 4 : 5),
+                Text(
+                  '$gemAmount',
                   style: TextStyle(
                     fontSize: isCompact ? 13 : 16,
                     fontWeight: FontWeight.bold,

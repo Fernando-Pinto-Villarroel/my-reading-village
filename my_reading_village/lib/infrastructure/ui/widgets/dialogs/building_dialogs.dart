@@ -198,8 +198,9 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
     // Check cooldown before showing ad
     final cooldown =
         widget.village.constructionSkipCooldownRemaining(widget.building.id!);
-    if (cooldown != null)
-      return; // Cooldown active, button should be disabled anyway
+    if (cooldown != null) {
+      return;
+    }
     setState(() => _watchingAd = true);
     final lang = context.read<LanguageProvider>();
     final village = context.read<VillageProvider>();
@@ -218,8 +219,9 @@ class _ConstructionSheetContentState extends State<ConstructionSheetContent> {
         title: lang.translate('notification_construction_title'),
         body: lang.translate('notification_construction_body'),
       );
-      if (mounted)
+      if (mounted) {
         showSuccessToast(context, lang.translate('ad_construction_skipped'));
+      }
     }
     if (mounted) setState(() => _watchingAd = false);
   }

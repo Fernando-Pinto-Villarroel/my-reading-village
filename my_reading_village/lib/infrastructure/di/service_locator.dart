@@ -11,6 +11,7 @@ import 'package:my_reading_village/domain/ports/inventory_repository.dart';
 import 'package:my_reading_village/domain/ports/book_search_port.dart';
 import 'package:my_reading_village/domain/ports/image_port.dart';
 import 'package:my_reading_village/application/services/building_service.dart';
+import 'package:my_reading_village/application/services/store_service.dart';
 import 'package:my_reading_village/application/services/villager_service.dart';
 import 'package:my_reading_village/application/services/reading_service.dart';
 import 'package:my_reading_village/application/services/inventory_service.dart';
@@ -21,6 +22,8 @@ import 'package:my_reading_village/application/services/ad_service.dart';
 import 'package:my_reading_village/application/services/audio_service.dart';
 import 'package:my_reading_village/application/services/backup_service.dart';
 import 'package:my_reading_village/application/services/notification_service.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 import 'package:my_reading_village/adapters/providers/village_provider.dart';
 import 'package:my_reading_village/adapters/providers/book_provider.dart';
 import 'package:my_reading_village/adapters/providers/tag_provider.dart';
@@ -47,10 +50,14 @@ void initServiceLocator() {
   sl.registerLazySingleton(() => MissionService(sl(), sl()));
   sl.registerLazySingleton(() => PlayerService(sl()));
   sl.registerLazySingleton(() => TagService(sl()));
-  sl.registerLazySingleton(() => AdService());
+  sl.registerLazySingleton(() => AdService(sl()));
   sl.registerLazySingleton(() => AudioService(sl()));
   sl.registerLazySingleton(() => BackupService(sl()));
   sl.registerLazySingleton(() => NotificationService());
+  sl.registerLazySingleton(() => AnalyticsService(sl()));
+  sl.registerLazySingleton(() => TimeVerificationService(sl<DatabaseHelper>()));
+  sl.registerLazySingleton(() => StoreService(sl<VillageRepository>(), sl<InventoryRepository>()));
+
 
   // Adapters (providers)
   sl.registerLazySingleton(() => VillageProvider(

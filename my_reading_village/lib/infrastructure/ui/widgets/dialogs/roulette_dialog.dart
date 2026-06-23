@@ -17,6 +17,7 @@ import 'package:my_reading_village/domain/rules/roulette_rules.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_village/domain/rules/species_rules.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/species_bonus_popup.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 
 // Circus palette — bold, vivid, alternating so adjacent segments never share a hue
 const List<Color> _circusColors = [
@@ -167,7 +168,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
   @override
   void initState() {
     super.initState();
-    _weeklySpecies = SpeciesRules.weeklySpeciesReward();
+    _weeklySpecies = SpeciesRules.weeklySpeciesReward(
+        now: sl<TimeVerificationService>().trustedNow());
     _rewards = _buildRewards(_weeklySpecies);
     _segmentImages = List.filled(_rewards.length, null);
     _controller = AnimationController(vsync: this);
@@ -290,6 +292,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
   }
 
   Future<void> _spin() async {
+    if (_isSpinning || _showingReward) return;
+
     final village = context.read<VillageProvider>();
     final lang = context.read<LanguageProvider>();
     final wasDailyFree = village.canSpinDailyFree;
@@ -305,8 +309,14 @@ class _RouletteDialogState extends State<_RouletteDialog>
       final confirmed = await _showGemConfirmDialog(context, lang, gemCost);
       if (!confirmed || !mounted) return;
     }
+
+    setState(() => _isSpinning = true);
+
     final canSpin = await village.spinRoulette();
-    if (!canSpin) return;
+    if (!canSpin) {
+      if (mounted) setState(() => _isSpinning = false);
+      return;
+    }
     if (wasDailyFree && mounted) {
       final remaining = village.rouletteNextFreeSpinIn;
       sl<NotificationService>().scheduleRouletteFreeSpin(
@@ -315,10 +325,6 @@ class _RouletteDialogState extends State<_RouletteDialog>
         body: lang.translate('notif_roulette_spin_body'),
       );
     }
-
-    setState(() {
-      _isSpinning = true;
-    });
 
     sl<AudioService>().startWheelSpinSound(const Duration(milliseconds: 4000));
 
@@ -331,18 +337,27 @@ class _RouletteDialogState extends State<_RouletteDialog>
             _random,
             _rewards.map((r) => r.key).toList(),
           );
+
+    final reward = _rewards[targetIndex];
+
+    Map<String, dynamic>? rewardData;
+    ({bool isDuplicate, String speciesId, String speciesNameKey})? speciesResult;
+    if (reward.type == 'species' && _weeklySpecies != null) {
+      speciesResult = await village.applySpeciesBonus(_weeklySpecies!.id);
+      if (speciesResult != null) await village.resetRouletteSpinWeekCount();
+    } else {
+      rewardData = {'type': reward.type, 'amount': reward.amount};
+      await village.applyRouletteReward(rewardData, persistOnly: true);
+    }
+
+    if (!mounted) return;
+
     final segmentAngle = 2 * pi / _rewards.length;
-
-    // The rotation angle at which segment targetIndex's midpoint sits under
-    // the pointer (top of wheel, angle -pi/2), independent of _currentAngle.
     final desiredAngle = -(targetIndex * segmentAngle + segmentAngle / 2);
-
-    // Add several full counterclockwise spins for the visual effect, then
-    // nudge exactly to desiredAngle so the pointer always matches the reward.
     final extraSpins = (6 + _random.nextInt(4)) * 2 * pi;
     final base = _currentAngle - extraSpins;
     double diff = (desiredAngle - base) % (2 * pi);
-    if (diff > 0) diff -= 2 * pi; // keep going counterclockwise
+    if (diff > 0) diff -= 2 * pi;
     final finalTarget = base + diff;
 
     _rotationAnimation = Tween<double>(
@@ -366,15 +381,9 @@ class _RouletteDialogState extends State<_RouletteDialog>
       _showingReward = true;
     });
 
-    final reward = _rewards[targetIndex];
-
-    if (reward.type == 'species' && _weeklySpecies != null) {
-      final result = await village.applySpeciesBonus(_weeklySpecies!.id);
-      if (!mounted || result == null) return;
-      await village.resetRouletteSpinWeekCount();
-      if (!mounted) return;
+    if (reward.type == 'species' && _weeklySpecies != null && speciesResult != null) {
       final speciesData = _weeklySpecies!;
-      final isDuplicate = result.isDuplicate;
+      final isDuplicate = speciesResult.isDuplicate;
       await showDialog(
         context: context,
         barrierDismissible: false,
@@ -383,14 +392,8 @@ class _RouletteDialogState extends State<_RouletteDialog>
           isDuplicate: isDuplicate,
         ),
       );
-    } else {
-      await village.applyRouletteReward({
-        'type': reward.type,
-        'amount': reward.amount,
-      });
-
+    } else if (rewardData != null) {
       if (!mounted) return;
-
       await showDialog(
         context: context,
         barrierDismissible: false,
@@ -399,11 +402,10 @@ class _RouletteDialogState extends State<_RouletteDialog>
           lang: lang,
         ),
       );
+      await village.refreshResources();
     }
 
     if (!mounted) return;
-
-    // Only after the popup is dismissed do we reveal the current gem/spin state
     setState(() => _showingReward = false);
   }
 

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:my_reading_village/infrastructure/persistence/database_helper.dart';
+import 'package:my_reading_village/infrastructure/security/backup_cipher.dart';
 
 class BackupService {
   final DatabaseHelper _db;
@@ -71,26 +71,26 @@ class BackupService {
 
     final data = await _db.exportAllTables(only: tablesToExport);
     final jsonString = const JsonEncoder.withIndent('  ').convert(data);
+    final encrypted = BackupCipher.encrypt(jsonString);
     final timestamp = DateTime.now()
         .toIso8601String()
         .replaceAll(':', '-')
         .replaceAll('.', '-');
-    final filename = 'my_reading_village_backup_$timestamp.json';
+    final filename = 'my_reading_village_backup_$timestamp.mrvb';
 
     if (saveToDownloads) {
-      final bytes = Uint8List.fromList(utf8.encode(jsonString));
       final savedPath = await FilePicker.platform.saveFile(
         dialogTitle: 'Save Backup',
         fileName: filename,
         type: FileType.custom,
-        allowedExtensions: ['json'],
-        bytes: bytes,
+        allowedExtensions: ['mrvb'],
+        bytes: encrypted,
       );
       return savedPath != null;
     } else {
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/$filename');
-      await file.writeAsString(jsonString);
+      await file.writeAsBytes(encrypted);
       await SharePlus.instance.share(ShareParams(
         files: [XFile(file.path)],
         text: 'My Reading Village Backup',
@@ -102,7 +102,7 @@ class BackupService {
   String? _validateBackup(Map<String, dynamic> data) {
     if (!data.containsKey('version')) return 'missing_version';
     final version = data['version'];
-    if (version is! int || version < 1) return 'invalid_version';
+    if (version is! int || version < 1 || version > 3) return 'invalid_version';
     final isPartial = data['partial'] == true;
     if (!isPartial) {
       for (final table in _requiredTables) {
@@ -111,32 +111,80 @@ class BackupService {
       }
     }
     for (final key in data.keys) {
-      if (key == 'version' || key == 'exported_at' || key == 'partial')
+      if (key == 'version' || key == 'exported_at' || key == 'partial') {
         continue;
+      }
       if (!_allTables.contains(key)) return 'unknown_table';
       if (data[key] is! List) return 'invalid_table_format';
     }
     return null;
   }
 
-  Future<bool> importData() async {
+  Future<
+      ({
+        Map<String, dynamic> data,
+        bool hasBooksData,
+        bool hadPurchasedSpeciesStripped
+      })?> pickAndValidate() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['json'],
+      allowedExtensions: ['mrvb'],
     );
-    if (result == null || result.files.isEmpty) return false;
+    if (result == null || result.files.isEmpty) return null;
     final filePath = result.files.single.path;
-    if (filePath == null) return false;
-    final jsonString = await File(filePath).readAsString();
+    if (filePath == null) return null;
+    final bytes = await File(filePath).readAsBytes();
+    if (!BackupCipher.isMrvb(bytes)) {
+      throw const FormatException('tampered_backup');
+    }
+    late String jsonString;
+    try {
+      jsonString = BackupCipher.decrypt(bytes);
+    } catch (_) {
+      throw const FormatException('tampered_backup');
+    }
     late Map<String, dynamic> data;
     try {
       data = json.decode(jsonString) as Map<String, dynamic>;
     } catch (_) {
-      throw const FormatException('invalid_backup_not_json');
+      throw const FormatException('tampered_backup');
     }
     final error = _validateBackup(data);
     if (error != null) throw FormatException(error);
+    final hadStripped = _db.stripPurchasedSpeciesFromData(data);
+    final hasBooksData =
+        data.containsKey('books') || data.containsKey('reading_sessions');
+    return (
+      data: data,
+      hasBooksData: hasBooksData,
+      hadPurchasedSpeciesStripped: hadStripped,
+    );
+  }
+
+  Future<({int totalPages, int completedBooks})> parseImportedReadingTotals(
+      Map<String, dynamic> data) async {
+    int totalPages = 0;
+    int completedBooks = 0;
+    final books = data['books'] as List<dynamic>?;
+    if (books != null) {
+      for (final row in books) {
+        final map = row as Map<String, dynamic>;
+        totalPages += (map['pages_read'] as int? ?? 0);
+        if ((map['is_completed'] as int? ?? 0) == 1) completedBooks++;
+      }
+    }
+    return (totalPages: totalPages, completedBooks: completedBooks);
+  }
+
+  Future<bool> doImport(Map<String, dynamic> data) async {
     await _db.importAllTables(data);
+    return true;
+  }
+
+  Future<bool> importData() async {
+    final picked = await pickAndValidate();
+    if (picked == null) return false;
+    await _db.importAllTables(picked.data);
     return true;
   }
 

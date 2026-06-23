@@ -12,6 +12,8 @@ class Book {
   final String createdAt;
   List<Tag> tags;
   final int? rating;
+  final String? notes;
+  final String? completedAt;
 
   Book({
     this.id,
@@ -25,6 +27,8 @@ class Book {
     String? createdAt,
     List<Tag>? tags,
     this.rating,
+    this.notes,
+    this.completedAt,
   })  : createdAt = createdAt ?? DateTime.now().toIso8601String(),
         tags = tags ?? [];
 
@@ -43,6 +47,8 @@ class Book {
       'cover_image_path': coverImagePath,
       'created_at': createdAt,
       'rating': rating,
+      'notes': notes,
+      'completed_at': completedAt,
     };
   }
 
@@ -58,6 +64,8 @@ class Book {
       coverImagePath: map['cover_image_path'] as String?,
       createdAt: map['created_at'] as String,
       rating: map['rating'] as int?,
+      notes: map['notes'] as String?,
+      completedAt: map['completed_at'] as String?,
     );
   }
 
@@ -73,6 +81,8 @@ class Book {
     String? createdAt,
     List<Tag>? tags,
     int? Function()? rating,
+    String? Function()? notes,
+    String? Function()? completedAt,
   }) {
     return Book(
       id: id ?? this.id,
@@ -86,6 +96,8 @@ class Book {
       createdAt: createdAt ?? this.createdAt,
       tags: tags ?? this.tags,
       rating: rating != null ? rating() : this.rating,
+      notes: notes != null ? notes() : this.notes,
+      completedAt: completedAt != null ? completedAt() : this.completedAt,
     );
   }
 }

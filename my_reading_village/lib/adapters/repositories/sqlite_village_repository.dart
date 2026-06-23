@@ -19,8 +19,8 @@ class SqliteVillageRepository implements VillageRepository {
       _db.updateConstructionStart(buildingId, constructionStart);
 
   @override
-  Future<void> markBuildingConstructed(int buildingId) =>
-      _db.markBuildingConstructed(buildingId);
+  Future<void> markBuildingConstructed(int buildingId, String completedAt) =>
+      _db.markBuildingConstructed(buildingId, completedAt);
 
   @override
   Future<void> upgradePlacedBuilding(int id, int newLevel,
@@ -81,7 +81,7 @@ class SqliteVillageRepository implements VillageRepository {
       _db.addResources(coins: coins, gems: gems, wood: wood, metal: metal);
 
   @override
-  Future<void> subtractResources(
+  Future<bool> subtractResources(
           {int coins = 0, int gems = 0, int wood = 0, int metal = 0}) =>
       _db.subtractResources(coins: coins, gems: gems, wood: wood, metal: metal);
 
@@ -140,7 +140,8 @@ class SqliteVillageRepository implements VillageRepository {
   Future<List<String>> getUnlockedSpeciesIds() => _db.getUnlockedSpeciesIds();
 
   @override
-  Future<void> unlockSpecies(String speciesId) => _db.unlockSpecies(speciesId);
+  Future<void> unlockSpecies(String speciesId, {bool isPurchased = false}) =>
+      _db.unlockSpecies(speciesId, isPurchased: isPurchased);
 
   @override
   Future<bool> isSpeciesUnlocked(String speciesId) =>
@@ -231,4 +232,22 @@ class SqliteVillageRepository implements VillageRepository {
   @override
   Future<void> incrementSpeciesManualRefreshSeed() =>
       _db.incrementSpeciesManualRefreshSeed();
+
+  @override
+  Future<({int excludedPages, int excludedBooks})>
+      getReadingMissionExclusions() =>
+          _db.getReadingMissionExclusions();
+
+  @override
+  Future<void> saveReadingMissionExclusions(
+          {required int pages, required int books}) =>
+      _db.saveReadingMissionExclusions(pages: pages, books: books);
+
+  @override
+  Future<bool> isPurchaseProcessed(String purchaseKey) =>
+      _db.isPurchaseProcessed(purchaseKey);
+
+  @override
+  Future<void> markPurchaseProcessed(String purchaseKey) =>
+      _db.markPurchaseProcessed(purchaseKey);
 }

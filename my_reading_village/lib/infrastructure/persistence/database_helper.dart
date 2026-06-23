@@ -36,6 +36,7 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version: 1,
+      onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _createTables,
     );
   }
@@ -52,7 +53,9 @@ class DatabaseHelper {
         max_rewarded_pages INTEGER NOT NULL DEFAULT 0,
         cover_image_path TEXT,
         created_at TEXT NOT NULL,
-        rating INTEGER
+        rating INTEGER,
+        notes TEXT,
+        completed_at TEXT
       )
     ''');
 
@@ -128,7 +131,15 @@ class DatabaseHelper {
         construction_duration_minutes INTEGER NOT NULL DEFAULT 60,
         is_constructed INTEGER NOT NULL DEFAULT 0,
         is_flipped INTEGER NOT NULL DEFAULT 0,
-        is_decoration INTEGER NOT NULL DEFAULT 0
+        is_decoration INTEGER NOT NULL DEFAULT 0,
+        completes_at TEXT
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE processed_purchases (
+        purchase_key TEXT PRIMARY KEY,
+        processed_at TEXT NOT NULL
       )
     ''');
 
@@ -187,7 +198,13 @@ class DatabaseHelper {
         effects_volume INTEGER NOT NULL DEFAULT 3,
         store_discount_seen_key TEXT NOT NULL DEFAULT '',
         store_gems_seen_date TEXT NOT NULL DEFAULT '',
-        species_manual_refresh_seed INTEGER NOT NULL DEFAULT 0
+        species_manual_refresh_seed INTEGER NOT NULL DEFAULT 0,
+        reading_mission_excluded_pages INTEGER NOT NULL DEFAULT 0,
+        reading_mission_excluded_books INTEGER NOT NULL DEFAULT 0,
+        analytics_consent INTEGER NOT NULL DEFAULT -1,
+        analytics_id TEXT NOT NULL DEFAULT '',
+        last_seen_at TEXT,
+        last_trusted_at TEXT
       )
     ''');
 
@@ -231,7 +248,8 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE species_unlocks (
         species_id TEXT PRIMARY KEY,
-        unlocked_at TEXT NOT NULL
+        unlocked_at TEXT NOT NULL,
+        is_purchased INTEGER NOT NULL DEFAULT 0
       )
     ''');
 

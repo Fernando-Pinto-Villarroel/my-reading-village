@@ -3,16 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:my_reading_village/infrastructure/ui/game/village_game.dart';
 
 class TapThroughInteractiveViewer extends StatelessWidget {
-  final TransformationController transformationController;
-  final double minScale;
-  final double maxScale;
   final VillageGame game;
 
   const TapThroughInteractiveViewer({
     super.key,
-    required this.transformationController,
-    required this.minScale,
-    required this.maxScale,
     required this.game,
   });
 
@@ -30,15 +24,13 @@ class TapThroughInteractiveViewer extends StatelessWidget {
             camPos.y + (details.localPosition.dy - screenSize.y / 2) / zoom;
         game.handleWorldTap(Vector2(worldX, worldY));
       },
-      child: InteractiveViewer(
-        transformationController: transformationController,
-        minScale: minScale,
-        maxScale: maxScale,
-        panEnabled: true,
-        scaleEnabled: true,
-        boundaryMargin: const EdgeInsets.all(double.infinity),
-        child: SizedBox.expand(),
-      ),
+      onScaleStart: (details) {
+        game.onGestureStart(details.focalPoint);
+      },
+      onScaleUpdate: (details) {
+        game.onGestureUpdate(details.focalPoint, details.scale);
+      },
+      child: const SizedBox.expand(),
     );
   }
 }

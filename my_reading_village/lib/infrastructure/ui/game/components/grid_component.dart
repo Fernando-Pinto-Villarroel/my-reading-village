@@ -84,15 +84,19 @@ class GridComponent extends Component with HasGameReference<FlameGame> {
     Color(0xFF363430),
   ];
 
-  static const List<Color> _fogColors = [
-    Color(0xFF8AB08A),
-    Color(0xFF80A880),
-    Color(0xFF90B890),
+  static const List<Color> _lockedGrassColors = [
+    Color(0xFF7A9A7A),
+    Color(0xFF829882),
+    Color(0xFF749472),
+    Color(0xFF7E967C),
+    Color(0xFF769276),
   ];
-  static const List<Color> _nightFogColors = [
-    Color(0xFF1A2E3C),
-    Color(0xFF182A38),
-    Color(0xFF1E3240),
+  static const List<Color> _nightLockedGrassColors = [
+    Color(0xFF1E2E1E),
+    Color(0xFF203020),
+    Color(0xFF1C2C1C),
+    Color(0xFF223222),
+    Color(0xFF1A2A1A),
   ];
 
   bool isNightMode = false;
@@ -119,10 +123,10 @@ class GridComponent extends Component with HasGameReference<FlameGame> {
     final right = camPos.x + visibleW / 2;
     final bottom = camPos.y + visibleH / 2;
 
-    final startX = ((left / _tileSize).floor() - 1).clamp(0, _mapSize - 1);
-    final startY = ((top / _tileSize).floor() - 1).clamp(0, _mapSize - 1);
-    final endX = ((right / _tileSize).ceil() + 1).clamp(0, _mapSize);
-    final endY = ((bottom / _tileSize).ceil() + 1).clamp(0, _mapSize);
+    final startX = (left / _tileSize).floor() - 1;
+    final startY = (top / _tileSize).floor() - 1;
+    final endX = (right / _tileSize).ceil() + 1;
+    final endY = (bottom / _tileSize).ceil() + 1;
 
     final tilePaint = Paint();
     final gridPaint = Paint()
@@ -147,8 +151,35 @@ class GridComponent extends Component with HasGameReference<FlameGame> {
         final roadColor = isNightMode ? _nightRoadColor : _roadColor;
         final roadDetailColor =
             isNightMode ? _nightRoadDetailColor : _roadDetailColor;
+        final insideMap =
+            x >= 0 && x < _mapSize && y >= 0 && y < _mapSize;
 
-        if (isRoad && unlocked) {
+        if (!insideMap) {
+          final colors = isNightMode ? _nightSeaColors : _seaColors;
+          final colorIdx = (x * 7 + y * 13).abs() % 5;
+          tilePaint.color = colors[colorIdx];
+          canvas.drawRect(rect, tilePaint);
+          final waveHash = (x * 5 + y * 17).abs() % 4;
+          if (waveHash == 0) {
+            final wavePaint = Paint()
+              ..color = (isNightMode
+                      ? const Color(0xFF2A5A7C)
+                      : const Color(0xFF9AD4EE))
+                  .withValues(alpha: 0.5)
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.0;
+            canvas.drawArc(
+              Rect.fromCenter(
+                  center: Offset(rect.left + 16, rect.top + 18),
+                  width: 12,
+                  height: 6),
+              0,
+              3.14,
+              false,
+              wavePaint,
+            );
+          }
+        } else if (isRoad && unlocked) {
           tilePaint.color = roadColor;
           canvas.drawRect(rect, tilePaint);
           final detailHash = (x * 11 + y * 23) % 5;
@@ -226,10 +257,11 @@ class GridComponent extends Component with HasGameReference<FlameGame> {
           tilePaint.color = grassColors[colorIdx];
           canvas.drawRect(rect, tilePaint);
         } else {
-          final fogColors = isNightMode ? _nightFogColors : _fogColors;
-          tilePaint.color = fogColors[(x * 7 + y * 13) % 3];
+          final colors =
+              isNightMode ? _nightLockedGrassColors : _lockedGrassColors;
+          final colorIdx = (x * 7 + y * 13) % colors.length;
+          tilePaint.color = colors[colorIdx];
           canvas.drawRect(rect, tilePaint);
-          canvas.drawRect(rect, Paint()..color = const Color(0x40606060));
         }
 
         if (showGridLines && unlocked) {

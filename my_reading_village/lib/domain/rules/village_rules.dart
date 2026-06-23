@@ -9,10 +9,10 @@ class VillageRules {
   static const int maxBuildingLevel = 3;
   static const int sadHappinessThreshold = 100;
 
-  static const int mapSize = 150;
-  static const int defaultAreaSize = 25;
+  static const int mapSize = 115;
+  static const int defaultAreaSize = 15;
   static const int chunkSize = 5;
-  static const int chunksPerSide = 30;
+  static const int chunksPerSide = 23;
 
   static int get defaultChunkStart =>
       (chunksPerSide - defaultAreaSize ~/ chunkSize) ~/ 2;
@@ -25,7 +25,7 @@ class VillageRules {
     return (startTile + endTile) ~/ 2;
   }
 
-  static int expansionGemCost(int expansionCount) => 3 * (expansionCount + 1);
+  static int expansionGemCost(int expansionCount) => 2 * (expansionCount + 1);
   static int expansionCoinCost(int expansionCount) => 30 + 5 * expansionCount;
 
   static int villagersForLevel(int level) => level * 5;

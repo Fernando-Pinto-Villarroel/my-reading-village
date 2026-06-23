@@ -1,6 +1,7 @@
 part of 'game_screen.dart';
 
 mixin _GameTapHandlers on State<GameScreen> {
+  bool _isPlacingBuilding = false;
   VillageProvider get _villageProvider;
   GameMode get _mode;
   set _mode(GameMode v);
@@ -139,6 +140,7 @@ mixin _GameTapHandlers on State<GameScreen> {
   }
 
   void _placeBuilding(int tileX, int tileY) async {
+    if (_isPlacingBuilding) return;
     final langProvider = Provider.of<LanguageProvider>(context, listen: false);
     final notif = sl<NotificationService>();
     final village = _villageProvider;
@@ -170,47 +172,59 @@ mixin _GameTapHandlers on State<GameScreen> {
       return;
     }
 
-    await village.placeBuilding(
-      type: _selectedBuildingType!,
-      name: template['name'] as String,
-      tileX: tileX,
-      tileY: tileY,
-      coinCost: coinCost,
-      gemCost: gemCost,
-      woodCost: woodCost,
-      metalCost: metalCost,
-      happinessBonus: template['happinessBonus'] as int,
-      constructionMinutes: template['constructionMinutes'] as int,
-      isFlipped: _flipNextBuilding,
-      tileWidth: VillageRules.buildingTileWidth(_selectedBuildingType!),
-      tileHeight: VillageRules.buildingTileHeight(_selectedBuildingType!),
-      isDecoration: isDecoration,
-    );
-    sl<AudioService>().playConstructionWipSound();
+    _isPlacingBuilding = true;
+    try {
+      final saved = await village.placeBuilding(
+        type: _selectedBuildingType!,
+        name: template['name'] as String,
+        tileX: tileX,
+        tileY: tileY,
+        coinCost: coinCost,
+        gemCost: gemCost,
+        woodCost: woodCost,
+        metalCost: metalCost,
+        happinessBonus: template['happinessBonus'] as int,
+        constructionMinutes: template['constructionMinutes'] as int,
+        isFlipped: _flipNextBuilding,
+        tileWidth: VillageRules.buildingTileWidth(_selectedBuildingType!),
+        tileHeight: VillageRules.buildingTileHeight(_selectedBuildingType!),
+        isDecoration: isDecoration,
+      );
+      if (saved == null) {
+        if (mounted) {
+          showWarningToast(
+              context, langProvider.translate('not_enough_resources_read_more'));
+        }
+        return;
+      }
+      sl<AudioService>().playConstructionWipSound();
 
-    if (!isDecoration) {
-      final placed = village.getBuildingAt(tileX, tileY);
-      if (placed != null && placed.id != null) {
-        final remaining = BuildingService.effectiveRemainingTime(
-            placed, village.activePowerups);
-        if (remaining > Duration.zero) {
-          notif.scheduleConstructionComplete(
-            buildingId: placed.id!,
-            buildingName: langProvider.translate('building_name_${placed.type}', fallback: placed.name),
-            remaining: remaining,
-            title: langProvider.translate('notification_construction_title'),
-            body: langProvider.translate('notification_construction_body'),
-          );
+      if (!isDecoration) {
+        final placed = village.getBuildingAt(tileX, tileY);
+        if (placed != null && placed.id != null) {
+          final remaining = BuildingService.effectiveRemainingTime(
+              placed, village.activePowerups);
+          if (remaining > Duration.zero) {
+            notif.scheduleConstructionComplete(
+              buildingId: placed.id!,
+              buildingName: langProvider.translate('building_name_${placed.type}', fallback: placed.name),
+              remaining: remaining,
+              title: langProvider.translate('notification_construction_title'),
+              body: langProvider.translate('notification_construction_body'),
+            );
+          }
         }
       }
-    }
 
-    setState(() {
-      _mode = GameMode.normal;
-      _selectedBuildingType = null;
-      _flipNextBuilding = false;
-    });
-    _syncGameState();
+      setState(() {
+        _mode = GameMode.normal;
+        _selectedBuildingType = null;
+        _flipNextBuilding = false;
+      });
+      _syncGameState();
+    } finally {
+      _isPlacingBuilding = false;
+    }
   }
 
   void _showBuildingNotConnectedWarning() {

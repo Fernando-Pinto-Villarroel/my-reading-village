@@ -7,6 +7,8 @@ import 'package:my_reading_village/domain/rules/holiday_rules.dart';
 import 'package:my_reading_village/adapters/providers/village_provider.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/missions_active_tab.dart';
 import 'package:my_reading_village/infrastructure/ui/localization/context_ext.dart';
+import 'package:my_reading_village/infrastructure/di/service_locator.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 
 class MissionTreeTab extends StatelessWidget {
   final int totalPagesRead;
@@ -22,7 +24,7 @@ class MissionTreeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final village = context.watch<VillageProvider>();
 
-    final now = DateTime.now();
+    final now = sl<TimeVerificationService>().trustedNow();
 
     return SingleChildScrollView(
       child: Column(
@@ -67,6 +69,7 @@ class BranchTreeCard extends StatefulWidget {
 
 class _BranchTreeCardState extends State<BranchTreeCard> {
   bool _expanded = false;
+  int _visibleCount = 15;
 
   String _lockedDescription(
       BuildContext context, MissionBranch branch, List<MissionBranch> deps) {
@@ -110,7 +113,10 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () => setState(() => _expanded = !_expanded),
+            onTap: () => setState(() {
+              _expanded = !_expanded;
+              if (!_expanded) _visibleCount = 15;
+            }),
             child: Container(
               padding: const EdgeInsets.all(12),
               child: Row(
@@ -214,16 +220,42 @@ class _BranchTreeCardState extends State<BranchTreeCard> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: [
-                  for (int i = 0; i < missions.length; i++) ...[
+                  for (int i = 0;
+                      i < missions.length && i < _visibleCount;
+                      i++) ...[
                     MissionTreeNode(
                       mission: missions[i],
                       village: widget.village,
                       totalPagesRead: widget.totalPagesRead,
                       completedBooks: widget.completedBooks,
-                      isLast: i == missions.length - 1,
+                      isLast: i == missions.length - 1 ||
+                          i == _visibleCount - 1,
                       isActive:
                           widget.village.getActiveMission(widget.branch)?.id ==
                               missions[i].id,
+                    ),
+                  ],
+                  if (missions.length > 15 &&
+                      _visibleCount < missions.length) ...[
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () => setState(
+                          () => _visibleCount = _visibleCount + 15),
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(
+                          context.t('see_more_missions'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            decorationColor: color,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                   ],
                 ],
@@ -348,7 +380,7 @@ class MissionTreeNode extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.t('mission_title_${mission.id}'),
+                  missionTitle(context, mission),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: isActive ? FontWeight.bold : FontWeight.normal,

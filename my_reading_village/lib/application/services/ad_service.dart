@@ -1,36 +1,55 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 import 'package:my_reading_village/app_constants.dart';
+import 'package:my_reading_village/infrastructure/persistence/database_helper.dart';
 import 'package:my_reading_village/infrastructure/ui/config/app_theme.dart';
 import 'package:my_reading_village/infrastructure/ui/localization/language_provider.dart';
 
 class AdService {
-  RewardedAd? _rewardedAd;
+  final DatabaseHelper _db;
+
   bool _isAdLoaded = false;
   bool _isShowing = false;
 
+  AdService(this._db);
+
   Future<void> initialize() async {
-    if (!AppConstants.googleAds) return;
-    await MobileAds.instance.initialize();
-    _loadAd();
+    if (!AppConstants.unityAds) return;
+    await UnityAds.init(
+      gameId: AppConstants.unityGameId,
+      testMode: !AppConstants.playStore,
+      onComplete: () async {
+        await _applyStoredConsent();
+        _loadAd();
+      },
+      onFailed: (_, __) {},
+    );
+  }
+
+  Future<void> setConsent(bool consent) async {
+    if (!AppConstants.unityAds) return;
+    try {
+      await UnityAds.setPrivacyConsent(PrivacyConsentType.gdpr, consent);
+    } catch (_) {}
+  }
+
+  Future<void> _applyStoredConsent() async {
+    try {
+      final stored = await _db.getAnalyticsConsent();
+      if (stored == 1 || stored == 0) {
+        await UnityAds.setPrivacyConsent(
+            PrivacyConsentType.gdpr, stored == 1);
+      }
+    } catch (_) {}
   }
 
   void _loadAd() {
-    if (!AppConstants.googleAds) return;
-    RewardedAd.load(
-      adUnitId: AppConstants.rewardedAdUnitId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewardedAd = ad;
-          _isAdLoaded = true;
-        },
-        onAdFailedToLoad: (_) {
-          _rewardedAd = null;
-          _isAdLoaded = false;
-        },
-      ),
+    if (!AppConstants.unityAds) return;
+    UnityAds.load(
+      placementId: AppConstants.unityPlacementId,
+      onComplete: (_) => _isAdLoaded = true,
+      onFailed: (_, __, ___) => _isAdLoaded = false,
     );
   }
 
@@ -38,11 +57,11 @@ class AdService {
       BuildContext context, LanguageProvider lang) async {
     if (_isShowing) return false;
 
-    if (!AppConstants.googleAds) {
+    if (!AppConstants.unityAds) {
       return _showTestDialog(context, lang);
     }
 
-    if (!_isAdLoaded || _rewardedAd == null) {
+    if (!_isAdLoaded) {
       _loadAd();
       return false;
     }
@@ -50,29 +69,19 @@ class AdService {
     _isShowing = true;
     final completer = Completer<bool>();
 
-    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdDismissedFullScreenContent: (ad) {
-        _isShowing = false;
-        if (!completer.isCompleted) completer.complete(false);
-        ad.dispose();
-        _rewardedAd = null;
-        _isAdLoaded = false;
-        _loadAd();
-      },
-      onAdFailedToShowFullScreenContent: (ad, _) {
-        _isShowing = false;
-        if (!completer.isCompleted) completer.complete(false);
-        ad.dispose();
-        _rewardedAd = null;
-        _isAdLoaded = false;
-        _loadAd();
-      },
-    );
+    void finish(bool rewarded) {
+      _isShowing = false;
+      _isAdLoaded = false;
+      _loadAd();
+      if (!completer.isCompleted) completer.complete(rewarded);
+    }
 
-    _rewardedAd!.show(
-      onUserEarnedReward: (_, __) {
-        if (!completer.isCompleted) completer.complete(true);
-      },
+    UnityAds.showVideoAd(
+      placementId: AppConstants.unityPlacementId,
+      onStart: (_) {},
+      onSkipped: (_) => finish(false),
+      onComplete: (_) => finish(true),
+      onFailed: (_, __, ___) => finish(false),
     );
 
     return completer.future;

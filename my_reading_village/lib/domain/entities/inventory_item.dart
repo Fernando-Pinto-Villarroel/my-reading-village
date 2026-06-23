@@ -9,36 +9,6 @@ class InventoryItem {
     this.quantity = 0,
   });
 
-  String get displayName {
-    switch (type) {
-      case 'book':
-        return 'Happiness Book';
-      case 'sandwich':
-        return 'Constructor Sandwich';
-      case 'hammer':
-        return 'Constructor Hammer';
-      case 'glasses':
-        return 'Magic Glasses';
-      default:
-        return type;
-    }
-  }
-
-  String get description {
-    switch (type) {
-      case 'book':
-        return 'Give to a villager to boost their happiness to 100% for 24 hours!';
-      case 'sandwich':
-        return 'Speed up all constructions by 2x for 1 hour!';
-      case 'hammer':
-        return 'Gain an extra constructor slot for 24 hours!';
-      case 'glasses':
-        return 'Earn 1.5x resources from reading for 1 hour!';
-      default:
-        return '';
-    }
-  }
-
   String get assetName {
     switch (type) {
       case 'book':

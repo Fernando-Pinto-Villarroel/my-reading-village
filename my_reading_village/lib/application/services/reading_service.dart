@@ -4,7 +4,8 @@ import 'package:my_reading_village/domain/entities/reading_session.dart';
 import 'package:my_reading_village/domain/entities/tag.dart';
 import 'package:my_reading_village/domain/ports/book_repository.dart';
 import 'package:my_reading_village/domain/rules/reading_rules.dart';
-import 'package:my_reading_village/app_constants.dart';
+import 'package:my_reading_village/infrastructure/di/service_locator.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
 
 class ReadingService {
   final BookRepository _repo;
@@ -143,7 +144,6 @@ class ReadingService {
         'gems': 0,
         'wood': 0,
         'metal': 0,
-        'exp': 0,
         'bookCompleted': false
       };
     }
@@ -172,13 +172,16 @@ class ReadingService {
         bookCompleted && book.maxRewardedPages < book.totalPages;
     if (completionBonusEarned) {
       coinsEarned += ReadingRules.bookCompletionCoinBonus;
-      gemsEarned += ReadingRules.bookCompletionGemBonus;
+      gemsEarned += ReadingRules.bookCompletionGems(book.totalPages);
     }
 
     final newMaxRewarded = max(book.maxRewardedPages, newPagesRead);
 
     await _repo.updateBookPages(bookId, newPagesRead, bookCompleted);
     await _repo.updateMaxRewardedPages(bookId, newMaxRewarded);
+    if (bookCompleted && !book.isCompleted) {
+      await _repo.updateBookCompletedAt(bookId, DateTime.now().toIso8601String());
+    }
     await _repo.insertReadingSession(ReadingSession(
       bookId: bookId,
       pagesRead: actualPagesLogged,
@@ -190,16 +193,25 @@ class ReadingService {
       timeTakenMinutes: timeTakenMinutes,
     ).toMap());
 
+    final analytics = sl<AnalyticsService>();
+    analytics.logPagesLogged(actualPagesLogged, timeTakenMinutes ?? 0);
+    if (bookCompleted && !book.isCompleted) {
+      analytics.logBookCompleted(book.totalPages);
+      analytics.updateUserProperties(totalPagesRead: newPagesRead);
+    } else {
+      analytics.updateUserProperties(totalPagesRead: newPagesRead);
+    }
+
     return {
       'coins': coinsEarned,
       'gems': gemsEarned,
       'wood': woodEarned,
       'metal': metalEarned,
-      'exp': 0,
       'bookCompleted': bookCompleted,
       'newPagesRead': newPagesRead,
       'rewardablePages': rewardablePages,
       'newMaxRewarded': newMaxRewarded,
+      'shortBookNoGems': completionBonusEarned && ReadingRules.bookCompletionGems(book.totalPages) == 0,
     };
   }
 
@@ -220,25 +232,6 @@ class ReadingService {
           'Total pages would exceed book total (${book.totalPages})');
     }
 
-    final targetDate = sessionDate ??
-        DateTime.parse(
-          allSessions.firstWhere((s) => s['id'] == sessionId)['date'] as String,
-        );
-    final pagesOnTargetDate = await _repo.getPagesReadForDate(
-      targetDate,
-      excludingSessionId: sessionId,
-    );
-    if (!AppConstants.testMode) {
-      final available = ReadingRules.dailyPageLimit - pagesOnTargetDate;
-      if (available <= 0) {
-        throw Exception('daily_limit_full:${ReadingRules.dailyPageLimit}');
-      }
-      if (newPages > available) {
-        throw Exception(
-            'daily_limit_partial:$available:${ReadingRules.dailyPageLimit}');
-      }
-    }
-
     await _repo.updateReadingSession(sessionId, {
       'pages_read': newPages,
       'time_taken_minutes': newTimeMins,
@@ -248,6 +241,11 @@ class ReadingService {
     final newPagesRead = otherPagesSum + newPages;
     final isCompleted = newPagesRead >= book.totalPages;
     await _repo.updateBookPages(bookId, newPagesRead, isCompleted);
+    if (isCompleted && !book.isCompleted) {
+      await _repo.updateBookCompletedAt(bookId, DateTime.now().toIso8601String());
+    } else if (!isCompleted && book.isCompleted) {
+      await _repo.updateBookCompletedAt(bookId, null);
+    }
 
     return book.copyWith(pagesRead: newPagesRead, isCompleted: isCompleted);
   }
@@ -263,6 +261,9 @@ class ReadingService {
     final newPagesRead = await _repo.sumSessionPagesForBook(bookId);
     final isCompleted = newPagesRead >= book.totalPages;
     await _repo.updateBookPages(bookId, newPagesRead, isCompleted);
+    if (!isCompleted && book.isCompleted) {
+      await _repo.updateBookCompletedAt(bookId, null);
+    }
 
     return book.copyWith(pagesRead: newPagesRead, isCompleted: isCompleted);
   }
@@ -273,6 +274,15 @@ class ReadingService {
     if (idx != -1) {
       books[idx] = books[idx].copyWith(rating: () => rating);
     }
+  }
+
+  Future<void> saveBookNote(int bookId, String note, List<Book> books) async {
+    await _repo.updateBookNote(bookId, note);
+    final idx = books.indexWhere((b) => b.id == bookId);
+    if (idx != -1) {
+      books[idx] = books[idx].copyWith(notes: () => note);
+    }
+    if (note.isNotEmpty) sl<AnalyticsService>().logBookNoteSaved();
   }
 
   Future<int> getTotalPagesRead() => _repo.getTotalPagesRead();

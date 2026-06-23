@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flame/game.dart';
 import 'package:flame/events.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' hide Draggable, Matrix4;
+import 'package:flutter/material.dart' hide Draggable;
 import 'components/grid_component.dart';
 import 'components/building_component.dart';
 import 'components/villager_component.dart';
@@ -45,6 +45,9 @@ class VillageGame extends FlameGame {
   List<String> _walkableTilesList = [];
 
   double _constructionCheckTimer = 0;
+  Vector2? _gestureStartCamPos;
+  double? _gestureStartZoom;
+  Offset? _gestureStartFocalPoint;
   final Map<int, PlacedBuilding> _buildingsById = {};
   List<ActivePowerup> _activePowerups = [];
   VillagerService? _villagerService;
@@ -57,7 +60,7 @@ class VillageGame extends FlameGame {
   });
 
   @override
-  Color backgroundColor() => const Color(0xFF709070);
+  Color backgroundColor() => const Color(0xFF7EC8E3);
 
   @override
   Future<void> onLoad() async {
@@ -488,6 +491,57 @@ class VillageGame extends FlameGame {
     camera.viewfinder.zoom = zoom.clamp(0.005, 10.0);
   }
 
+  void setCameraDirectly(Vector2 position, double zoom) {
+    final newZoom = zoom.clamp(UiConstants.minZoom, UiConstants.maxZoom);
+    final (minX, maxX, minY, maxY) = _cameraBounds(newZoom);
+    camera.viewfinder.zoom = newZoom;
+    camera.viewfinder.position = Vector2(
+      maxX > minX ? position.x.clamp(minX, maxX) : (VillageRules.mapSize * UiConstants.tilePixelSize) / 2,
+      maxY > minY ? position.y.clamp(minY, maxY) : (VillageRules.mapSize * UiConstants.tilePixelSize) / 2,
+    );
+    _gestureStartCamPos = null;
+  }
+
+  (double minX, double maxX, double minY, double maxY) _cameraBounds(double zoom) {
+    final seaBorder = UiConstants.seaBorderTiles * UiConstants.tilePixelSize;
+    final mapPixels = VillageRules.mapSize * UiConstants.tilePixelSize;
+    final halfVisW = size.x / (2 * zoom);
+    final halfVisH = size.y / (2 * zoom);
+    return (halfVisW - seaBorder, mapPixels + seaBorder - halfVisW, halfVisH - seaBorder, mapPixels + seaBorder - halfVisH);
+  }
+
+  void onGestureStart(Offset focalPoint) {
+    _gestureStartCamPos = camera.viewfinder.position.clone();
+    _gestureStartZoom = camera.viewfinder.zoom;
+    _gestureStartFocalPoint = focalPoint;
+  }
+
+  void onGestureUpdate(Offset focalPoint, double scale) {
+    final startCam = _gestureStartCamPos;
+    final startZoom = _gestureStartZoom;
+    final startFocal = _gestureStartFocalPoint;
+    if (startCam == null || startZoom == null || startFocal == null) return;
+
+    final W = size.x;
+    final H = size.y;
+    final newZoom = (startZoom * scale).clamp(UiConstants.minZoom, UiConstants.maxZoom);
+
+    final fwx = startCam.x + (startFocal.dx - W / 2) / startZoom;
+    final fwy = startCam.y + (startFocal.dy - H / 2) / startZoom;
+
+    final camX = fwx - (focalPoint.dx - W / 2) / newZoom;
+    final camY = fwy - (focalPoint.dy - H / 2) / newZoom;
+
+    final (minX, maxX, minY, maxY) = _cameraBounds(newZoom);
+    final mapPixels = VillageRules.mapSize * UiConstants.tilePixelSize;
+
+    camera.viewfinder.zoom = newZoom;
+    camera.viewfinder.position = Vector2(
+      maxX > minX ? camX.clamp(minX, maxX) : mapPixels / 2,
+      maxY > minY ? camY.clamp(minY, maxY) : mapPixels / 2,
+    );
+  }
+
   ({int minX, int minY, int maxX, int maxY})? getOccupiedBounds() {
     int? minX, minY, maxX, maxY;
 
@@ -557,48 +611,6 @@ class VillageGame extends FlameGame {
     }
   }
 
-  Matrix4 buildFlyMatrix(double wx, double wy, double flameZoom) {
-    final clampedZoom =
-        flameZoom.clamp(UiConstants.minZoom, UiConstants.maxZoom);
-    final scale = clampedZoom / UiConstants.defaultZoom;
-    final centerWorld =
-        VillageRules.defaultAreaCenterTile * UiConstants.tilePixelSize +
-            UiConstants.tilePixelSize / 2;
-    final W = size.x;
-    final H = size.y;
-    final childCenterX = W / 2 + (wx - centerWorld) * UiConstants.defaultZoom;
-    final childCenterY = H / 2 + (wy - centerWorld) * UiConstants.defaultZoom;
-    final tx = W / 2 - scale * childCenterX;
-    final ty = H / 2 - scale * childCenterY;
-    return Matrix4.identity()
-      ..scaleByVector3(Vector3(scale, scale, 1.0))
-      ..setTranslationRaw(tx, ty, 0.0);
-  }
-
-  void applyCameraTransform(double scale, double tx, double ty) {
-    final zoom = (UiConstants.defaultZoom * scale)
-        .clamp(UiConstants.minZoom, UiConstants.maxZoom);
-    camera.viewfinder.zoom = zoom;
-
-    final centerWorld =
-        VillageRules.defaultAreaCenterTile * UiConstants.tilePixelSize +
-            UiConstants.tilePixelSize / 2;
-
-    final viewSize = size;
-    final childCenterX = (viewSize.x / 2 - tx) / scale;
-    final childCenterY = (viewSize.y / 2 - ty) / scale;
-
-    final worldX =
-        centerWorld + (childCenterX - viewSize.x / 2) / UiConstants.defaultZoom;
-    final worldY =
-        centerWorld + (childCenterY - viewSize.y / 2) / UiConstants.defaultZoom;
-
-    final ws = UiConstants.worldPixelSize;
-    camera.viewfinder.position = Vector2(
-      worldX.clamp(0, ws),
-      worldY.clamp(0, ws),
-    );
-  }
 
   void handleWorldTap(Vector2 worldPos) {
     VillagerComponent? topmost;

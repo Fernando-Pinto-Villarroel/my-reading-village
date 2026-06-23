@@ -56,6 +56,51 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     return result;
   }
 
+  bool stripPurchasedSpeciesFromData(Map<String, dynamic> data) {
+    final speciesRows = data['species_unlocks'] as List<dynamic>?;
+    if (speciesRows == null) return false;
+
+    final strippedIds = <String>{};
+    final cleanSpecies = <dynamic>[];
+    for (final row in speciesRows) {
+      final map = row as Map<String, dynamic>;
+      if ((map['is_purchased'] as int? ?? 0) == 1) {
+        strippedIds.add(map['species_id'] as String);
+      } else {
+        cleanSpecies.add(row);
+      }
+    }
+
+    if (strippedIds.isEmpty) return false;
+
+    data['species_unlocks'] = cleanSpecies;
+
+    final villagerRows = data['villagers'] as List<dynamic>?;
+    if (villagerRows != null) {
+      const starters = SpeciesRules.starterSpecies;
+      final rng = Random();
+      data['villagers'] = villagerRows.map((row) {
+        final map = Map<String, dynamic>.from(row as Map);
+        if (strippedIds.contains(map['species'] as String?)) {
+          map['species'] = starters[rng.nextInt(starters.length)];
+        }
+        return map;
+      }).toList();
+    }
+
+    final choiceRows = data['pending_villager_choices'] as List<dynamic>?;
+    if (choiceRows != null) {
+      data['pending_villager_choices'] = choiceRows.where((row) {
+        final map = row as Map<String, dynamic>;
+        return !strippedIds.contains(map['species1'] as String?) &&
+               !strippedIds.contains(map['species2'] as String?) &&
+               !strippedIds.contains(map['species3'] as String?);
+      }).toList();
+    }
+
+    return true;
+  }
+
   Future<void> importAllTables(Map<String, dynamic> data) async {
     final db = await database;
     final dir = await getApplicationDocumentsDirectory();
@@ -65,6 +110,14 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
     final tablesToRestore =
         _allTables.where((t) => data.containsKey(t)).toList();
 
+    final tableColumns = <String, Set<String>>{};
+    for (final table in tablesToRestore) {
+      final info = await db.rawQuery('PRAGMA table_info($table)');
+      tableColumns[table] = info.map((r) => r['name'] as String).toSet();
+    }
+
+    final importTs = DateTime.now().millisecondsSinceEpoch;
+
     await db.transaction((txn) async {
       for (final table in tablesToRestore.reversed) {
         await txn.delete(table);
@@ -72,21 +125,22 @@ extension DatabaseHelperBackupOperations on DatabaseHelper {
       for (final table in tablesToRestore) {
         final rows = data[table] as List<dynamic>?;
         if (rows == null) continue;
-        for (final row in rows) {
-          final mutable = Map<String, dynamic>.from(row as Map);
+        final validColumns = tableColumns[table]!;
+        for (var i = 0; i < rows.length; i++) {
+          final mutable = Map<String, dynamic>.from(rows[i] as Map);
           if (table == 'books') {
             final imageData = mutable.remove('cover_image_data') as String?;
             final imageExt =
                 mutable.remove('cover_image_ext') as String? ?? '.jpg';
             if (imageData != null && imageData.isNotEmpty) {
               final bytes = base64Decode(imageData);
-              final filename =
-                  'cover_${DateTime.now().millisecondsSinceEpoch}$imageExt';
+              final filename = 'cover_${importTs}_$i$imageExt';
               final file = File(p.join(coverDir.path, filename));
               await file.writeAsBytes(bytes);
               mutable['cover_image_path'] = file.path;
             }
           }
+          mutable.removeWhere((k, _) => !validColumns.contains(k));
           await txn.insert(
             table,
             mutable,

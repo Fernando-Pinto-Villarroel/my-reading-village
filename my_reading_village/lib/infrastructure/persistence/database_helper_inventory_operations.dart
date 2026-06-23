@@ -109,4 +109,9 @@ extension DatabaseHelperInventoryOperations on DatabaseHelper {
           where: 'mission_id = ?', whereArgs: [missionId]);
     }
   }
+
+  Future<void> deleteMissionProgress(String missionId) async {
+    final db = await database;
+    await db.delete('mission_progress', where: 'mission_id = ?', whereArgs: [missionId]);
+  }
 }

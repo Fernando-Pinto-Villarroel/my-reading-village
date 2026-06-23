@@ -55,9 +55,6 @@ class NotificationService {
   Future<void> initialize() async {
     if (_initialized) return;
     tz_data.initializeTimeZones();
-    try {
-      tz.setLocalLocation(tz.local);
-    } catch (_) {}
     const androidSettings =
         AndroidInitializationSettings('@mipmap/launcher_icon');
     const initSettings = InitializationSettings(android: androidSettings);

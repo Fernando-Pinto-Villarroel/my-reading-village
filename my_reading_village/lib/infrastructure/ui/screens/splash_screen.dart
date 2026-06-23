@@ -8,8 +8,11 @@ import 'package:my_reading_village/adapters/providers/tag_provider.dart';
 import 'package:my_reading_village/adapters/providers/village_provider.dart';
 import 'package:my_reading_village/adapters/repositories/villager_favorites.dart';
 import 'package:my_reading_village/application/services/notification_service.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
+import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/clock_fraud_dialog.dart';
 import 'package:my_reading_village/domain/rules/holiday_rules.dart';
 import 'package:my_reading_village/domain/rules/store_rules.dart';
+import 'package:my_reading_village/application/services/app_update_service.dart';
 import 'package:my_reading_village/application/services/audio_service.dart';
 import 'package:my_reading_village/infrastructure/di/service_locator.dart';
 import 'package:my_reading_village/infrastructure/persistence/database_helper.dart';
@@ -34,6 +37,9 @@ class _SplashScreenState extends State<SplashScreen> {
     'assets/images/backgrounds/splash_bg_1.png',
     'assets/images/backgrounds/splash_bg_2.png',
     'assets/images/backgrounds/splash_bg_3.png',
+    'assets/images/backgrounds/splash_bg_4.png',
+    'assets/images/backgrounds/splash_bg_5.png',
+    'assets/images/backgrounds/splash_bg_6.png',
   ];
 
   late final String _backgroundImage;
@@ -182,57 +188,104 @@ class _SplashScreenState extends State<SplashScreen> {
     final languageProvider = context.read<LanguageProvider>();
     final navigator = Navigator.of(context);
 
+    bool criticalFailure = false;
+
+    await AppUpdateService.checkAndPrompt();
+
+    try {
+      await sl<TimeVerificationService>().ensureInitialized();
+    } catch (_) {}
+
     try {
       await villageProvider.loadData();
-      await _setProgress(0.2);
+    } catch (_) {
+      criticalFailure = true;
+    }
+    await _setProgress(0.2);
 
-      final locale = villageProvider.language;
+    if (criticalFailure) {
+      await _setProgress(1.0);
+      if (mounted) {
+        await _showRetryDialog(
+          villageProvider, bookProvider, tagProvider, languageProvider, navigator);
+      }
+      return;
+    }
+
+    final locale = villageProvider.language;
+
+    try {
       await languageProvider.load(locale);
       await _loadTips(locale);
-
       if (mounted) {
         setState(() {
           _tapHint = languageProvider.translate('splash_tap_tip');
         });
       }
-      await _setProgress(0.45);
+    } catch (_) {}
+    await _setProgress(0.45);
 
+    if (mounted && sl<TimeVerificationService>().hasPendingFraudDecision) {
+      final accepted = await showClockFraudDialog(context);
+      if (accepted == true) {
+        try {
+          await villageProvider.loadData();
+        } catch (_) {}
+      }
+    }
+
+    try {
       VillagerFavorites.setLocale(locale);
       await VillagerFavorites.load();
-      await _setProgress(0.6);
-
-      await tagProvider.loadTags();
-      await _setProgress(0.75);
-
-      await bookProvider.loadData();
-      await _setProgress(0.9);
-
-      try {
-        final notif = sl<NotificationService>();
-        final db = DatabaseHelper();
-        final settings = await db.getNotificationSettings();
-        final daysStr = settings['days_enabled'] as String;
-        final activeDays = daysStr.split('').map((c) => c == '1').toList();
-        final startHour = settings['start_hour'] as int;
-        final endHour = settings['end_hour'] as int;
-        final perDay = settings['per_day'] as int;
-        final messages = await _loadNotificationMessages(locale);
-        await notif.scheduleNotifications(
-          activeDays: activeDays,
-          startHour: startHour,
-          endHour: endHour,
-          notificationsPerDay: perDay,
-          messages: messages,
-        );
-        await _scheduleEventReminders(notif, locale);
-        await _scheduleStoreDiscountNotifications(notif, locale);
-      } catch (_) {}
-
-      await _setProgress(1.0);
-      await Future.delayed(const Duration(milliseconds: 1500));
     } catch (_) {
-      await _setProgress(1.0);
+      VillagerFavorites.setLocale(locale);
     }
+    await _setProgress(0.6);
+
+    try {
+      await tagProvider.loadTags();
+    } catch (_) {}
+    await _setProgress(0.75);
+
+    try {
+      await bookProvider.loadData();
+    } catch (_) {
+      criticalFailure = true;
+    }
+    await _setProgress(0.9);
+
+    if (criticalFailure) {
+      await _setProgress(1.0);
+      if (mounted) {
+        await _showRetryDialog(
+          villageProvider, bookProvider, tagProvider, languageProvider, navigator);
+      }
+      return;
+    }
+
+    try {
+      final notif = sl<NotificationService>();
+      final db = DatabaseHelper();
+      final settings = await db.getNotificationSettings();
+      final daysStr = settings['days_enabled'] as String;
+      final activeDays = daysStr.split('').map((c) => c == '1').toList();
+      final startHour = settings['start_hour'] as int;
+      final endHour = settings['end_hour'] as int;
+      final perDay = settings['per_day'] as int;
+      final messages = await _loadNotificationMessages(locale);
+      await notif.scheduleNotifications(
+        activeDays: activeDays,
+        startHour: startHour,
+        endHour: endHour,
+        notificationsPerDay: perDay,
+        messages: messages,
+      );
+      await _scheduleEventReminders(notif, locale);
+      await _scheduleStoreDiscountNotifications(notif, locale);
+    } catch (_) {}
+
+    await _setProgress(1.0);
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     try {
       await sl<AudioService>().startMusicLoop();
@@ -253,6 +306,41 @@ class _SplashScreenState extends State<SplashScreen> {
           transitionDuration: const Duration(milliseconds: 600),
         ),
       );
+    }
+  }
+
+  Future<void> _showRetryDialog(
+    VillageProvider villageProvider,
+    BookProvider bookProvider,
+    TagProvider tagProvider,
+    LanguageProvider languageProvider,
+    NavigatorState navigator,
+  ) async {
+    final retry = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          languageProvider.translate('splash_load_error_title'),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          languageProvider.translate('splash_load_error_body'),
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(languageProvider.translate('retry')),
+          ),
+        ],
+      ),
+    );
+    if (retry == true && mounted) {
+      setState(() => _progress = 0.0);
+      _initializeApp();
     }
   }
 

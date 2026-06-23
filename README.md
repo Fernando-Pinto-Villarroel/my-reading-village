@@ -14,8 +14,9 @@
 ![Dart](https://img.shields.io/badge/Dart-3.5-0175C2?style=flat-square&logo=dart&logoColor=white)
 ![Flame](https://img.shields.io/badge/Flame-1.21-FF6D00?style=flat-square&logo=firebase&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-Local_DB-003B57?style=flat-square&logo=sqlite&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Analytics-FFCA28?style=flat-square&logo=firebase&logoColor=black)
 ![Provider](https://img.shields.io/badge/Provider-6.1-6C63FF?style=flat-square)
-![AdMob](https://img.shields.io/badge/AdMob-Rewarded_Ads-EA4335?style=flat-square&logo=googleads&logoColor=white)
+![Unity Ads](https://img.shields.io/badge/Unity_Ads-Rewarded_Ads-000000?style=flat-square&logo=unity&logoColor=white)
 ![IAP](https://img.shields.io/badge/IAP-Google_Play-34A853?style=flat-square&logo=googleplay&logoColor=white)
 ![Privacy](https://img.shields.io/badge/Data-Device--Only-64748B?style=flat-square&logo=lock&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square&logo=android&logoColor=white)
@@ -35,20 +36,24 @@
 - [Business Model & ROI](#business-model--roi)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
+- [Subprojects](#subprojects)
 - [Project Structure](#project-structure)
 - [Database Schema](#database-schema)
+- [Firebase Analytics](#firebase-analytics)
+- [Security Features](#security-features)
 - [Asset Pipeline](#asset-pipeline)
 - [Getting Started](#getting-started)
 - [Building for Android](#building-for-android)
+- [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ---
 
 ## Overview
 
-**My Reading Village** is a privacy-first mobile game that rewards real-world reading with in-game village-building progression. Log the pages you read, earn coins, gems, wood, and metal, then use those resources to construct and upgrade buildings in a charming 2D isometric village populated by 43 unique kawaii animal villagers.
+**My Reading Village** is a privacy-first mobile game that rewards real-world reading with in-game village-building progression. Log the pages you read, earn coins, gems, wood, and metal, then use those resources to construct and upgrade buildings in a charming 2D isometric village populated by 41 unique kawaii animal villagers.
 
-The game replicates the dopamine reward loops found in addictive mobile games — but redirects them toward building a healthy reading habit. All gameplay data stays exclusively on your device: no accounts, no cloud sync, no tracking.
+The game replicates the dopamine reward loops found in addictive mobile games — but redirects them toward building a healthy reading habit. All gameplay data stays exclusively on your device: no accounts, no cloud sync, no tracking. Analytics are opt-in and anonymous.
 
 ---
 
@@ -115,7 +120,7 @@ The goal is to make reading **feel as rewarding as playing a mobile game**, crea
       <td>Buildings require real time to construct and upgrade — spend gems to speed up or watch a rewarded ad to skip 10 minutes</td>
     </tr>
     <tr>
-      <td><strong>43 villager species</strong></td>
+      <td><strong>41 villager species</strong></td>
       <td>Common, Rare, Extraordinary, Legendary, and Godly species — unlock through leveling, IAP, lucky wheel, species bonus, or secret codes</td>
     </tr>
     <tr>
@@ -176,11 +181,19 @@ The goal is to make reading **feel as rewarding as playing a mobile game**, crea
     </tr>
     <tr>
       <td><strong>Backup & restore</strong></td>
-      <td>Export and import the full game state as a file — full local backup without cloud dependency</td>
+      <td>Export and import the full game state as a file — full local backup without cloud dependency, protected against malicious imports</td>
     </tr>
     <tr>
       <td><strong>Stats dashboard</strong></td>
-      <td>Track village level, XP, total pages, books completed, building counts, happiness scores, and resource history</td>
+      <td>Track village level, XP, total pages, books completed, building counts, happiness scores, and resource history — with fl_chart visualizations</td>
+    </tr>
+    <tr>
+      <td><strong>Firebase Analytics</strong></td>
+      <td>Opt-in anonymous analytics with consent modal after onboarding — toggle in Settings → Data; 27+ custom events and 8 user properties tracked</td>
+    </tr>
+    <tr>
+      <td><strong>Security protections</strong></td>
+      <td>Backup import sanitization strips paid species to prevent IAP bypassing; device clock-tamper detection warns when the system date appears manipulated</td>
     </tr>
     <tr>
       <td><strong>5 languages</strong></td>
@@ -192,7 +205,7 @@ The goal is to make reading **feel as rewarding as playing a mobile game**, crea
     </tr>
     <tr>
       <td><strong>Privacy by design</strong></td>
-      <td>Core gameplay requires no internet — all progress lives on-device in a local SQLite database. Network is used only for optional book search (Open Library API), in-app purchases, and rewarded ads; books can always be added manually without a connection</td>
+      <td>Core gameplay requires no internet — all progress lives on-device in a local SQLite database. Network is used only for optional book search (Open Library API), in-app purchases, rewarded ads, and opt-in analytics; books can always be added manually without a connection</td>
     </tr>
   </tbody>
 </table>
@@ -264,10 +277,10 @@ My Reading Village is free-to-play with optional in-app purchases. No paywalls b
 | Category                         | Products                 | Price Range  |
 | -------------------------------- | ------------------------ | ------------ |
 | Gem Packs (consumable)           | 6 tiers (50–2000 gems)   | $0.99–$29.99 |
-| Item Packs (consumable)          | 5 bundles (Starter–Mega) | $1.49–$19.99 |
-| Species Unlocks (non-consumable) | 30 paid species          | $0.99–$19.99 |
+| Item Packs (consumable)          | 5 bundles (Starter–Mega) | $1.99–$19.99 |
+| Species Unlocks (non-consumable) | 31 paid species          | $1.99–$13.99 |
 
-**2. AdMob Rewarded Ads (3 placements)**
+**2. Unity Ads Rewarded Ads (3 placements)**
 
 | Placement         | Mechanic                                                |
 | ----------------- | ------------------------------------------------------- |
@@ -281,7 +294,7 @@ Ads are always optional and user-initiated — no interruptions to gameplay.
 
 - 13 seasonal events throughout the year drive re-engagement spikes
 - Multi-branch mission chains provide always-available progression goals
-- 43 collectible species create long-term collection motivation
+- 41 collectible species create long-term collection motivation
 - Habit loop tied to real reading creates daily active use patterns
 
 ### Revenue Projections (Lean Estimate)
@@ -318,12 +331,17 @@ _Assumptions: 2–4% monthly IAP conversion, $3–$5 avg purchase, rewarded ad e
 | Animations           | confetti                                            | ^0.8.0            |
 | Audio                | audioplayers                                        | ^6.1.0            |
 | Notifications        | flutter_local_notifications                         | ^21.0.0           |
-| Monetization         | in_app_purchase + google_mobile_ads                 | ^3.2.0 / ^5.1.0   |
+| Monetization         | in_app_purchase + unity_ads_plugin                  | ^3.2.0 / ^0.3.30  |
+| Analytics            | firebase_core + firebase_analytics                  | ^3.6.0 / ^11.3.3  |
+| Encryption           | encrypt                                             | ^5.0.3            |
+| Charts               | fl_chart                                            | ^0.69.0           |
 | Book Search          | http                                                | ^1.2.2            |
 | Image Picker         | image_picker                                        | ^1.1.2            |
 | File I/O (backup)    | file_picker + path_provider                         | ^10.3.10 / ^2.1.5 |
 | Gallery Save         | gal                                                 | ^2.3.0            |
 | Sharing              | share_plus                                          | ^12.0.1           |
+| URL Launching        | url_launcher                                        | ^6.3.0            |
+| Icons                | font_awesome_flutter                                | ^10.7.0           |
 | Art Pipeline         | AI-generated sprites (Gemini + custom Python tools) | —                 |
 
 ---
@@ -381,29 +399,108 @@ lib/
 
 ---
 
+## Subprojects
+
+This monorepo contains three standalone subprojects alongside the Flutter app.
+
+### `my_reading_village_marketing/` — Social Media Content Generator
+
+A Python toolkit that generates ready-to-post social media content (Instagram/Facebook/TikTok stories and reels) using the game's own assets, brand palette, and villager data.
+
+```bash
+cd my_reading_village_marketing
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# Generate a vertical video story (9:16)
+.venv/bin/python3 scripts/generate.py --template reading_benefits_story --lang en
+.venv/bin/python3 scripts/generate.py --template villager_reveal_reel --villager cat --lang en
+.venv/bin/python3 scripts/generate.py --template gameplay_showcase --lang en
+
+# Generate a static image post (1080×1920 PNG)
+.venv/bin/python3 scripts/generate.py --template villager_spotlight --villager fox --lang en
+.venv/bin/python3 scripts/generate.py --template feature_highlight --lang es
+```
+
+> Requires **FFmpeg** on the system path for video encoding: `sudo apt install ffmpeg`
+
+Templates live in `templates/image/` and `templates/video/`. Generated output goes to `output/` (git-ignored). See [`my_reading_village_marketing/README.md`](my_reading_village_marketing/README.md) for the full template catalog and options.
+
+### `my_reading_village_website/` — Marketing Website
+
+A standalone marketing website deployed on **Netlify**. Built with Vite + React + TypeScript, Tailwind CSS v4, Motion (Framer Motion successor), GSAP + ScrollTrigger, Lenis smooth scroll, and Embla Carousel — all using the exact same kawaii-pastel palette as the app.
+
+Pages: **Home**, **News**, **Privacy Policy**, **Terms & Conditions**.
+
+```bash
+cd my_reading_village_website
+bun install
+bun run dev        # local dev server
+bun run build      # production build → dist/
+```
+
+Deployment is automated via [`netlify.toml`](my_reading_village_website/netlify.toml): every push to `main` triggers `bun run build` and publishes `dist/`. See [`docs/specs/WEBSITE.md`](docs/specs/WEBSITE.md) for the original design brief and brand guidelines.
+
+---
+
 ## Project Structure
 
 ```
 my-reading-village/
 ├── my_reading_village/              # Flutter application root
-│   ├── android/                  # Android platform files + build config
+│   ├── android/                     # Android platform files + build config
 │   ├── assets/
-│   │   ├── audios/               # Background music and sound effect files
-│   │   ├── images/               # Sprites: buildings (3 levels), decorations,
-│   │   │                         #   villagers (43 species), items, resources, logos
-│   │   ├── messages/             # i18n JSON files (en, es, pt, fr, it)
-│   │   └── prompts/
-│   │       └── decorations.md    # AI prompt specifications for all decoration assets
-│   ├── lib/                      # All Dart source code (see Architecture above)
+│   │   ├── audios/                  # Background music and sound effect files
+│   │   ├── images/                  # Sprites: buildings (3 levels), decorations,
+│   │   │                            #   villagers (41 species), items, resources, logos
+│   │   └── messages/                # i18n JSON files (en, es, pt, fr, it)
+│   ├── lib/                         # All Dart source code (see Architecture above)
 │   └── pubspec.yaml
-├── tools/                        # Asset pipeline utilities (Python)
-│   ├── autocrop.py               # Batch remove transparent/empty borders
-│   ├── mirror.py                 # Batch flip images horizontally or vertically
-│   ├── remove_background.py      # Batch background removal via flood-fill
-│   ├── original-images/          # Source images before processing
-│   └── README.md                 # Full usage guide for all tools
-├── LICENSE.md                    # My Reading Village Community License v1.0
-└── README.md                     # This file
+│
+├── my_reading_village_marketing/    # Social media content generator (Python)
+│   ├── palette.py                   # AppTheme colors as Python constants
+│   ├── assets.py                    # Resolved paths to game assets
+│   ├── utils.py                     # Shared PIL helpers (drawing, easing, species data)
+│   ├── templates/
+│   │   ├── image/                   # Static image templates (villager_spotlight, feature_highlight, reading_tip)
+│   │   └── video/                   # Animated video templates (reading_benefits_story, villager_reveal_reel,
+│   │                                #   gameplay_showcase, countdown_story)
+│   ├── scripts/generate.py          # CLI dispatcher
+│   ├── output/                      # Generated content — git-ignored
+│   ├── requirements.txt
+│   └── README.md
+│
+├── my_reading_village_website/      # Marketing website (Vite + React + TS)
+│   ├── src/
+│   │   ├── pages/                   # Home, News, Privacy, Terms
+│   │   ├── components/              # Layout, common, and home-specific components
+│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── data/                    # Static content (news entries, etc.)
+│   │   └── styles/                  # Global CSS and Tailwind tokens
+│   ├── public/                      # Static assets (icons, sitemap, robots.txt)
+│   ├── netlify.toml                  # Netlify build + headers config
+│   ├── package.json                  # Bun-managed dependencies
+│   └── README.md
+│
+├── docs/
+│   ├── specs/
+│   │   ├── FIREBASE.md              # Firebase Analytics one-time setup guide
+│   │   ├── UNITY_ADS.md             # Unity Ads account setup and placement IDs
+│   │   ├── MARKETING.md             # Social media launch guide (Reddit, Instagram, TikTok, YouTube)
+│   │   ├── PLAY_STORE.md            # Google Play publishing workflow
+│   │   ├── VULNERABILITIES.md       # Security feature implementation spec
+│   │   └── WEBSITE.md               # Marketing website design brief
+│   ├── bug_reports/                  # Dated bug reports
+│   └── slides/                       # Presentation decks
+│
+├── tools/                           # Asset pipeline utilities (Python)
+│   ├── autocrop.py                  # Batch remove transparent/empty borders
+│   ├── mirror.py                    # Batch flip images horizontally or vertically
+│   ├── remove_background.py         # Batch background removal via flood-fill
+│   ├── original-images/             # Source images before processing
+│   └── README.md                    # Full usage guide for all tools
+│
+├── LICENSE.md                       # My Reading Village Community License v1.0
+└── README.md                        # This file
 ```
 
 ---
@@ -424,14 +521,63 @@ All data is stored in a local SQLite database on-device. No data is ever transmi
 | `road_tiles`               | Player-placed road terrain tiles                                                                   |
 | `special_tiles`            | Water, sand, and rock terrain markers                                                              |
 | `unlocked_chunks`          | Map expansion tracking — which 5×5 tile chunks are unlocked                                        |
-| `game_state`               | Singleton player profile — XP, level, username, village name, language, settings, ad counters, volume |
+| `game_state`               | Singleton player profile — XP, level, username, village name, language, settings, ad counters, volume, analytics_id |
 | `inventory_items`          | Consumable item quantities — book, sandwich, glasses, hammer                                       |
 | `minigame_cooldowns`       | Per-minigame cooldown end timestamps                                                               |
 | `active_powerups`          | Time-limited active buffs — type, target villager, activation time, duration                       |
 | `mission_progress`         | Mission completion and claim state — plus baseline counters for event delta tracking               |
-| `species_unlocks`          | Roster of unlocked villager species with unlock timestamps                                         |
+| `species_unlocks`          | Roster of unlocked villager species with unlock timestamps and purchase origin flag                |
 | `pending_villager_choices` | Queued house-population dialogs (species/name options per house)                                   |
 | `used_secret_codes`        | Redeemed promotional codes — one-time use per device                                               |
+
+---
+
+## Firebase Analytics
+
+Analytics are **100% opt-in** and **anonymous**. A consent modal is shown after the onboarding tour completes. The user can toggle analytics at any time in **Settings → Data**. The app works identically with analytics on or off.
+
+An anonymous `analytics_id` is generated on first launch and stored in SQLite. It travels with the player's backup file — restoring a backup on a new device preserves the same ID. It has no connection to any personal identifier.
+
+Analytics use the **Firebase Spark plan** (free, no credit card, no event-count limit).
+
+**Events tracked (27+):**
+
+| Category       | Events                                                                                          |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| Reading        | `pages_logged`, `book_completed`, `book_rated`, `book_note_saved`                              |
+| Village        | `building_placed`, `chunk_unlocked`, `level_up`, `species_unlocked`, `villager_choice_made`    |
+| Engagement     | `mission_claimed`, `roulette_spun`, `reading_modal_opened`, `stats_dialog_opened`, `backpack_opened`, `species_gallery_opened`, `store_opened`, `settings_opened` |
+| Monetization   | `ad_watched`, `iap_purchase`                                                                    |
+| Lifecycle      | `photo_taken`, `data_exported`, `data_imported`, `language_changed`, `tutorial_completed`      |
+| Consent        | `analytics_consent_given`, `analytics_consent_revoked`                                         |
+
+**User properties set automatically:** `player_level`, `building_count`, `villager_count`, `expansion_count`, `total_books_completed`, `total_pages_read`, `has_made_iap`, `language`.
+
+For the one-time Firebase project setup (download `google-services.json`, enable DebugView, etc.) see [`docs/specs/FIREBASE.md`](docs/specs/FIREBASE.md).
+
+---
+
+## Security Features
+
+### Species Purchase Protection
+
+A user could export their backup JSON, share it with a friend, and the friend imports it — gaining all paid species ($1.99–$13.99 each) for free. The import pipeline prevents this:
+
+1. `species_unlocks` rows flagged as IAP-purchased (`is_purchased = 1`) are stripped from the imported file.
+2. Any villager whose species was stripped has their species replaced with a random starter species (cat, dog, or rabbit) — the villager itself (name, happiness, house assignment) is preserved.
+3. Any pending villager choice that included a stripped species is removed entirely — the player receives a new choice naturally through gameplay.
+
+A warning dialog is shown when stripping occurs, with a **Restore Purchases** button that lets legitimate users (e.g. reinstalling on a new device) recover paid species via Google Play.
+
+### Date Tampering Detection
+
+Seasonal events are date-gated. A player could set their device clock forward to access out-of-date events or backward to exploit time-based cooldowns. The app detects suspicious clock changes:
+
+- On each app foreground, the app compares the device clock against a trusted internet time source (when online) and against the last recorded timestamp (when offline).
+- A sudden forward jump or backward shift beyond a configurable threshold triggers a **fraud warning popup** — the player is informed that the date appears manipulated and that event progress may be affected.
+- The warning is purely informational (no data is deleted); it serves as a deterrent and preserves trust in the seasonal event system.
+
+For the full implementation spec see [`docs/specs/VULNERABILITIES.md`](docs/specs/VULNERABILITIES.md).
 
 ---
 
@@ -452,8 +598,6 @@ pip install -r requirements.txt
 | `autocrop.py`          | Remove empty/transparent borders with optional padding | `.venv/bin/python3 autocrop.py --padding 5`            |
 
 For full usage details, flags, and examples see [`tools/README.md`](tools/README.md).
-
-AI generation prompts for all game assets (villagers, buildings, decorations, items, and more), including dimensions, style, and palette guidance, are in [`my_reading_village/assets/prompts/`](my_reading_village/assets/prompts/).
 
 ---
 
@@ -520,9 +664,57 @@ flutter build appbundle --release
 # Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
-For the full Google Play publishing workflow (signing, store listing, in-app products, staged rollout) see [`PLAY_STORE.md`](PLAY_STORE.md).
+For the full Google Play publishing workflow (signing, store listing, in-app products, staged rollout) see [`docs/specs/PLAY_STORE.md`](docs/specs/PLAY_STORE.md).
 
-For AdMob account setup, ad unit IDs, and enabling live ads see [`GOOGLE_ADS.md`](GOOGLE_ADS.md).
+For Unity Ads account setup, placement IDs, and enabling live ads see [`docs/specs/UNITY_ADS.md`](docs/specs/UNITY_ADS.md).
+
+For Firebase Analytics setup (replacing the placeholder `google-services.json`) see [`docs/specs/FIREBASE.md`](docs/specs/FIREBASE.md).
+
+---
+
+## Troubleshooting
+
+### `flutter run` hangs at "Waiting for VM Service port to be available..."
+
+**Affected devices:** Honor, Huawei, Nubia, RedMagic, and other Chinese OEM phones running Android 14 or 15 (MagicOS 8, HarmonyOS 4+, RedMagicOS, etc.).
+
+**Root cause:** These devices suppress logcat output for third-party apps by default. Flutter's tool discovers the Dart VM debug port by scanning logcat for the "VM Service listening on..." message — if logcat is silenced, the tool never finds the port and hangs indefinitely. The app itself installs and runs fine; only the debug connection is broken.
+
+**Fix (one-time, survives reboots):**
+
+```bash
+adb shell setprop persist.log.tag I
+```
+
+Then run `flutter run` normally. The `persist.` prefix makes the change permanent across reboots. Without it (`log.tag` without `persist.`) the fix is lost on the next device restart.
+
+**To verify it worked:**
+
+```bash
+adb shell getprop persist.log.tag
+# Should print: I
+```
+
+**To confirm Firebase Analytics is receiving events** (optional, while debugging):
+
+```bash
+# Enable DebugView mode on the device
+adb shell setprop debug.firebase.analytics.app com.ferchostudiodev.my_reading_village
+
+# Then open Firebase Console → Analytics → DebugView
+# Events will appear in real time
+
+# Disable when done
+adb shell setprop debug.firebase.analytics.app .none.
+```
+
+**If `setprop persist.log.tag I` is not enough** (some Honor GT / Magic Pro models), try enabling logging through the device's engineering menu:
+
+1. Open the Phone dialer and dial `*#*#2846579#*#*`
+2. Navigate to **Background Settings**
+3. Enable **Log output** or **Logging always on**
+
+> This issue is tracked upstream in the Flutter repository. The `persist.log.tag I` workaround was confirmed working on Honor Magic 6 Lite, Honor GT Pro, Nubia, and RedMagic devices.
 
 ---
 

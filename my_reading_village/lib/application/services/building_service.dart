@@ -2,6 +2,8 @@ import 'package:my_reading_village/domain/entities/inventory_item.dart';
 import 'package:my_reading_village/domain/entities/placed_building.dart';
 import 'package:my_reading_village/domain/ports/village_repository.dart';
 import 'package:my_reading_village/domain/rules/village_rules.dart';
+import 'package:my_reading_village/infrastructure/di/service_locator.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
 
 class BuildingService {
   final VillageRepository _repo;
@@ -9,12 +11,14 @@ class BuildingService {
 
   static String tileKey(int x, int y) => '$x,$y';
 
+  static DateTime _trustedNow() => sl<TimeVerificationService>().trustedNow();
+
   static Duration effectiveRemainingTime(
       PlacedBuilding b, List<ActivePowerup> powerups) {
     if (b.isConstructed || b.constructionStart == null) return Duration.zero;
     final start = DateTime.parse(b.constructionStart!);
     final total = Duration(minutes: b.constructionDurationMinutes);
-    final now = DateTime.now();
+    final now = _trustedNow();
     if (!now.isAfter(start)) return total;
 
     double effectiveElapsedMs = 0.0;
@@ -254,7 +258,9 @@ class BuildingService {
         final specialType = specialTiles[tileKey(x + dx, y + dy)];
         if (specialType != null &&
             specialType != 'sand' &&
-            specialType != 'rock') return false;
+            specialType != 'rock') {
+          return false;
+        }
         if (!isTileUnlocked(x + dx, y + dy, unlockedChunks)) return false;
       }
     }
@@ -342,8 +348,9 @@ class BuildingService {
     int tileHeight = 1,
     bool isDecoration = false,
   }) async {
-    await _repo.subtractResources(
+    final ok = await _repo.subtractResources(
         coins: coinCost, gems: gemCost, wood: woodCost, metal: metalCost);
+    if (!ok) return null;
 
     final building = PlacedBuilding(
       type: type,
@@ -357,7 +364,7 @@ class BuildingService {
       woodCost: woodCost,
       metalCost: metalCost,
       happinessBonus: happinessBonus,
-      constructionStart: DateTime.now().toIso8601String(),
+      constructionStart: _trustedNow().toIso8601String(),
       constructionDurationMinutes: constructionMinutes,
       isConstructed: false,
       isFlipped: isFlipped,
@@ -376,7 +383,8 @@ class BuildingService {
       if (!b.isConstructed &&
           effectiveRemainingTime(b, powerups) == Duration.zero) {
         b.isConstructed = true;
-        await _repo.markBuildingConstructed(b.id!);
+        await _repo.markBuildingConstructed(
+            b.id!, _trustedNow().toIso8601String());
         completed.add(b);
       }
     }
@@ -413,15 +421,16 @@ class BuildingService {
 
     if (coins < coinCost || wood < woodCost || metal < metalCost) return false;
 
-    await _repo.subtractResources(
+    final ok = await _repo.subtractResources(
         coins: coinCost, wood: woodCost, metal: metalCost);
+    if (!ok) return false;
 
     final newLevel = building.level + 1;
     final constructionMinutes = VillageRules.upgradeConstructionMinutes(
       template['constructionMinutes'] as int,
       building.level,
     );
-    final constructionStart = DateTime.now().toIso8601String();
+    final constructionStart = _trustedNow().toIso8601String();
 
     await _repo.upgradePlacedBuilding(
         buildingId, newLevel, constructionStart, constructionMinutes);
@@ -458,8 +467,14 @@ class BuildingService {
     if (gemCost <= 0) return false;
     if (currentGems < gemCost) return false;
 
-    await _repo.subtractResources(gems: gemCost);
-    await _repo.markBuildingConstructed(buildingId);
+    final ok = await _repo.subtractResources(gems: gemCost);
+    if (!ok) return false;
+    final now = _trustedNow();
+    final completedStart =
+        now.subtract(Duration(minutes: building.constructionDurationMinutes));
+    await _repo.updateConstructionStart(
+        buildingId, completedStart.toIso8601String());
+    await _repo.markBuildingConstructed(buildingId, now.toIso8601String());
     return true;
   }
 
@@ -591,27 +606,16 @@ class BuildingService {
     if (specialTiles.remove(key) != null) await _repo.deleteSpecialTile(x, y);
   }
 
-  Future<bool> expandTerritoryWithGems(int chunkX, int chunkY, int currentGems,
-      int expansionCount, Set<String> unlockedChunks) async {
-    if (!isChunkAdjacentToUnlocked(chunkX, chunkY, unlockedChunks)) {
-      return false;
-    }
-    final cost = VillageRules.expansionGemCost(expansionCount);
-    if (currentGems < cost) return false;
-    await _repo.subtractResources(gems: cost);
-    await _repo.insertUnlockedChunk(chunkX, chunkY);
-    await _repo.incrementExpansionCount();
-    return true;
-  }
-
-  Future<bool> expandTerritoryWithCoins(int chunkX, int chunkY,
+  Future<bool> expandTerritory(int chunkX, int chunkY, int currentGems,
       int currentCoins, int expansionCount, Set<String> unlockedChunks) async {
     if (!isChunkAdjacentToUnlocked(chunkX, chunkY, unlockedChunks)) {
       return false;
     }
-    final cost = VillageRules.expansionCoinCost(expansionCount);
-    if (currentCoins < cost) return false;
-    await _repo.subtractResources(coins: cost);
+    final gemCost = VillageRules.expansionGemCost(expansionCount);
+    final coinCost = VillageRules.expansionCoinCost(expansionCount);
+    if (currentGems < gemCost || currentCoins < coinCost) return false;
+    final ok = await _repo.subtractResources(gems: gemCost, coins: coinCost);
+    if (!ok) return false;
     await _repo.insertUnlockedChunk(chunkX, chunkY);
     await _repo.incrementExpansionCount();
     return true;

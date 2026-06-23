@@ -27,7 +27,8 @@ class MissionData {
         ..._advancedConstructionBranch,
         ..._decoratorBranch,
         ..._villagerBranch,
-        ..._bookTrackingBranch,
+        ..._booksCompletedBranch,
+        ..._pageReadingBranch,
         ..._halloweenBranch,
         ..._thanksgivingBranch,
         ..._christmasBranch,
@@ -471,106 +472,71 @@ class MissionData {
     ),
   ];
 
-  static const List<Mission> _bookTrackingBranch = [
-    Mission(
-      id: 'bt_pages_100',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 100,
-      reward: MissionReward(exp: 25, gems: 3),
-      orderInBranch: 0,
-    ),
-    Mission(
-      id: 'bt_pages_300',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 300,
-      reward: MissionReward(exp: 40, coins: 20, gems: 5),
-      orderInBranch: 1,
-    ),
-    Mission(
-      id: 'bt_books_1',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.booksCompleted,
-      targetCount: 1,
-      reward: MissionReward(exp: 50, coins: 30, gems: 10),
-      orderInBranch: 2,
-    ),
-    Mission(
-      id: 'bt_pages_500',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 500,
-      reward: MissionReward(exp: 60, coins: 40, gems: 12),
-      orderInBranch: 3,
-    ),
-    Mission(
-      id: 'bt_pages_750',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 750,
-      reward: MissionReward(exp: 70, coins: 50, gems: 15),
-      orderInBranch: 4,
-    ),
-    Mission(
-      id: 'bt_books_2',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.booksCompleted,
-      targetCount: 2,
-      reward: MissionReward(exp: 80, coins: 60, gems: 20),
-      orderInBranch: 5,
-    ),
-    Mission(
-      id: 'bt_pages_1000',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 1000,
-      reward: MissionReward(exp: 100, coins: 70, gems: 25),
-      orderInBranch: 6,
-    ),
-    Mission(
-      id: 'bt_pages_1500',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 1500,
-      reward: MissionReward(exp: 120, coins: 90, gems: 30),
-      orderInBranch: 7,
-    ),
-    Mission(
-      id: 'bt_books_4',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.booksCompleted,
-      targetCount: 4,
-      reward: MissionReward(exp: 140, coins: 100, gems: 35),
-      orderInBranch: 8,
-    ),
-    Mission(
-      id: 'bt_pages_2500',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.totalPagesRead,
-      targetCount: 2500,
-      reward: MissionReward(exp: 180, coins: 120, gems: 40),
-      orderInBranch: 9,
-    ),
-    Mission(
-      id: 'bt_books_8',
-      branch: MissionBranch.bookTracking,
-      checkType: MissionCheckType.bm,
-      conditionType: MissionConditionType.booksCompleted,
-      targetCount: 8,
-      reward: MissionReward(exp: 250, coins: 150, gems: 50),
-      orderInBranch: 10,
-    ),
+  static final List<int> _booksCompletedMilestones = _buildBooksMilestones();
+
+  static List<int> _buildBooksMilestones() {
+    final milestones = <int>[];
+    for (int i = 1; i <= 10; i++) {
+      milestones.add(i);
+    }
+    for (int i = 12; i <= 30; i += 2) {
+      milestones.add(i);
+    }
+    int n = 33;
+    while (n < 100) {
+      milestones.add(n);
+      n += 3;
+    }
+    milestones.add(100);
+    return milestones;
+  }
+
+  static final List<int> _pageReadingMilestones = _buildPageMilestones();
+
+  static List<int> _buildPageMilestones() {
+    final milestones = <int>[
+      100, 200, 300, 500, 700, 900, 1100, 1350, 1600,
+      1850, 2100, 2350, 2600, 2900, 3200,
+    ];
+    int p = 3500;
+    while (p < 30000) {
+      milestones.add(p);
+      p += 300;
+    }
+    milestones.add(30000);
+    return milestones;
+  }
+
+  static final List<Mission> _booksCompletedBranch = [
+    for (int i = 0; i < _booksCompletedMilestones.length; i++)
+      Mission(
+        id: 'bc2_books_${_booksCompletedMilestones[i]}',
+        branch: MissionBranch.booksCompleted,
+        checkType: MissionCheckType.bm,
+        conditionType: MissionConditionType.booksCompleted,
+        targetCount: _booksCompletedMilestones[i],
+        reward: MissionReward(
+          exp: 20 + i * 5,
+          gems: (_booksCompletedMilestones[i] ~/ 10) * 2 + 3,
+        ),
+        orderInBranch: i,
+      ),
+  ];
+
+  static final List<Mission> _pageReadingBranch = [
+    for (int i = 0; i < _pageReadingMilestones.length; i++)
+      Mission(
+        id: 'pr_pages_${_pageReadingMilestones[i]}',
+        branch: MissionBranch.pageReading,
+        checkType: MissionCheckType.bm,
+        conditionType: MissionConditionType.totalPagesRead,
+        targetCount: _pageReadingMilestones[i],
+        reward: MissionReward(
+          exp: 15 + i * 3,
+          gems: ((_pageReadingMilestones[i] - 1) ~/ 1500) + 2,
+        ),
+        orderInBranch: i,
+      ),
   ];
 
   static const List<Mission> _halloweenBranch = [

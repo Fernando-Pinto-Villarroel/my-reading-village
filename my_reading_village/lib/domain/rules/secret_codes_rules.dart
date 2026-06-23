@@ -77,14 +77,14 @@ class SecretCodesRules {
       code: 'LOR-ENA-AMU',
       rewards: [
         SecretReward.species('lion'),
-        SecretReward.item('glasses', 3),
-        SecretReward.item('sandwich', 2),
+        SecretReward.item('glasses'),
+        SecretReward.item('sandwich'),
       ],
     ),
     SecretCode(
       code: 'PNK-MNT-LAV',
       rewards: [
-        SecretReward.coins(500),
+        SecretReward.coins(200),
         SecretReward.wood(100),
       ],
     ),
@@ -119,8 +119,8 @@ class SecretCodesRules {
     SecretCode(
       code: 'KWI-PLM-FNT',
       rewards: [
-        SecretReward.coins(1000),
-        SecretReward.metal(150),
+        SecretReward.coins(300),
+        SecretReward.metal(100),
       ],
     ),
     SecretCode(
@@ -129,6 +129,35 @@ class SecretCodesRules {
         SecretReward.species('tiger'),
         SecretReward.item('sandwich'),
         SecretReward.item('hammer'),
+      ],
+    ),
+    SecretCode(
+      code: 'BRZ-KPY-WNT',
+      rewards: [
+        SecretReward.species('capybara'),
+        SecretReward.gems(5),
+      ],
+    ),
+    SecretCode(
+      code: 'PLX-MOO-JVR',
+      rewards: [
+        SecretReward.species('cow'),
+        SecretReward.gems(5),
+      ],
+    ),
+    SecretCode(
+      code: 'WLF-SHR-DNQ',
+      rewards: [
+        SecretReward.species('sheep'),
+        SecretReward.gems(5),
+      ],
+    ),
+    SecretCode(
+      code: 'TNK-ZPR-GLM',
+      rewards: [
+        SecretReward.coins(50),
+        SecretReward.metal(10),
+        SecretReward.gems(2),
       ],
     ),
   ];

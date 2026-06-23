@@ -5,6 +5,8 @@ import 'package:my_reading_village/domain/ports/book_search_port.dart';
 
 class BookSearchAdapter implements BookSearchPort {
   static const _baseUrl = 'https://openlibrary.org/search.json';
+  static const _maxRetries = 3;
+  static const _baseDelayMs = 200;
 
   @override
   Future<List<BookSearchResult>> searchBooks(String query) async {
@@ -12,11 +14,26 @@ class BookSearchAdapter implements BookSearchPort {
 
     final uri = Uri.parse(
         '$_baseUrl?q=${Uri.encodeQueryComponent(query)}&limit=15&fields=title,author_name,number_of_pages_median,cover_i,subject');
-    final http.Response response;
-    try {
-      response = await http.get(uri).timeout(Duration(seconds: 10));
-    } catch (e) {
-      throw BookSearchException('Network error: $e');
+
+    http.Response? response;
+    Object? lastError;
+
+    for (int attempt = 0; attempt < _maxRetries; attempt++) {
+      if (attempt > 0) {
+        await Future.delayed(Duration(milliseconds: _baseDelayMs * (1 << (attempt - 1))));
+      }
+      try {
+        response = await http.get(uri).timeout(Duration(seconds: 10));
+        if (response.statusCode < 500) break;
+        lastError = BookSearchException('API error (${response.statusCode})');
+      } catch (e) {
+        lastError = e;
+        response = null;
+      }
+    }
+
+    if (response == null) {
+      throw BookSearchException('Network error: $lastError');
     }
 
     if (response.statusCode >= 400) {

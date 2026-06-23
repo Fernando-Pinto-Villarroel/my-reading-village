@@ -116,7 +116,7 @@ class _BookFormDialogState extends State<BookFormDialog> {
           child: Text(context.t('cancel')),
         ),
         ElevatedButton(
-          onPressed: _submit,
+          onPressed: _coverLoading ? null : _submit,
           style: ElevatedButton.styleFrom(foregroundColor: Colors.white),
           child: Text(_isEditing ? context.t('save') : context.t('add')),
         ),

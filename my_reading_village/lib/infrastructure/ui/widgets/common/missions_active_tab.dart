@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_reading_village/application/services/audio_service.dart';
 import 'package:my_reading_village/infrastructure/di/service_locator.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/app_toast.dart';
@@ -14,12 +15,46 @@ import 'package:my_reading_village/infrastructure/ui/localization/context_ext.da
 import 'package:my_reading_village/infrastructure/ui/localization/language_provider.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/species_bonus_popup.dart';
 
+String _fmtCount(int n, String locale) =>
+    NumberFormat.decimalPattern(locale).format(n);
+
+String missionTitle(BuildContext context, Mission mission) {
+  final locale = context.read<LanguageProvider>().currentLocale;
+  final count = mission.targetCount ?? 1;
+  if (mission.branch == MissionBranch.booksCompleted) {
+    if (count == 1) return context.t('mission_title_finish_books_one');
+    return context.tw(
+        'mission_title_finish_books', {'amount': _fmtCount(count, locale)});
+  }
+  if (mission.branch == MissionBranch.pageReading) {
+    return context.tw(
+        'mission_title_read_pages', {'amount': _fmtCount(count, locale)});
+  }
+  return context.t('mission_title_${mission.id}');
+}
+
+String missionDesc(BuildContext context, Mission mission) {
+  final locale = context.read<LanguageProvider>().currentLocale;
+  final count = mission.targetCount ?? 1;
+  if (mission.branch == MissionBranch.booksCompleted) {
+    if (count == 1) return context.t('mission_desc_finish_books_one');
+    return context.tw(
+        'mission_desc_finish_books', {'amount': _fmtCount(count, locale)});
+  }
+  if (mission.branch == MissionBranch.pageReading) {
+    return context.tw(
+        'mission_desc_read_pages', {'amount': _fmtCount(count, locale)});
+  }
+  return context.t('mission_desc_${mission.id}');
+}
+
 class MissionColors {
   static const Color basicConstruction = AppTheme.mint;
   static const Color advancedConstruction = AppTheme.skyBlue;
   static const Color decorator = AppTheme.peach;
   static const Color villager = AppTheme.pink;
-  static const Color bookTracking = AppTheme.lavender;
+  static const Color booksCompleted = AppTheme.lavender;
+  static const Color pageReading = Color(0xFFB3E5FC);
   static const Color halloween = Color(0xFFFF8C42);
   static const Color christmas = Color(0xFF66BB6A);
   static const Color easter = Color(0xFFEC407A);
@@ -35,8 +70,10 @@ class MissionColors {
         return decorator;
       case MissionBranch.villager:
         return villager;
-      case MissionBranch.bookTracking:
-        return bookTracking;
+      case MissionBranch.booksCompleted:
+        return booksCompleted;
+      case MissionBranch.pageReading:
+        return pageReading;
       case MissionBranch.halloween:
         return halloween;
       case MissionBranch.thanksgiving:
@@ -76,7 +113,9 @@ class MissionColors {
         return Icons.palette;
       case MissionBranch.villager:
         return Icons.pets;
-      case MissionBranch.bookTracking:
+      case MissionBranch.booksCompleted:
+        return Icons.menu_book;
+      case MissionBranch.pageReading:
         return Icons.auto_stories;
       case MissionBranch.halloween:
         return Icons.nightlight_round;
@@ -275,7 +314,7 @@ class ActiveMissionCard extends StatelessWidget {
           ],
           const SizedBox(height: 8),
           Text(
-            context.t('mission_title_${mission.id}'),
+            missionTitle(context, mission),
             style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -283,7 +322,7 @@ class ActiveMissionCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            context.t('mission_desc_${mission.id}'),
+            missionDesc(context, mission),
             style: TextStyle(
                 fontSize: 12, color: AppTheme.darkText.withValues(alpha: 0.6)),
           ),

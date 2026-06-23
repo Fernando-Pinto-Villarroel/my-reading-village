@@ -59,4 +59,8 @@ class SqliteInventoryRepository implements InventoryRepository {
           pagesAtActivation: pagesAtActivation,
           booksAtActivation: booksAtActivation,
           buildingCountAtActivation: buildingCountAtActivation);
+
+  @override
+  Future<void> deleteMissionProgress(String missionId) =>
+      _db.deleteMissionProgress(missionId);
 }

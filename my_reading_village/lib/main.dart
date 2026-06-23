@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_reading_village/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_village/infrastructure/di/service_locator.dart';
 import 'package:my_reading_village/infrastructure/ui/config/app_theme.dart';
@@ -12,10 +17,23 @@ import 'package:my_reading_village/infrastructure/ui/screens/splash_screen.dart'
 import 'package:my_reading_village/application/services/ad_service.dart';
 import 'package:my_reading_village/application/services/audio_service.dart';
 import 'package:my_reading_village/application/services/notification_service.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
+import 'package:my_reading_village/application/services/store_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppConstants.loadVersion();
+  try {
+    await Firebase.initializeApp();
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  } catch (_) {}
   initServiceLocator();
+  unawaited(sl<TimeVerificationService>().ensureInitialized());
   await sl<LanguageProvider>().load(LanguageProvider.defaultLocale);
   try {
     await sl<NotificationService>().initialize();
@@ -26,6 +44,12 @@ void main() async {
   } catch (_) {}
   try {
     await sl<AudioService>().initialize();
+  } catch (_) {}
+  try {
+    await sl<AnalyticsService>().initialize();
+  } catch (_) {}
+  try {
+    await sl<StoreService>().initialize();
   } catch (_) {}
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyReadingVillageApp());
@@ -56,6 +80,7 @@ class _MyReadingVillageAppState extends State<MyReadingVillageApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       sl<AudioService>().pauseForBackground();
+      sl<TimeVerificationService>().onPause();
     } else if (state == AppLifecycleState.resumed) {
       sl<AudioService>().resumeFromBackground();
     }

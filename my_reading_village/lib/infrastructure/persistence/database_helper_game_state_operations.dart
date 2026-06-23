@@ -16,12 +16,14 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
         [coins, gems, wood, metal]);
   }
 
-  Future<void> subtractResources(
+  Future<bool> subtractResources(
       {int coins = 0, int gems = 0, int wood = 0, int metal = 0}) async {
     final db = await database;
-    await db.rawUpdate(
-        'UPDATE resources SET coins = coins - ?, gems = gems - ?, wood = wood - ?, metal = metal - ? WHERE id = 1',
-        [coins, gems, wood, metal]);
+    final count = await db.rawUpdate(
+        'UPDATE resources SET coins = coins - ?, gems = gems - ?, wood = wood - ?, metal = metal - ? '
+        'WHERE id = 1 AND coins >= ? AND gems >= ? AND wood >= ? AND metal >= ?',
+        [coins, gems, wood, metal, coins, gems, wood, metal]);
+    return count > 0;
   }
 
   Future<List<Map<String, dynamic>>> getVillagers() async {
@@ -178,13 +180,14 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
     return rows.map((r) => r['species_id'] as String).toList();
   }
 
-  Future<void> unlockSpecies(String speciesId) async {
+  Future<void> unlockSpecies(String speciesId, {bool isPurchased = false}) async {
     final db = await database;
     await db.insert(
       'species_unlocks',
       {
         'species_id': speciesId,
-        'unlocked_at': DateTime.now().toIso8601String()
+        'unlocked_at': DateTime.now().toIso8601String(),
+        'is_purchased': isPurchased ? 1 : 0,
       },
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
@@ -322,6 +325,30 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
         'UPDATE game_state SET species_manual_refresh_seed = species_manual_refresh_seed + 1 WHERE id = 1');
   }
 
+  Future<({int excludedPages, int excludedBooks})>
+      getReadingMissionExclusions() async {
+    final state = await getGameState();
+    return (
+      excludedPages:
+          state['reading_mission_excluded_pages'] as int? ?? 0,
+      excludedBooks:
+          state['reading_mission_excluded_books'] as int? ?? 0,
+    );
+  }
+
+  Future<void> saveReadingMissionExclusions(
+      {required int pages, required int books}) async {
+    final db = await database;
+    await db.update(
+      'game_state',
+      {
+        'reading_mission_excluded_pages': pages,
+        'reading_mission_excluded_books': books,
+      },
+      where: 'id = 1',
+    );
+  }
+
   Future<bool> isSecretCodeUsed(String code) async {
     final db = await database;
     final normalized = code.toUpperCase();
@@ -337,6 +364,69 @@ extension DatabaseHelperGameStateOperations on DatabaseHelper {
       'used_secret_codes',
       {'code': normalized, 'redeemed_at': DateTime.now().toIso8601String()},
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> getAnalyticsConsent() async {
+    final state = await getGameState();
+    return state['analytics_consent'] as int? ?? -1;
+  }
+
+  Future<void> setAnalyticsConsent(int value) async {
+    final db = await database;
+    await db.update('game_state', {'analytics_consent': value}, where: 'id = 1');
+  }
+
+  Future<String> getAnalyticsId() async {
+    final state = await getGameState();
+    return state['analytics_id'] as String? ?? '';
+  }
+
+  Future<void> setAnalyticsId(String id) async {
+    final db = await database;
+    await db.update('game_state', {'analytics_id': id}, where: 'id = 1');
+  }
+
+  Future<DateTime?> getLastSeenAt() async {
+    final state = await getGameState();
+    final val = state['last_seen_at'] as String?;
+    return val != null ? DateTime.parse(val) : null;
+  }
+
+  Future<void> setLastSeenAt(DateTime dt) async {
+    final db = await database;
+    await db.update('game_state', {'last_seen_at': dt.toIso8601String()},
+        where: 'id = 1');
+  }
+
+  Future<DateTime?> getLastTrustedAt() async {
+    final state = await getGameState();
+    final val = state['last_trusted_at'] as String?;
+    return val != null ? DateTime.parse(val) : null;
+  }
+
+  Future<void> setLastTrustedAt(DateTime dt) async {
+    final db = await database;
+    await db.update('game_state', {'last_trusted_at': dt.toIso8601String()},
+        where: 'id = 1');
+  }
+
+  Future<bool> isPurchaseProcessed(String purchaseKey) async {
+    final db = await database;
+    final rows = await db.query('processed_purchases',
+        where: 'purchase_key = ?', whereArgs: [purchaseKey], limit: 1);
+    return rows.isNotEmpty;
+  }
+
+  Future<void> markPurchaseProcessed(String purchaseKey) async {
+    final db = await database;
+    await db.insert(
+      'processed_purchases',
+      {
+        'purchase_key': purchaseKey,
+        'processed_at': DateTime.now().toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 }

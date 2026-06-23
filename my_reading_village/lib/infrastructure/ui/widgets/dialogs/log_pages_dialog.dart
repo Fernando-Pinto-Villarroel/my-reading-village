@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:my_reading_village/infrastructure/ui/config/app_theme.dart';
@@ -9,8 +10,10 @@ import 'package:my_reading_village/infrastructure/ui/localization/language_provi
 import 'package:my_reading_village/domain/rules/reading_rules.dart';
 import 'package:my_reading_village/infrastructure/di/service_locator.dart';
 import 'package:my_reading_village/application/services/audio_service.dart';
-import 'package:my_reading_village/app_constants.dart';
-import 'package:intl/intl.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
+
+Completer<void>? _activeCompletionFlow;
+Future<void>? get activeBookCompletionFlow => _activeCompletionFlow?.future;
 
 void showLogPagesDialog(BuildContext context, int bookId) {
   final bookProvider = context.read<BookProvider>();
@@ -193,80 +196,10 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                 setDialogState(() => timeError = null);
 
                 final db = DatabaseHelper();
-                int pagesToLog = pages;
-                if (!AppConstants.testMode) {
-                  const int dailyPageLimit = ReadingRules.dailyPageLimit;
-                  final todayPages = await db.getPagesReadForDate(selectedDate);
-                  final formattedDate =
-                      DateFormat('MMM d, yyyy').format(selectedDate);
-                  if (todayPages >= dailyPageLimit) {
-                    if (dialogCtx.mounted) {
-                      showDialog(
-                        context: dialogCtx,
-                        builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          title: Text(
-                              langProvider.translate('daily_limit_title'),
-                              textAlign: TextAlign.center),
-                          content: Text(
-                              langProvider
-                                  .translate('daily_limit_reached_message')
-                                  .replaceAll('{date}', formattedDate),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: AppTheme.darkText
-                                      .withValues(alpha: 0.8))),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: Text(langProvider.translate('close')),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    return;
-                  }
-                  final allowedPages =
-                      (dailyPageLimit - todayPages).clamp(0, pages);
-                  if (allowedPages < pages && dialogCtx.mounted) {
-                    final confirmed = await showDialog<bool>(
-                      context: dialogCtx,
-                      builder: (ctx) => AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        title: Text(langProvider.translate('daily_limit_title'),
-                            textAlign: TextAlign.center),
-                        content: Text(
-                            langProvider
-                                .translate('daily_limit_partial_message')
-                                .replaceAll('{date}', formattedDate)
-                                .replaceAll('{allowed}', '$allowedPages')
-                                .replaceAll('{limit}', '$dailyPageLimit'),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color:
-                                    AppTheme.darkText.withValues(alpha: 0.8))),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: Text(langProvider.translate('cancel')),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: Text(langProvider
-                                .translate('log_partial_button')
-                                .replaceAll('{pages}', '$allowedPages')),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirmed != true) return;
-                  }
-                  pagesToLog = allowedPages < pages ? allowedPages : pages;
-                }
+                final int pagesToLog = pages;
                 if (pagesToLog <= 0) return;
+                final todayPagesBefore =
+                    await db.getPagesReadForDate(selectedDate);
 
                 if (!dialogCtx.mounted) return;
                 Navigator.pop(dialogCtx);
@@ -280,24 +213,25 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                 final gemsEarned = rewards['gems'] as int;
                 final woodEarned = rewards['wood'] as int;
                 final metalEarned = rewards['metal'] as int;
-                final expEarned = rewards['exp'] as int;
 
-                if (context.mounted) {
-                  await villageProvider.addResources(
-                    coins: coinsEarned,
-                    gems: gemsEarned,
-                    wood: woodEarned,
-                    metal: metalEarned,
-                  );
-                  if (expEarned > 0) {
-                    await villageProvider.addExp(expEarned);
-                  }
-                  final totalPages = await db.getTotalPagesRead();
-                  final completedBooksCount = await db.getCompletedBooksCount();
-                  await villageProvider.checkMissions(
-                      totalPagesRead: totalPages,
-                      completedBooks: completedBooksCount);
-                }
+                await villageProvider.addResources(
+                  coins: coinsEarned,
+                  gems: gemsEarned,
+                  wood: woodEarned,
+                  metal: metalEarned,
+                );
+                final totalPages = await db.getTotalPagesRead();
+                final completedBooksCount = await db.getCompletedBooksCount();
+                await villageProvider.checkMissions(
+                    totalPagesRead: totalPages,
+                    completedBooks: completedBooksCount);
+
+                final todayPagesAfter =
+                    await db.getPagesReadForDate(selectedDate);
+                final showCelebration = todayPagesBefore <
+                        ReadingRules.dailyPageCelebrationThreshold &&
+                    todayPagesAfter >=
+                        ReadingRules.dailyPageCelebrationThreshold;
 
                 if (context.mounted) {
                   sl<AudioService>().playVillagerUnlockedSound();
@@ -309,8 +243,12 @@ void showLogPagesDialog(BuildContext context, int bookId) {
                     rewards['metal'] as int,
                     rewards['bookCompleted'] as bool,
                     rewards['rewardablePages'] as int,
+                    rewards['shortBookNoGems'] as bool? ?? false,
                     bookId: bookId,
                     bookProvider: bookProvider,
+                    showCelebration: showCelebration,
+                    todayTotalPages: todayPagesAfter,
+                    langProvider: langProvider,
                   );
                 }
               },
@@ -433,12 +371,27 @@ Future<int?> _showPageCalculatorModal(
   );
 }
 
-void _showRewardPopup(BuildContext context, int coins, int gems, int wood,
-    int metal, bool bookCompleted, int rewardablePages,
-    {int? bookId, BookProvider? bookProvider}) {
+void _showRewardPopup(
+    BuildContext context,
+    int coins,
+    int gems,
+    int wood,
+    int metal,
+    bool bookCompleted,
+    int rewardablePages,
+    bool shortBookNoGems, {
+    int? bookId,
+    BookProvider? bookProvider,
+    bool showCelebration = false,
+    int todayTotalPages = 0,
+    LanguageProvider? langProvider,
+  }) {
+  final completer = Completer<void>();
+  _activeCompletionFlow = completer;
+
   late OverlayEntry overlayEntry;
   overlayEntry = OverlayEntry(
-    builder: (context) => RewardPopup(
+    builder: (_) => RewardPopup(
       coinsEarned: coins,
       gemsEarned: gems,
       woodEarned: wood,
@@ -447,24 +400,157 @@ void _showRewardPopup(BuildContext context, int coins, int gems, int wood,
       rewardablePages: rewardablePages,
       onDismiss: () {
         overlayEntry.remove();
-        if (bookCompleted &&
-            bookId != null &&
-            bookProvider != null &&
-            context.mounted) {
-          _showRatingDialog(context, bookId, bookProvider);
-        }
+        _processPostRewardDialogs(
+          context,
+          showCelebration: showCelebration,
+          todayTotalPages: todayTotalPages,
+          showShortBookReflection: shortBookNoGems,
+          bookCompleted: bookCompleted,
+          bookId: bookId,
+          bookProvider: bookProvider,
+          langProvider: langProvider,
+        ).whenComplete(() {
+          if (!completer.isCompleted) completer.complete();
+          _activeCompletionFlow = null;
+        });
       },
     ),
   );
   Overlay.of(context).insert(overlayEntry);
 }
 
-void _showRatingDialog(
-    BuildContext context, int bookId, BookProvider bookProvider) {
+Future<void> _processPostRewardDialogs(
+  BuildContext context, {
+  required bool showCelebration,
+  required int todayTotalPages,
+  required bool showShortBookReflection,
+  required bool bookCompleted,
+  int? bookId,
+  BookProvider? bookProvider,
+  LanguageProvider? langProvider,
+}) async {
+  final lang = langProvider ?? context.read<LanguageProvider>();
+  if (!context.mounted) return;
+  if (showCelebration) {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppTheme.cream,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.auto_awesome, color: AppTheme.pink, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                lang.translate('reading_celebration_title'),
+                style: TextStyle(
+                  color: AppTheme.darkText,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.auto_awesome, color: AppTheme.pink, size: 22),
+          ],
+        ),
+        content: Text(
+          lang
+              .translate('reading_celebration_message')
+              .replaceAll('{pages}', '$todayTotalPages'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppTheme.darkText.withAlpha(200),
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.pink,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text(lang.translate('got_it')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  if (!context.mounted) return;
+  if (showShortBookReflection) {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppTheme.cream,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.menu_book_rounded,
+                color: AppTheme.lavender, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                lang.translate('short_book_no_gems_title'),
+                style: TextStyle(
+                  color: AppTheme.darkText,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          lang.translate('short_book_no_gems_message'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppTheme.darkText.withAlpha(200),
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.lavender,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text(lang.translate('got_it')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  if (!context.mounted) return;
+  if (bookCompleted && bookId != null && bookProvider != null) {
+    await _showRatingDialog(context, bookId, bookProvider);
+    if (!context.mounted) return;
+    await showBookNotesDialog(context, bookId, bookProvider);
+  }
+}
+
+Future<void> _showRatingDialog(
+    BuildContext context, int bookId, BookProvider bookProvider) async {
   int selectedRating = 0;
   final langProvider = context.read<LanguageProvider>();
 
-  showDialog(
+  await showDialog<void>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => StatefulBuilder(
@@ -520,10 +606,11 @@ void _showRatingDialog(
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(ctx);
               if (selectedRating > 0) {
                 await bookProvider.rateBook(bookId, selectedRating);
+                sl<AnalyticsService>().logBookRated(selectedRating);
               }
+              if (ctx.mounted) Navigator.pop(ctx);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.coinGold,
@@ -533,6 +620,112 @@ void _showRatingDialog(
           ),
         ],
       ),
+    ),
+  );
+}
+
+Future<void> showBookNotesDialog(
+    BuildContext context, int bookId, BookProvider bookProvider,
+    {String? initialNote}) async {
+  final langProvider = context.read<LanguageProvider>();
+  final notesController = TextEditingController(text: initialNote ?? '');
+
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => OrientationBuilder(
+      builder: (ctx, orientation) {
+        final landscape = orientation == Orientation.landscape;
+        return StatefulBuilder(
+          builder: (ctx, setState) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            backgroundColor: AppTheme.cream,
+            titlePadding: EdgeInsets.fromLTRB(20, landscape ? 12 : 20, 20, 0),
+            contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            title: Column(
+              children: [
+                if (!landscape) ...[
+                  Icon(Icons.note_alt_outlined, size: 28, color: AppTheme.lavender),
+                  SizedBox(height: 6),
+                ],
+                Text(
+                  langProvider.translate('book_note_title'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: landscape ? 16 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkText,
+                  ),
+                ),
+                if (!landscape) ...[
+                  SizedBox(height: 4),
+                  Text(
+                    langProvider.translate('book_note_subtitle'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.darkText.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: TextField(
+                controller: notesController,
+                maxLength: 500,
+                maxLines: landscape ? 2 : 4,
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(
+                  hintText: langProvider.translate('book_note_hint'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.lavender.withValues(alpha: 0.4)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.lavender.withValues(alpha: 0.4)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.lavender),
+                  ),
+                  counterStyle: TextStyle(
+                    fontSize: 11,
+                    color: notesController.text.length >= 480
+                        ? AppTheme.pink
+                        : AppTheme.darkText.withValues(alpha: 0.45),
+                  ),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  langProvider.translate('skip_note'),
+                  style: TextStyle(color: AppTheme.darkText.withValues(alpha: 0.6)),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: notesController.text.trim().isEmpty
+                    ? null
+                    : () async {
+                        Navigator.pop(ctx);
+                        await bookProvider.saveBookNote(
+                            bookId, notesController.text.trim());
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.lavender,
+                  foregroundColor: AppTheme.darkText,
+                  disabledBackgroundColor: AppTheme.lavender.withValues(alpha: 0.3),
+                ),
+                child: Text(langProvider.translate('save_note')),
+              ),
+            ],
+          ),
+        );
+      },
     ),
   );
 }

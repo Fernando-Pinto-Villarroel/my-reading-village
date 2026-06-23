@@ -200,6 +200,11 @@ class BookProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> saveBookNote(int bookId, String note) async {
+    await _readingSvc.saveBookNote(bookId, note, _books);
+    notifyListeners();
+  }
+
   Future<int> getTotalPagesRead() => _readingSvc.getTotalPagesRead();
   Future<int> getCompletedBooksCount() => _readingSvc.getCompletedBooksCount();
   Future<int> getTotalSessionsCount() => _readingSvc.getTotalSessionsCount();

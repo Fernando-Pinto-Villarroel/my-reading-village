@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Security — never commit the encryption key
+lib/infrastructure/security/backup_key.dart

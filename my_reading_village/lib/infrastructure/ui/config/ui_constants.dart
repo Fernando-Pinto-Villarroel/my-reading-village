@@ -5,4 +5,5 @@ class UiConstants {
   static const double minZoom = 0.1;
   static const double maxZoom = 3.0;
   static const double zoomStep = 0.2;
+  static const double seaBorderTiles = 10.0;
 }

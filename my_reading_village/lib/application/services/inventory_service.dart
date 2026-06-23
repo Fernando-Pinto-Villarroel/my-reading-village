@@ -216,8 +216,4 @@ class InventoryService {
     return rewardType;
   }
 
-  Future<void> cleanupExpiredPowerups(List<ActivePowerup> powerups) async {
-    await _invRepo.deleteExpiredPowerups();
-    powerups.removeWhere((p) => !p.isActive);
-  }
 }

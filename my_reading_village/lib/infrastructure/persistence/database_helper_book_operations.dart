@@ -34,6 +34,16 @@ extension DatabaseHelperBookOperations on DatabaseHelper {
     await db.update('books', {'rating': rating}, where: 'id = ?', whereArgs: [bookId]);
   }
 
+  Future<void> updateBookNote(int bookId, String note) async {
+    final db = await database;
+    await db.update('books', {'notes': note}, where: 'id = ?', whereArgs: [bookId]);
+  }
+
+  Future<void> updateBookCompletedAt(int bookId, String? completedAt) async {
+    final db = await database;
+    await db.update('books', {'completed_at': completedAt}, where: 'id = ?', whereArgs: [bookId]);
+  }
+
   Future<void> deleteBook(int bookId) async {
     final db = await database;
     await db.delete('book_tags', where: 'book_id = ?', whereArgs: [bookId]);
@@ -175,6 +185,82 @@ extension DatabaseHelperBookOperations on DatabaseHelper {
       result[(row['month_idx'] as int?) ?? 0] = (row['pages'] as int?) ?? 0;
     }
     return result;
+  }
+
+  Future<Map<int, int>> getCompletedBooksByDayOfWeek(DateTime monday) async {
+    final db = await database;
+    final start = '${monday.year.toString().padLeft(4, '0')}-'
+        '${monday.month.toString().padLeft(2, '0')}-'
+        '${monday.day.toString().padLeft(2, '0')}';
+    final end = monday.add(const Duration(days: 7));
+    final endStr = '${end.year.toString().padLeft(4, '0')}-'
+        '${end.month.toString().padLeft(2, '0')}-'
+        '${end.day.toString().padLeft(2, '0')}';
+    final rows = await db.rawQuery(
+      "SELECT strftime('%Y-%m-%d', completed_at) as day, COUNT(*) as cnt "
+      "FROM books WHERE completed_at >= ? AND completed_at < ? AND is_completed = 1 GROUP BY day",
+      [start, endStr],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      final parsed = DateTime.tryParse(row['day'] as String);
+      if (parsed != null) result[parsed.weekday - 1] = (row['cnt'] as int?) ?? 0;
+    }
+    return result;
+  }
+
+  Future<Map<int, int>> getCompletedBooksByWeekOfMonth(int year, int month) async {
+    final db = await database;
+    final monthStr = '${year.toString().padLeft(4, '0')}-'
+        '${month.toString().padLeft(2, '0')}';
+    final rows = await db.rawQuery(
+      "SELECT (CAST(strftime('%d', completed_at) AS INTEGER) - 1) / 7 as week_idx, "
+      "COUNT(*) as cnt FROM books "
+      "WHERE strftime('%Y-%m', completed_at) = ? AND is_completed = 1 GROUP BY week_idx",
+      [monthStr],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      result[(row['week_idx'] as int?) ?? 0] = (row['cnt'] as int?) ?? 0;
+    }
+    return result;
+  }
+
+  Future<Map<int, int>> getCompletedBooksByMonthOfYear(int year) async {
+    final db = await database;
+    final rows = await db.rawQuery(
+      "SELECT CAST(strftime('%m', completed_at) AS INTEGER) - 1 as month_idx, "
+      "COUNT(*) as cnt FROM books "
+      "WHERE strftime('%Y', completed_at) = ? AND is_completed = 1 GROUP BY month_idx",
+      [year.toString()],
+    );
+    final result = <int, int>{};
+    for (final row in rows) {
+      result[(row['month_idx'] as int?) ?? 0] = (row['cnt'] as int?) ?? 0;
+    }
+    return result;
+  }
+
+  Future<int> getReadingMinutesInPeriod(String startDate, String endDate) async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT COALESCE(SUM(time_taken_minutes), 0) as total FROM reading_sessions '
+      'WHERE date >= ? AND date < ? AND time_taken_minutes IS NOT NULL',
+      [startDate, endDate],
+    );
+    return result.first['total'] as int;
+  }
+
+  Future<List<Map<String, dynamic>>> getPagesByBookInPeriod(
+      String startDate, String endDate) async {
+    final db = await database;
+    return db.rawQuery(
+      'SELECT b.title, SUM(rs.pages_read) as pages '
+      'FROM reading_sessions rs JOIN books b ON rs.book_id = b.id '
+      'WHERE rs.date >= ? AND rs.date < ? '
+      'GROUP BY rs.book_id ORDER BY pages DESC',
+      [startDate, endDate],
+    );
   }
 
   Future<List<Map<String, dynamic>>> getTags() async {

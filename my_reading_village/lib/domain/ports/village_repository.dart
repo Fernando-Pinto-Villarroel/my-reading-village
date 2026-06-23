@@ -2,7 +2,7 @@ abstract class VillageRepository {
   Future<List<Map<String, dynamic>>> getPlacedBuildings();
   Future<int> insertPlacedBuilding(Map<String, dynamic> building);
   Future<void> updateConstructionStart(int buildingId, String constructionStart);
-  Future<void> markBuildingConstructed(int buildingId);
+  Future<void> markBuildingConstructed(int buildingId, String completedAt);
   Future<void> upgradePlacedBuilding(int id, int newLevel, String constructionStart, int constructionMinutes);
   Future<void> deletePlacedBuilding(int buildingId);
   Future<void> revertBuildingUpgrade(int id, int previousLevel, int previousMinutes);
@@ -18,7 +18,7 @@ abstract class VillageRepository {
   Future<void> insertUnlockedChunk(int chunkX, int chunkY);
   Future<Map<String, dynamic>> getResources();
   Future<void> addResources({int coins = 0, int gems = 0, int wood = 0, int metal = 0});
-  Future<void> subtractResources({int coins = 0, int gems = 0, int wood = 0, int metal = 0});
+  Future<bool> subtractResources({int coins = 0, int gems = 0, int wood = 0, int metal = 0});
   Future<List<Map<String, dynamic>>> getVillagers();
   Future<int> insertVillager(String name, String species, int houseId);
   Future<void> updateVillagerHappiness(int villagerId, int happiness);
@@ -35,7 +35,7 @@ abstract class VillageRepository {
   Future<({String? week, int count})> getRouletteSpinWeekData();
   Future<void> setRouletteSpinWeekData(String week, int count);
   Future<List<String>> getUnlockedSpeciesIds();
-  Future<void> unlockSpecies(String speciesId);
+  Future<void> unlockSpecies(String speciesId, {bool isPurchased = false});
   Future<bool> isSpeciesUnlocked(String speciesId);
   Future<Map<String, String>> getEventSpeciesOverrides();
   Future<void> setEventSpeciesOverrides(Map<String, String> overrides);
@@ -69,4 +69,9 @@ abstract class VillageRepository {
   Future<void> saveStoreGemSeenDate(String date);
   Future<int> getSpeciesManualRefreshSeed();
   Future<void> incrementSpeciesManualRefreshSeed();
+  Future<({int excludedPages, int excludedBooks})> getReadingMissionExclusions();
+  Future<void> saveReadingMissionExclusions(
+      {required int pages, required int books});
+  Future<bool> isPurchaseProcessed(String purchaseKey);
+  Future<void> markPurchaseProcessed(String purchaseKey);
 }

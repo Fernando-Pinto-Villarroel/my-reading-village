@@ -141,14 +141,14 @@ class _ReadingCalculatorContentState extends State<_ReadingCalculatorContent> {
         );
       case _ResourceType.gems:
         final booksForGems =
-            (target / ReadingRules.bookCompletionGemBonus).ceil();
+            (target / ReadingRules.bookCompletionGemBonusDefault).ceil();
         return _CalculationResult(
           resourceType: type,
           target: target,
           pagesNeeded: null,
           booksNeeded: booksForGems,
           ratePerPage: null,
-          bonusPerBook: ReadingRules.bookCompletionGemBonus,
+          bonusPerBook: null,
         );
       case _ResourceType.wood:
         final pagesForWood = (target / ReadingRules.woodPerPage).ceil();
@@ -692,7 +692,9 @@ class _ResultCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
           ],
-          if (result.booksNeeded != null)
+          if (result.resourceType == _ResourceType.gems) ...[
+            _GemResultSection(target: result.target),
+          ] else if (result.booksNeeded != null) ...[
             _ResultRow(
               icon: Icons.auto_stories,
               color: AppTheme.darkPink,
@@ -704,16 +706,6 @@ class _ResultCard extends StatelessWidget {
                       .t('calculator_bonus_per_book')
                       .replaceAll('{bonus}', '${result.bonusPerBook}')
                   : null,
-            ),
-          if (result.resourceType == _ResourceType.gems) ...[
-            const SizedBox(height: 8),
-            Text(
-              context.t('calculator_gems_note'),
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.darkText.withValues(alpha: 0.55),
-                fontStyle: FontStyle.italic,
-              ),
             ),
           ],
         ],
@@ -809,6 +801,134 @@ class _GoalRangeErrorCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _GemResultSection extends StatelessWidget {
+  final int target;
+  const _GemResultSection({required this.target});
+
+  static const _tiers = [
+    (label: '500+', gems: 18),
+    (label: '350–499', gems: 13),
+    (label: '200–349', gems: 10),
+    (label: '100–199', gems: 5),
+    (label: '50–99', gems: 2),
+    (label: '<50', gems: 0),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final booksLong = (target / 18).ceil();
+    final booksMid = (target / 10).ceil();
+    final booksShort = (target / 2).ceil();
+    final pLabel = context.t('pages_label');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ResultRow(
+          icon: Icons.auto_stories,
+          color: AppTheme.gemPurple,
+          text: context
+              .t('calculator_gems_scenario_long')
+              .replaceAll('{books}', '$booksLong'),
+          detail: context.t('calculator_gems_detail_long'),
+        ),
+        const SizedBox(height: 8),
+        _ResultRow(
+          icon: Icons.menu_book_rounded,
+          color: AppTheme.darkLavender,
+          text: context
+              .t('calculator_gems_scenario_std')
+              .replaceAll('{books}', '$booksMid'),
+          detail: context.t('calculator_gems_detail_std'),
+        ),
+        const SizedBox(height: 8),
+        _ResultRow(
+          icon: Icons.book_outlined,
+          color: AppTheme.mediumMint,
+          text: context
+              .t('calculator_gems_scenario_short')
+              .replaceAll('{books}', '$booksShort'),
+          detail: context.t('calculator_gems_detail_short'),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          context.t('calculator_gems_tier_title'),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.darkText.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: _tiers.map((tier) {
+            final hasReward = tier.gems > 0;
+            return Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              decoration: BoxDecoration(
+                color: hasReward
+                    ? AppTheme.gemPurple.withValues(alpha: 0.07)
+                    : Colors.grey.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: hasReward
+                      ? AppTheme.gemPurple.withValues(alpha: 0.35)
+                      : Colors.grey.withValues(alpha: 0.25),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${tier.label} $pLabel',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: hasReward
+                          ? AppTheme.darkText.withValues(alpha: 0.75)
+                          : Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Container(
+                    width: 1,
+                    height: 12,
+                    color: hasReward
+                        ? AppTheme.gemPurple.withValues(alpha: 0.4)
+                        : Colors.grey.withValues(alpha: 0.3),
+                  ),
+                  const SizedBox(width: 5),
+                  if (hasReward) ...[
+                    ResourceIcon.gem(size: 12),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${tier.gems}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.gemPurple,
+                      ),
+                    ),
+                  ] else
+                    Text(
+                      '—',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.withValues(alpha: 0.6),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

@@ -28,8 +28,9 @@ class VillagerService {
     int cap = 0;
     for (final b in buildings) {
       if (b.type != type) continue;
-      if (!_buildingService.isBuildingRoadConnected(b, roadTiles, buildings))
+      if (!_buildingService.isBuildingRoadConnected(b, roadTiles, buildings)) {
         continue;
+      }
       final effectiveLevel = _buildingService.effectiveBuildingLevel(b);
       if (effectiveLevel <= 0) continue;
       cap += VillageRules.buildingCapacity(b.type, effectiveLevel);
@@ -85,12 +86,12 @@ class VillagerService {
     }).toList();
   }
 
-  void updateVillagerHappiness(
+  Future<void> updateVillagerHappiness(
       List<Villager> villagers,
       List<PlacedBuilding> buildings,
       Set<String> roadTiles,
       List<ActivePowerup> activePowerups,
-      int playerLevel) {
+      int playerLevel) async {
     if (villagers.isEmpty) return;
 
     for (int i = 0; i < villagers.length; i++) {
@@ -111,7 +112,7 @@ class VillagerService {
 
       villagers[i].happiness = happiness;
       if (villagers[i].id != null) {
-        _repo.updateVillagerHappiness(villagers[i].id!, happiness);
+        await _repo.updateVillagerHappiness(villagers[i].id!, happiness);
       }
     }
   }

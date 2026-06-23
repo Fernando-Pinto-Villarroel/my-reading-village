@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ import 'package:my_reading_village/application/services/building_service.dart';
 import 'package:my_reading_village/application/services/notification_service.dart';
 import 'package:my_reading_village/app_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
+import 'package:my_reading_village/application/services/store_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void showSettingsDialog(BuildContext context, VillageProvider village,
@@ -51,6 +54,8 @@ class _SettingsDialogState extends State<_SettingsDialog>
   String? _usernameError;
   String? _townNameError;
   int _currentTab = 0;
+  bool _analyticsEnabled = false;
+  bool _restoringPurchases = false;
 
   @override
   void initState() {
@@ -63,6 +68,7 @@ class _SettingsDialogState extends State<_SettingsDialog>
     });
     _usernameCtrl = TextEditingController(text: widget.village.username);
     _townNameCtrl = TextEditingController(text: widget.village.townName);
+    _analyticsEnabled = sl<AnalyticsService>().isEnabled;
   }
 
   @override
@@ -99,23 +105,71 @@ class _SettingsDialogState extends State<_SettingsDialog>
       );
       if (saved && result.saveToDownloads && mounted) {
         showSuccessToast(context, context.t('export_saved_to_downloads'));
+        sl<AnalyticsService>().logDataExported();
       }
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        showAppToast(context, context.t('export_error'),
+            backgroundColor: const Color(0xFFE53935),
+            icon: Icons.error_outline,
+            duration: const Duration(seconds: 4));
+      }
+    }
   }
 
   Future<void> _handleImport() async {
     final confirmed = await _showImportWarning(context);
     if (confirmed != true || !mounted) return;
     try {
-      final success = await sl<BackupService>().importData();
-      if (success && mounted) {
-        await widget.village.loadData();
-        await sl<BookProvider>().loadData();
-        await sl<TagProvider>().loadTags();
-        VillagerFavorites.setLocale(widget.village.language);
-        await VillagerFavorites.load();
-        if (mounted) Navigator.pop(context);
+      final backup = sl<BackupService>();
+      final picked = await backup.pickAndValidate();
+      if (picked == null || !mounted) return;
+
+      bool countForMissions = false;
+      if (picked.hasBooksData) {
+        final choice = await _showReadingMissionsChoice(context);
+        if (choice == null || !mounted) return;
+        countForMissions = choice;
       }
+
+      await backup.doImport(picked.data);
+      if (!mounted) return;
+
+      await widget.village.loadData();
+      await sl<LanguageProvider>().load(widget.village.language);
+      await sl<AnalyticsService>().initialize();
+      await sl<BookProvider>().loadData();
+      await sl<TagProvider>().loadTags();
+      VillagerFavorites.setLocale(widget.village.language);
+      await VillagerFavorites.load();
+      if (!mounted) return;
+
+      if (picked.hadPurchasedSpeciesStripped) {
+        await _showPurchasedSpeciesStrippedDialog(context);
+        if (!mounted) return;
+      }
+
+      if (picked.hasBooksData) {
+        if (countForMissions) {
+          final totals = await backup.parseImportedReadingTotals(picked.data);
+          if (!mounted) return;
+          await widget.village.bulkPrecompleteMissionsForImport(
+            totalPages: totals.totalPages,
+            completedBooks: totals.completedBooks,
+          );
+          await widget.village.applyReadingMissionExclusions(pages: 0, books: 0);
+        } else {
+          final totals = await backup.parseImportedReadingTotals(picked.data);
+          if (!mounted) return;
+          await widget.village.applyReadingMissionExclusions(
+            pages: totals.totalPages,
+            books: totals.completedBooks,
+          );
+        }
+      }
+
+      sl<AnalyticsService>().logDataImported();
+      if (mounted) Navigator.pop(context);
     } on FormatException catch (e) {
       if (!mounted) return;
       final msg = _importErrorMessage(context, e.message);
@@ -123,7 +177,37 @@ class _SettingsDialogState extends State<_SettingsDialog>
           backgroundColor: const Color(0xFFE53935),
           icon: Icons.error_outline,
           duration: const Duration(seconds: 4));
-    } catch (_) {}
+    } catch (_) {
+      if (!mounted) return;
+      showAppToast(context, context.t('import_failed'),
+          backgroundColor: const Color(0xFFE53935),
+          icon: Icons.error_outline,
+          duration: const Duration(seconds: 4));
+    }
+  }
+
+  Future<void> _handleRestorePurchases() async {
+    setState(() => _restoringPurchases = true);
+    try {
+      final anyRestored = await sl<StoreService>().restoreAndCollectResults();
+      if (!mounted) return;
+      await widget.village.refreshResources();
+      await widget.village.refreshSpeciesUnlocks();
+      if (!mounted) return;
+      showSuccessToast(
+          context,
+          anyRestored
+              ? context.t('restore_purchases_success')
+              : context.t('restore_purchases_nothing'));
+    } catch (_) {
+      if (!mounted) return;
+      showAppToast(context, context.t('restore_purchases_error'),
+          backgroundColor: const Color(0xFFE53935),
+          icon: Icons.error_outline,
+          duration: const Duration(seconds: 4));
+    } finally {
+      if (mounted) setState(() => _restoringPurchases = false);
+    }
   }
 
   Future<void> _handleReset() async {
@@ -452,6 +536,65 @@ class _SettingsDialogState extends State<_SettingsDialog>
         children: [
           Row(
             children: [
+              Icon(Icons.bar_chart_rounded,
+                  size: 20, color: AppTheme.darkLavender),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.t('analytics_settings_title'),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.darkText),
+                ),
+              ),
+              Switch(
+                value: _analyticsEnabled,
+                activeThumbColor: AppTheme.darkLavender,
+                activeTrackColor: AppTheme.lavender,
+                onChanged: (v) async {
+                  setState(() => _analyticsEnabled = v);
+                  await sl<AnalyticsService>().setConsent(v);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            context.t('analytics_settings_desc'),
+            style: TextStyle(
+                fontSize: 12, color: AppTheme.darkText.withValues(alpha: 0.60)),
+          ),
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: () async {
+              final uri = Uri.parse('https://myreadingvillage.com/privacy');
+              try {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              } catch (_) {}
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.open_in_new, size: 13, color: AppTheme.darkLavender),
+                const SizedBox(width: 4),
+                Text(
+                  context.t('analytics_privacy_link'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.darkLavender,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppTheme.darkLavender,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Divider(color: AppTheme.darkText.withValues(alpha: 0.15)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
               Icon(Icons.storage_rounded, size: 20, color: AppTheme.darkMint),
               const SizedBox(width: 8),
               Text(
@@ -496,6 +639,31 @@ class _SettingsDialogState extends State<_SettingsDialog>
               onPressed: _handleImport,
             ),
           ),
+          if (AppConstants.playStore) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: _restoringPurchases
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.restore_rounded,
+                        color: AppTheme.darkLavender),
+                label: Text(context.t('restore_purchases')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.darkText,
+                  side: const BorderSide(color: AppTheme.darkLavender),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: _restoringPurchases ? null : _handleRestorePurchases,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           Divider(color: AppTheme.darkText.withValues(alpha: 0.15)),
           const SizedBox(height: 8),
@@ -594,8 +762,8 @@ class _SettingsDialogState extends State<_SettingsDialog>
             icon: const Icon(Icons.email_rounded,
                 size: 20, color: AppTheme.darkPink),
             label: context.t('info_email'),
-            value: 'ferpintovillarroel1406@gmail.com',
-            url: 'mailto:ferpintovillarroel1406@gmail.com',
+            value: 'myreadingvillage@gmail.com',
+            url: 'mailto:myreadingvillage@gmail.com',
             color: AppTheme.darkPink,
           ),
           const SizedBox(height: 8),
@@ -618,12 +786,63 @@ class _SettingsDialogState extends State<_SettingsDialog>
           ),
           const SizedBox(height: 8),
           _ContactItem(
-            icon: const FaIcon(FontAwesomeIcons.linkedin,
-                size: 18, color: AppTheme.darkLavender),
-            label: context.t('info_linkedin'),
-            value: 'Fernando Pinto Villarroel',
-            url: 'https://www.linkedin.com/in/fernando-pinto-villarroel/',
-            color: AppTheme.darkLavender,
+            icon: const FaIcon(FontAwesomeIcons.youtube,
+                size: 18, color: AppTheme.darkOrange),
+            label: context.t('info_youtube'),
+            value: '@myreadingvillage',
+            url: 'https://www.youtube.com/@myreadingvillage',
+            color: AppTheme.darkOrange,
+          ),
+          const SizedBox(height: 8),
+          _ContactItem(
+            icon: const FaIcon(FontAwesomeIcons.reddit,
+                size: 18, color: AppTheme.darkMint),
+            label: context.t('info_reddit'),
+            value: 'u/myreadingvillage',
+            url: 'https://www.reddit.com/user/myreadingvillage/',
+            color: AppTheme.darkMint,
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppTheme.gemPurple.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                  color: AppTheme.gemPurple.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.auto_awesome_rounded,
+                    color: AppTheme.darkLavender, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.t('info_secret_codes_cta_title'),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.darkLavender,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        context.t('info_secret_codes_cta_body'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.darkText.withValues(alpha: 0.75),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
         ],
@@ -1073,6 +1292,160 @@ class _ExportMethodOption extends StatelessWidget {
   }
 }
 
+Future<bool?> _showReadingMissionsChoice(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) {
+      bool? selected;
+      return StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: AppTheme.cream,
+          title: Row(
+            children: [
+              const Icon(Icons.auto_stories, color: AppTheme.darkLavender),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  ctx.t('import_reading_missions_title'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: AppTheme.darkText),
+                ),
+              ),
+            ],
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.5,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ReadingMissionChoiceTile(
+                    icon: Icons.radio_button_unchecked,
+                    iconColor: AppTheme.darkMint,
+                    label: ctx.t('import_reading_missions_yes'),
+                    description: ctx.t('import_reading_missions_yes_desc'),
+                    isSelected: selected == true,
+                    onTap: () => setState(() => selected = true),
+                  ),
+                  const SizedBox(height: 10),
+                  _ReadingMissionChoiceTile(
+                    icon: Icons.radio_button_unchecked,
+                    iconColor: AppTheme.darkLavender,
+                    label: ctx.t('import_reading_missions_no'),
+                    description: ctx.t('import_reading_missions_no_desc'),
+                    isSelected: selected == false,
+                    onTap: () => setState(() => selected = false),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, null),
+              child: Text(ctx.t('cancel'),
+                  style: const TextStyle(color: AppTheme.darkText)),
+            ),
+            TextButton(
+              onPressed:
+                  selected != null ? () => Navigator.pop(ctx, selected) : null,
+              child: Text(
+                ctx.t('continue'),
+                style: TextStyle(
+                  color: selected != null
+                      ? AppTheme.darkLavender
+                      : AppTheme.darkText.withValues(alpha: 0.3),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+class _ReadingMissionChoiceTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String description;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ReadingMissionChoiceTile({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.description,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? iconColor.withValues(alpha: 0.18)
+              : iconColor.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? iconColor.withValues(alpha: 0.8)
+                : iconColor.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              isSelected ? Icons.check_circle : icon,
+              color: iconColor,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppTheme.darkText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.darkText.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 Future<bool?> _showImportWarning(BuildContext context) {
   return showDialog<bool>(
     context: context,
@@ -1158,7 +1531,148 @@ String _importErrorMessage(BuildContext context, String errorCode) {
   if (errorCode == 'invalid_backup_not_json') {
     return lang.translate('import_error_not_json');
   }
+  if (errorCode == 'tampered_backup') {
+    return lang.translate('import_error_tampered');
+  }
   return lang.translate('import_error_invalid_file');
+}
+
+Future<void> _showPurchasedSpeciesStrippedDialog(BuildContext context) async {
+  final lang = context.read<LanguageProvider>();
+  final village = context.read<VillageProvider>();
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => _PurchasedSpeciesStrippedDialog(
+      lang: lang,
+      village: village,
+    ),
+  );
+}
+
+class _PurchasedSpeciesStrippedDialog extends StatefulWidget {
+  final LanguageProvider lang;
+  final VillageProvider village;
+  const _PurchasedSpeciesStrippedDialog({
+    required this.lang,
+    required this.village,
+  });
+
+  @override
+  State<_PurchasedSpeciesStrippedDialog> createState() =>
+      _PurchasedSpeciesStrippedDialogState();
+}
+
+class _PurchasedSpeciesStrippedDialogState
+    extends State<_PurchasedSpeciesStrippedDialog> {
+  bool _restoring = false;
+
+  Future<void> _handleRestorePurchases() async {
+    setState(() => _restoring = true);
+    try {
+      final anyRestored = await sl<StoreService>().restoreAndCollectResults();
+
+      if (!mounted) return;
+
+      await widget.village.refreshResources();
+      await widget.village.refreshSpeciesUnlocks();
+
+      if (!mounted) return;
+      final msg = anyRestored
+          ? widget.lang.translate('restore_purchases_success')
+          : widget.lang.translate('restore_purchases_nothing');
+      // ignore: use_build_context_synchronously
+      showSuccessToast(context, msg);
+    } catch (_) {
+      if (!mounted) return;
+      showAppToast(
+        context,
+        widget.lang.translate('restore_purchases_error'),
+        backgroundColor: const Color(0xFFE53935),
+        icon: Icons.error_outline,
+        duration: const Duration(seconds: 4),
+      );
+    } finally {
+      if (mounted) setState(() => _restoring = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final landscape = mq.size.width > mq.size.height;
+    final maxH = mq.size.height * (landscape ? 0.85 : 0.75);
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppTheme.cream,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 480, maxHeight: maxH),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!landscape) ...[
+                Icon(Icons.lock_outline,
+                    color: AppTheme.darkLavender, size: 40),
+                const SizedBox(height: 12),
+              ],
+              Text(
+                widget.lang.translate('import_purchased_species_title'),
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                widget.lang.translate('import_purchased_species_body'),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppTheme.darkText.withValues(alpha: 0.8),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              if (_restoring)
+                const CircularProgressIndicator()
+              else ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _handleRestorePurchases,
+                    icon: const Icon(Icons.restore_rounded, size: 18),
+                    label: Text(
+                      widget.lang.translate('restore_purchases'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.darkSkyBlue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    widget.lang.translate('close'),
+                    style: TextStyle(
+                        color: AppTheme.darkText.withValues(alpha: 0.6)),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 Future<List<Map<String, String>>> _loadNotificationMessages(
@@ -1779,6 +2293,7 @@ class _LanguageSelector extends StatelessWidget {
                 if (locale != null) {
                   VillagerFavorites.setLocale(locale);
                   VillagerFavorites.load();
+                  sl<AnalyticsService>().logLanguageChanged(locale);
                   context
                       .read<LanguageProvider>()
                       .changeLanguage(locale)

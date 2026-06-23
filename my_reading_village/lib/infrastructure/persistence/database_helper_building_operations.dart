@@ -17,9 +17,11 @@ extension DatabaseHelperBuildingOperations on DatabaseHelper {
         where: 'id = ?', whereArgs: [buildingId]);
   }
 
-  Future<void> markBuildingConstructed(int buildingId) async {
+  Future<void> markBuildingConstructed(
+      int buildingId, String completedAt) async {
     final db = await database;
-    await db.update('placed_buildings', {'is_constructed': 1},
+    await db.update(
+        'placed_buildings', {'is_constructed': 1, 'completes_at': completedAt},
         where: 'id = ?', whereArgs: [buildingId]);
   }
 
@@ -30,6 +32,7 @@ extension DatabaseHelperBuildingOperations on DatabaseHelper {
       'is_constructed': 0,
       'construction_start': constructionStart,
       'construction_duration_minutes': constructionMinutes,
+      'completes_at': null,
     }, where: 'id = ?', whereArgs: [buildingId]);
   }
 
@@ -45,6 +48,7 @@ extension DatabaseHelperBuildingOperations on DatabaseHelper {
       'is_constructed': 1,
       'construction_start': null,
       'construction_duration_minutes': constructionMinutes,
+      'completes_at': null,
     }, where: 'id = ?', whereArgs: [buildingId]);
   }
 
@@ -98,6 +102,64 @@ extension DatabaseHelperBuildingOperations on DatabaseHelper {
     final db = await database;
     await db.delete('special_tiles',
         where: 'tile_x = ? AND tile_y = ?', whereArgs: [x, y]);
+  }
+
+  static const Duration _fraudSlack = Duration(minutes: 2);
+
+  bool _isFraudulentRow(Map<String, dynamic> row, DateTime trustedNow) {
+    final start = row['construction_start'] as String?;
+    final completes = row['completes_at'] as String?;
+    final startInFuture =
+        start != null && DateTime.parse(start).isAfter(trustedNow.add(_fraudSlack));
+    final completesInFuture = completes != null &&
+        DateTime.parse(completes).isAfter(trustedNow.add(_fraudSlack));
+    return startInFuture || completesInFuture;
+  }
+
+  Future<({int count, DateTime? latestTimestamp})> getFraudulentConstructionsInfo(
+      DateTime trustedNow) async {
+    final db = await database;
+    final buildings =
+        await db.query('placed_buildings', where: 'is_constructed = 1');
+    int count = 0;
+    DateTime? latest;
+    for (final b in buildings) {
+      if (!_isFraudulentRow(b, trustedNow)) continue;
+      count++;
+      for (final key in ['construction_start', 'completes_at']) {
+        final value = b[key] as String?;
+        if (value == null) continue;
+        final ts = DateTime.parse(value);
+        if (latest == null || ts.isAfter(latest)) latest = ts;
+      }
+    }
+    return (count: count, latestTimestamp: latest);
+  }
+
+  Future<int> rollbackFraudulentConstructions(DateTime trustedNow) async {
+    final db = await database;
+    final buildings =
+        await db.query('placed_buildings', where: 'is_constructed = 1');
+    int count = 0;
+    for (final b in buildings) {
+      if (!_isFraudulentRow(b, trustedNow)) continue;
+      final start = b['construction_start'] as String?;
+      final values = <String, dynamic>{
+        'is_constructed': 0,
+        'completes_at': null,
+      };
+      if (start != null && DateTime.parse(start).isAfter(trustedNow)) {
+        values['construction_start'] = trustedNow.toIso8601String();
+      }
+      await db.update(
+        'placed_buildings',
+        values,
+        where: 'id = ?',
+        whereArgs: [b['id']],
+      );
+      count++;
+    }
+    return count;
   }
 
   Future<List<Map<String, dynamic>>> getUnlockedChunks() async {

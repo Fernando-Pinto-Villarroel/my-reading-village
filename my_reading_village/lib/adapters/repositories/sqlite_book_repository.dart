@@ -29,6 +29,14 @@ class SqliteBookRepository implements BookRepository {
       _db.updateBookRating(bookId, rating);
 
   @override
+  Future<void> updateBookNote(int bookId, String note) =>
+      _db.updateBookNote(bookId, note);
+
+  @override
+  Future<void> updateBookCompletedAt(int bookId, String? completedAt) =>
+      _db.updateBookCompletedAt(bookId, completedAt);
+
+  @override
   Future<void> deleteBook(int bookId) => _db.deleteBook(bookId);
 
   @override

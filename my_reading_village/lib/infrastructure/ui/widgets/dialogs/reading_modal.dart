@@ -15,6 +15,7 @@ import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/tag_manager
 import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/reading_calculator_dialog.dart';
 import 'package:my_reading_village/infrastructure/ui/localization/context_ext.dart';
 import 'package:my_reading_village/infrastructure/ui/localization/language_provider.dart';
+import 'package:my_reading_village/domain/entities/book_filter.dart';
 
 Future<void> showReadingModal(BuildContext context) {
   final landscape = isLandscape(context);
@@ -173,10 +174,68 @@ class _ReadingModalContent extends StatelessWidget {
   }
 }
 
-class _BooksTab extends StatelessWidget {
+class _BooksTab extends StatefulWidget {
   final ScrollController scrollController;
 
   const _BooksTab({required this.scrollController});
+
+  @override
+  State<_BooksTab> createState() => _BooksTabState();
+}
+
+class _BooksTabState extends State<_BooksTab> {
+  static const int _pageSize = 5;
+
+  int _visibleCount = _pageSize;
+  String? _lastFilterSig;
+  bool _pendingFillCheck = false;
+
+  static String _filterSig(BookFilter f) =>
+      '${f.searchQuery}|${f.selectedTagIds.join(',')}|${f.showCompleted}|${f.sortField.index}|${f.sortDirection.index}';
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!mounted || !widget.scrollController.hasClients) return;
+    final pos = widget.scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 300) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() {
+    if (!mounted) return;
+    final total = context.read<BookProvider>().filteredBooks.length;
+    if (_visibleCount < total) {
+      setState(() => _visibleCount = (_visibleCount + _pageSize).clamp(0, total));
+    }
+  }
+
+  void _scheduleFillCheck() {
+    if (_pendingFillCheck) return;
+    _pendingFillCheck = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pendingFillCheck = false;
+      if (!mounted || !widget.scrollController.hasClients) return;
+      final total = context.read<BookProvider>().filteredBooks.length;
+      if (_visibleCount >= total) return;
+      try {
+        if (widget.scrollController.position.maxScrollExtent <= 0) {
+          _loadMore();
+        }
+      } catch (_) {}
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +256,15 @@ class _BooksTab extends StatelessWidget {
           child: Consumer<BookProvider>(
             builder: (ctx, bookProvider, _) {
               final books = bookProvider.filteredBooks;
+
+              final sig = _filterSig(bookProvider.filter);
+              if (_lastFilterSig != null && sig != _lastFilterSig) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) setState(() => _visibleCount = _pageSize);
+                });
+              }
+              _lastFilterSig = sig;
+
               if (bookProvider.books.isEmpty) {
                 return SingleChildScrollView(
                   child: Center(
@@ -230,11 +298,34 @@ class _BooksTab extends StatelessWidget {
                           color: AppTheme.darkText.withValues(alpha: 0.5))),
                 );
               }
+
+              if (_visibleCount < books.length) _scheduleFillCheck();
+
+              final sliceEnd = _visibleCount.clamp(0, books.length);
+              final hasMore = _visibleCount < books.length;
+
               return ListView.builder(
-                controller: scrollController,
-                itemCount: books.length + 1,
+                controller: widget.scrollController,
+                itemCount: sliceEnd + 1,
                 itemBuilder: (ctx, i) {
-                  if (i == books.length) return SizedBox(height: 24);
+                  if (i == sliceEnd) {
+                    return hasMore
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppTheme.lavender,
+                                ),
+                              ),
+                            ),
+                          )
+                        : SizedBox(height: 24);
+                  }
                   final book = books[i];
                   return BookCard(
                     book: book,

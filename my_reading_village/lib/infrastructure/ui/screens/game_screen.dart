@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:my_reading_village/application/services/audio_service.dart';
-import 'package:flame/game.dart' hide Matrix4;
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -49,6 +49,11 @@ import 'package:my_reading_village/infrastructure/ui/widgets/tour/tour_overlay.d
 import 'package:my_reading_village/app_constants.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/common/app_toast.dart';
 import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/secret_codes_dialog.dart';
+import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/analytics_consent_dialog.dart';
+import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/clock_fraud_dialog.dart';
+import 'package:my_reading_village/application/services/analytics_service.dart';
+import 'package:my_reading_village/application/services/time_verification_service.dart';
+import 'package:my_reading_village/infrastructure/ui/widgets/dialogs/log_pages_dialog.dart';
 
 part 'game_screen_tap_handlers.dart';
 
@@ -62,7 +67,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen>
-    with TickerProviderStateMixin, _GameTapHandlers {
+    with TickerProviderStateMixin, WidgetsBindingObserver, _GameTapHandlers {
   late VillageGame _game;
   VillageProvider? _villageProviderRef;
   @override
@@ -87,7 +92,6 @@ class _GameScreenState extends State<GameScreen>
   final GlobalKey _gameRepaintKey = GlobalKey();
   @override
   bool _flipNextBuilding = false;
-  late final TransformationController _transformController;
   late final TabController _buildingTabController;
   AnimationController? _flyController;
   final GlobalKey _tourMissionsKey = GlobalKey();
@@ -104,10 +108,14 @@ class _GameScreenState extends State<GameScreen>
   final GlobalKey _tourSpeciesKey = GlobalKey();
   int _tourStep = -1;
   bool _tourInitialized = false;
+  bool _analyticsConsentChecked = false;
+  bool _fraudDialogShowing = false;
+  DateTime? _tourStartedAt;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -120,24 +128,14 @@ class _GameScreenState extends State<GameScreen>
       onVillagerTapped: _onVillagerTapped,
       onExpansionSignTapped: _onExpansionSignTapped,
     );
-    _transformController = TransformationController();
-    _transformController.addListener(_onTransformChanged);
     _buildingTabController = TabController(length: 3, vsync: this);
-  }
-
-  void _onTransformChanged() {
-    final m = _transformController.value;
-    final scale = m.getMaxScaleOnAxis();
-    final translation = m.getTranslation();
-    _game.applyCameraTransform(scale, translation.x, translation.y);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _villageProviderRef?.removeListener(_onVillageProviderChanged);
     _constructionTimer?.cancel();
-    _transformController.removeListener(_onTransformChanged);
-    _transformController.dispose();
     _buildingTabController.dispose();
     _flyController?.dispose();
     super.dispose();
@@ -161,18 +159,22 @@ class _GameScreenState extends State<GameScreen>
       vsync: this,
     );
 
-    final startMatrix = _transformController.value.clone();
-    final targetMatrix = _game.buildFlyMatrix(worldPos.x, worldPos.y, 1.8);
+    final startPos = _game.camera.viewfinder.position.clone();
+    final startZoom = _game.camera.viewfinder.zoom;
+    const targetZoom = 1.8;
+    final targetPos = Vector2(worldPos.x, worldPos.y);
     final curved =
         CurvedAnimation(parent: _flyController!, curve: Curves.easeInOut);
 
     _flyController!.addListener(() {
       final t = curved.value;
-      final lerped = Matrix4.zero();
-      for (int i = 0; i < 16; i++) {
-        lerped[i] = startMatrix[i] + (targetMatrix[i] - startMatrix[i]) * t;
-      }
-      _transformController.value = lerped;
+      _game.setCameraDirectly(
+        Vector2(
+          startPos.x + (targetPos.x - startPos.x) * t,
+          startPos.y + (targetPos.y - startPos.y) * t,
+        ),
+        startZoom + (targetZoom - startZoom) * t,
+      );
     });
 
     _flyController!.addStatusListener((status) {
@@ -208,13 +210,56 @@ class _GameScreenState extends State<GameScreen>
         if (mounted &&
             !_villageProvider.tutorialCompleted &&
             !AppConstants.testMode) {
+          _tourStartedAt = DateTime.now();
           setState(() => _tourStep = kTourStepWelcome);
+        } else if (mounted && !_analyticsConsentChecked) {
+          _analyticsConsentChecked = true;
+          if (_villageProvider.tutorialCompleted &&
+              sl<AnalyticsService>().isConsentPending &&
+              !AppConstants.testMode) {
+            showAnalyticsConsentDialog(context);
+          }
         }
       });
     }
   }
 
   void _onVillageProviderChanged() => _checkLevelUp();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _handleResume();
+    }
+  }
+
+  Future<void> _handleResume() async {
+    final result = await sl<TimeVerificationService>().onResume();
+    if (!mounted) return;
+
+    final pendingFlow = activeBookCompletionFlow;
+    if (pendingFlow != null) {
+      await pendingFlow;
+      if (!mounted) return;
+    }
+
+    bool reload = result.rolledBack > 0;
+    if (result.pendingDecision && !_fraudDialogShowing) {
+      _fraudDialogShowing = true;
+      try {
+        final accepted = await showClockFraudDialog(context);
+        if (accepted == true) reload = true;
+      } finally {
+        _fraudDialogShowing = false;
+      }
+    }
+    if (!mounted) return;
+    if (reload) {
+      await _villageProvider.loadData();
+      if (mounted) _syncGameState();
+    }
+    if (mounted) setState(() {});
+  }
 
   @override
   void _syncGameState() {
@@ -364,6 +409,7 @@ class _GameScreenState extends State<GameScreen>
 
   Future<void> _captureVillagePhoto() async {
     if (_isCapturing) return;
+    sl<AnalyticsService>().logPhotoTaken('screenshot');
     sl<AudioService>().playCameraSound();
     setState(() {
       _isCapturing = true;
@@ -413,12 +459,15 @@ class _GameScreenState extends State<GameScreen>
       final fitZoom = min(screenW / contentWorldW, screenH / contentWorldH)
           .clamp(0.005, 10.0);
 
+      final savedCamPos = _game.camera.viewfinder.position.clone();
+      final savedCamZoom = _game.camera.viewfinder.zoom;
+
       _game.setCameraForCapture(Vector2(worldCenterX, worldCenterY), fitZoom);
       await Future.delayed(const Duration(milliseconds: 100));
 
       final fullImage = await boundary.toImage(pixelRatio: pixelRatio);
 
-      _onTransformChanged();
+      _game.setCameraDirectly(savedCamPos, savedCamZoom);
 
       final visibleContentW = contentWorldW * fitZoom;
       final visibleContentH = contentWorldH * fitZoom;
@@ -500,8 +549,13 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Future<void> _completeTour() async {
+    final durationMins = _tourStartedAt != null
+        ? DateTime.now().difference(_tourStartedAt!).inMinutes
+        : 0;
     await _villageProvider.markTutorialCompleted();
+    sl<AnalyticsService>().logTutorialCompleted(durationMins);
     if (mounted) setState(() => _tourStep = -1);
+    if (mounted) showAnalyticsConsentDialog(context);
   }
 
   void _onTourGoBack() {
@@ -612,7 +666,7 @@ class _GameScreenState extends State<GameScreen>
               child: GameWidget(
                 game: _game,
                 loadingBuilder: (context) => Container(
-                  color: const Color(0xFF709070),
+                  color: const Color(0xFF5BB8D4),
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -634,9 +688,6 @@ class _GameScreenState extends State<GameScreen>
           ),
           Positioned.fill(
             child: TapThroughInteractiveViewer(
-              transformationController: _transformController,
-              minScale: UiConstants.minZoom / UiConstants.defaultZoom,
-              maxScale: UiConstants.maxZoom / UiConstants.defaultZoom,
               game: _game,
             ),
           ),
@@ -692,6 +743,7 @@ class _GameScreenState extends State<GameScreen>
                     if (_tourStep == kTourStepBackpackHighlight) {
                       setState(() => _tourStep = kTourStepBackpackExplain);
                     } else {
+                      sl<AnalyticsService>().logBackpackOpened();
                       _villageProvider.clearNewBackpackItems();
                       showBackpackDialog(context, _villageProvider);
                     }
@@ -701,8 +753,8 @@ class _GameScreenState extends State<GameScreen>
                       setState(() => _tourStep = kTourStepMinigamesExplain);
                     } else {
                       showMinigamesDialog(context, village: _villageProvider,
-                          onReturn: () {
-                        _villageProvider.loadData();
+                          onReturn: () async {
+                        await _villageProvider.loadData();
                         _syncGameState();
                       });
                     }
@@ -718,6 +770,7 @@ class _GameScreenState extends State<GameScreen>
                     if (_tourStep == kTourStepStoreHighlight) {
                       setState(() => _tourStep = kTourStepStoreExplain);
                     } else {
+                      sl<AnalyticsService>().logStoreOpened();
                       showStoreDialog(context);
                     }
                   },
@@ -796,6 +849,14 @@ class _GameScreenState extends State<GameScreen>
                   : null,
               onInputSubmit: _onTourInputSubmit,
             ),
+          if (sl<TimeVerificationService>().isSuspicious)
+            _ClockWarningBanner(
+              landscape: landscape,
+              onDismiss: () {
+                sl<TimeVerificationService>().dismissForSession();
+                setState(() {});
+              },
+            ),
         ],
       ),
     );
@@ -863,6 +924,7 @@ class _GameScreenState extends State<GameScreen>
         if (_tourStep == kTourStepReadingHighlight) {
           setState(() => _tourStep = kTourStepReadingExplain);
         } else {
+          sl<AnalyticsService>().logReadingModalOpened();
           showReadingModal(context);
         }
       },
@@ -877,6 +939,7 @@ class _GameScreenState extends State<GameScreen>
         if (_tourStep == kTourStepStatsHighlight) {
           setState(() => _tourStep = kTourStepStatsExplain);
         } else {
+          sl<AnalyticsService>().logStatsDialogOpened('weekly', 'pages');
           showStatsDialog(context, _villageProvider, _bookProvider);
         }
       },
@@ -884,6 +947,7 @@ class _GameScreenState extends State<GameScreen>
         if (_tourStep == kTourStepSettingsHighlight) {
           setState(() => _tourStep = kTourStepSettingsExplain);
         } else {
+          sl<AnalyticsService>().logSettingsOpened();
           showSettingsDialog(context, _villageProvider,
               onRetakeTutorial: _startRetakeTutorial);
         }
@@ -892,6 +956,7 @@ class _GameScreenState extends State<GameScreen>
         if (_tourStep == kTourStepSpeciesHighlight) {
           setState(() => _tourStep = kTourStepSpeciesExplain);
         } else {
+          sl<AnalyticsService>().logSpeciesGalleryOpened();
           showSpeciesBookDialog(context);
         }
       },
@@ -1061,6 +1126,66 @@ class _NewSpeciesPopup extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClockWarningBanner extends StatelessWidget {
+  final bool landscape;
+  final VoidCallback onDismiss;
+  const _ClockWarningBanner({required this.landscape, required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    final bannerColor = Color.lerp(AppTheme.pink, Colors.red, 0.3)!
+        .withValues(alpha: 0.92);
+    return Positioned(
+      bottom: MediaQuery.of(context).padding.bottom + 8,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: landscape ? 480.0 : double.infinity,
+          ),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: bannerColor,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.18),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.schedule_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    context.t('clock_warning_body'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: onDismiss,
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
